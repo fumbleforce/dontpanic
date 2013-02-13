@@ -1,18 +1,11 @@
-module.exports = 
-{
-
-
-handle_request: function(request, response)
+exports.handle_request = function(request, response)
 {
     //Do logics here
-    var result = "result \n";
+    var result = "result \n end";
     
     //write results to response message
-    response.write(result);
+    response.render('index');
     
-    //End response message
-    response.end("end");
+
 }
 
-
-}//end module
