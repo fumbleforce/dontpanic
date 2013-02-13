@@ -1,10 +1,13 @@
-var express = require('express');
-var server = module.exports = express();
-var engine = require('./server/js/engine.js');
+var express = require('express'),
+    server = module.exports = express(),
+    engine = require('./server/js/engine.js');
+
+
+//Configuration
 
 server.engine('.html', require('ejs').__express);
-console.log(__dirname);
 server.set('views', __dirname + '/client/views');
+server.use(express.static(__dirname + '/client/rec'));
 server.set('view engine', 'html');
 
 server.get('/', function(request, response){
