@@ -6,7 +6,7 @@
 */
 var express     = require('express'),
     server      = module.exports = express(),
-    engine      = require('./server/js/engine.js');
+    engine      = require('./server/js/engine.js'),
     ioserver    = require('http').createServer(server);
 
 
