@@ -2,8 +2,8 @@
 
     This module will feature all game logic, keeping all games in memory and writing to the DB module.
 */
-var ge = module.exports = {games : {}, game_count : 0},
-    models = require('./models.js');
+var ge = module.exports = {games : {}, game_count : 0};
+    //models = require('./models.js');
 
 
 /*  Decode command
@@ -13,9 +13,10 @@ var ge = module.exports = {games : {}, game_count : 0},
 ge.command = function(client, command){
 
     if (commad.type === 'create_game') {
-        var game = new models.Game(command.players, command.game_template)
-        game.id = 1234;
-        ge.games.(game.id) = game;
+        var game = new models.Game(command.players, command.game_template),
+            id = 1234;
+        game.id = id;
+        ge.games[id] = game;
         ge.game_count++;
         game.start();
     }
