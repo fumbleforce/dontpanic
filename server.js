@@ -47,8 +47,6 @@ ioserver.listen(server.get('port'));
 var socket_listener = require('socket.io').listen(ioserver);
 
 
-
-
 /*  TODO Configures the socket.io server
 */
 //socket_listener.configure(function (){
@@ -57,9 +55,6 @@ var socket_listener = require('socket.io').listen(ioserver);
 //        callback(null, true);
 //    });
 //});
-
-
-
 
 /*  Handle client interaction through socket.io:
     
