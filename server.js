@@ -68,8 +68,8 @@ socket_listener.sockets.on('connection', function (client) {
     // TODO Client setup
     client.userid = 1;
     client.emit('isconnected');
-    //engine.start_game(client);
     console.log('**SOCKET_LISTENER** client ' + client.userid + ' connected');
+    //engine.create_game(client);
     
     //Client sent log message
     client.on('msg', function(msg) {
@@ -77,15 +77,13 @@ socket_listener.sockets.on('connection', function (client) {
         if(msg === 'Hello server'){
             client.emit('msg', 'Oh hello there Client');
         }
-    });     
-            
+    });
             
     client.on('end_game', function(c) {
         console.log('**SOCKET_LISTENER** received command ' + c);
         engine.end_game(client, c);
     });
     
-
     client.on('create_game', function(c) {
         console.log('**SOCKET_LISTENER** received create command ' + c);
         engine.create_game(client, c);
@@ -111,13 +109,11 @@ socket_listener.sockets.on('connection', function (client) {
         engine.command(client, c);
     });
 
-    //Client Disconnects
     client.on('disconnect', function () {
         console.log('**SOCKET_LISTENER** client ' + client.userid + ' disconnected.');
         //engine.endGame(client.game.id, client.userid);
-    });  
-    
-         
+    });
+      
 });// end onConnection
 
    
