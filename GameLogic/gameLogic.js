@@ -1,3 +1,5 @@
+var Models = require(".\\model.js");
+
 var Player = function (User, Node, color, Role, info_Cards, actions_left) {
 	
 	this.User = User;
