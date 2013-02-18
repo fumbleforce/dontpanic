@@ -6,13 +6,13 @@ var game = function (players, settings) {
 };
 
 
-var player = function (user, node, color, role, info_cards, actions_left) {
-	
+var player = function (user, node, color, role, actions_left) {
+	//trenger vel ikke info cards fra starten? legger til 2 ved gamestart?
 	this.user = user;
 	this.node = node;//Position of the player
 	this.color = color;
 	this.role = role;
-	this.info_cards = info_cards;
+	this.info_cards = [];
 	this.actions_left = actions_left;
 	
 };
@@ -50,27 +50,27 @@ player.prototype.set_actions_left = function (actions_left) {
 };
 
 player.prototype.minus_one_action = function () {
-	if (actions_left != 0) {
+	if (this.actions_left !== 0) {
 		this.actions_left -= 1;		
 	}
 	//update gui?
 };
 
 player.prototype.remove_info_card = function(info_card) {
-	for (var i = 0; i < info_cards.length(); i++) {
-		if (info_cards[i] == info_card) {
-			info_cards.splice(i, 1);
+	for (var i = 0; i < this.info_cards.length; i++) {
+		if (this.info_cards[i] === info_card) {
+			this.info_cards.splice(i, 1);
 			//update gui?
 		}
 	}
 };
 
 player.prototype.add_info_card = function(info_card) {
-	this.info_cards.splice(0, 1, info_card);
+	this.info_cards.push(info_card);
 	//update gui?
 };
 
-player.prototype.update_position = function (Node) {
+player.prototype.move_player = function (node) {
 	this.node = node;
 	//update gui?
 };
@@ -129,17 +129,16 @@ var zone = function (type, people, nodes, adjacent_zones, panic_level) {
 	this.panic_level = panic_level;//settes til 0 i starten??
 };
 
-zone.prototype.update_panic_level = function (zone, panic_level) {
-	zone.panic_level += paniclevel;		
-	if (zone.panic_level >= 50) {
-		zone.panic_level == 50;
+zone.prototype.update_panic_level = function (panic_level) {
+	this.panic_level += panic_level;		
+	if (this.panic_level >= 50) {
+		this.panic_level == 50;
 		//send beskjed om maks panikk
 	}
 };
 
-zone.prototype.move_people = function (people, to_zone) {
-	if (this.zone.people >= people) {
-		
+zone.prototype.move_people = function (p, to_zone) {
+	if (this.zone.people >= p) {
 		for (var i = 0; i < this.adjacent_zones.length; i++) {
 			//hvis zonen er nabo kan du flytte
 			if (adjacent_zones[i] === to_zone) {
@@ -165,6 +164,10 @@ var timer = function (timer_interval) {
 	},(interval * 60 * 1000));
 };
 
+var info_card = function (text, effect) {
+	this.text = text;
+	this.effect = effect;
+}
 var map = function (nodes, zones) {
 	
 	this.nodes = nodes;
@@ -172,12 +175,22 @@ var map = function (nodes, zones) {
 	
 };
 
-map.prototype.update_map_panic = function (increase_panic_level) {
-	for (var i = 0; i < zones.length; i++) {
-		zone.prototype.update_panic_level(zones[i], increase_panic_level);
-	}
-};
-
 var settings = function (timer_interval) {
 	var timer = new timer(timer_interval);
 };
+
+zone1 = new zone("type", 100, "nodes", "adjacent_zones", 10);
+zone2 = new zone("type", 10, "nodes", "adjacent_zones,", "panic_level");
+console.log("zone1ppl. " + zone1.people);
+console.log("zone2ppl: " + zone2.people);
+//zone1.move_people(50, zone2);
+console.log("zone1ppl. " + zone1.people);
+console.log("zone2ppl: " + zone2.people);
+
+position1 = new position(1,2,3);
+position2 = new position(2,1,3);
+node1 = new node(position1, "adjacent_zones", "is_start_position", "connects_to");
+node2 = new node(position2, "adjacent_zones", "is_start_position", "connects_to");
+player1 = new player("user1", node1, "blue", "driver", 4);
+info_card1 = new info_card("BOMB!", "+50 pl industrial sectors");
+
