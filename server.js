@@ -38,7 +38,6 @@ console.log('Server running at http://127.0.0.1:8008/');
 
 
 
-
 /* Configure Socket.IO:
     
     The socket.IO server listens to a http-server that listens to the express server.
@@ -66,7 +65,7 @@ var socket_listener = require('socket.io').listen(ioserver);
 */   
 socket_listener.sockets.on('connection', function (client) {
 
-    //Client setup
+    // TODO Client setup
     client.userid = 1;
     client.emit('isconnected');
     //engine.start_game(client);
@@ -80,9 +79,35 @@ socket_listener.sockets.on('connection', function (client) {
         }
     });     
             
-    //Client sends command
-    client.on('command', function(c) {
+            
+    client.on('end_game', function(c) {
         console.log('**SOCKET_LISTENER** received command ' + c);
+        engine.end_game(client, c);
+    });
+    
+
+    client.on('create_game', function(c) {
+        console.log('**SOCKET_LISTENER** received create command ' + c);
+        engine.create_game(client, c);
+    });
+    
+    client.on('join_game', function(c) {
+        console.log('**SOCKET_LISTENER** received join command ' + c);
+        engine.join_game(client, c);
+    });
+    
+    client.on('leave_game', function(c) {
+        console.log('**SOCKET_LISTENER** received leave command ' + c);
+        engine.leave_game(client, c);
+    });
+    
+    client.on('reconnect_game', function(c) {
+        console.log('**SOCKET_LISTENER** received reconnect command ' + c);
+        engine.reconnect_game(client, c);
+    });
+    
+    client.on('game_command', function(c) {
+        console.log('**SOCKET_LISTENER** received in-game command ' + c);
         engine.command(client, c);
     });
 
@@ -94,7 +119,7 @@ socket_listener.sockets.on('connection', function (client) {
     
          
 });// end onConnection
-//    
+
    
     
     
