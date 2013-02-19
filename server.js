@@ -67,7 +67,7 @@ socket_listener.sockets.on('connection', function (client) {
 
     // TODO Client setup
     client.userid = 1;
-    client.emit('isconnected');
+    client.emit('is_connected');
     //engine.start_game(client);
     console.log('**SOCKET_LISTENER** client ' + client.userid + ' connected');
     
