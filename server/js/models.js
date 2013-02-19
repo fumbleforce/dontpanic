@@ -191,21 +191,28 @@ models.zone.prototype.update_panic_level = function (panic_level) {
 	}
 };
 
+<<<<<<< HEAD
 models.zone.prototype.move_people = function (p, to_zone) {
 	if (this.zone.people >= p) {
+=======
+zone.prototype.move_people = function (people, to_zone) {
+	if (this.people >= people) {
+>>>>>>> .
 		for (var i = 0; i < this.adjacent_zones.length; i++) {
 			//hvis zonen er nabo kan du flytte
-			if (adjacent_zones[i] === to_zone) {
+			if (this.adjacent_zones[i] === to_zone) {
 				this.people -= people;
 				to_zone.people += people;
 			}
 			else {
 				//error message to gui
+				console.log("The zone is not adjacent!!");
 			}
 		}
 	}
 	else {
 		//error 
+		console.log("There isnt that many people in this zone!!");
 	}
 };
 
@@ -263,6 +270,7 @@ models.settings = function (timer_interval) {
 	var timer = new timer(timer_interval);
 };
 
+<<<<<<< HEAD
 
 
 
@@ -280,6 +288,22 @@ console.log("zone2ppl: " + zone2.people);
 console.log("zone1ppl. " + zone1.people);
 console.log("zone2ppl: " + zone2.people);
 
+=======
+zone1 = new zone("type", 100, "nodes", [], 10);
+zone2 = new zone("type", 10, "nodes", [], "panic_level");
+zone3 = new zone("type", 50, "nodes", [], 50);
+zone1.adjacent_zones.push(zone2);
+zone2.adjacent_zones.push(zone1);
+node1 = new node("position", "adjacent_zones", "is_start_position", "connects_to");
+console.log(node1.has_information_center);
+console.log(node1.has_road_block);
+node1.add_information_center();
+node1.add_road_block();
+console.log(node1.has_information_center);
+console.log(node1.has_road_block);
+node1.remove_road_block();
+console.log(node1.has_road_block);
+>>>>>>> .
 position1 = new position(1,2,3);
 position2 = new position(2,1,3);
 node1 = new node(position1, "adjacent_zones", "is_start_position", "connects_to");
