@@ -3,7 +3,7 @@
 var socket = io.connect('http://localhost');
 
 
-socket.on('isconnected', function () {
+socket.on('is_connected', function () {
     console.log('Connected');
     socket.emit('msg', 'Hello server');
 });
@@ -19,10 +19,10 @@ socket.on('data', function (data) {
     //game_client.onData(d);
 });
 
-function command(c){
-    var send = JSON.stringify(c)
+function command(type, c){
+    var send = JSON.stringify(c);
     console.log('Sending command "' + send + '"');
-    socket.emit('command', send);
+    socket.emit(type, send);
 }
 
 function msg(m){
@@ -30,5 +30,7 @@ function msg(m){
     socket.emit('msg', m);
 }
 
+
 }());
+
 
