@@ -1,3 +1,5 @@
+(function(){
+
 var socket = io.connect('http://localhost');
 
 
@@ -27,4 +29,6 @@ function msg(m){
     console.log('Sending message "' + c + '"');
     socket.emit('msg', m);
 }
-s
+
+}());
+
