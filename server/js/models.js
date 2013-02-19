@@ -74,7 +74,7 @@ models.user = function (username, password, name, email, is_admin) {
 
 
 
-
+/*
 models.position = function(x, y, z){
 	this.x = x;
 	this.y = y;
@@ -92,6 +92,7 @@ models.position.prototype.set_z = function (z) {
 	this.z = z;
 	//update gui?
 };
+*/
 
 
 
@@ -99,10 +100,9 @@ models.position.prototype.set_z = function (z) {
 
 
 
-
-models.node = function (position, adjacent_zones, is_start_position, connects_to) {
-	
-	this.position = position;
+models.node = function (x, y, adjacent_zones, is_start_position, connects_to) {
+	this.x = x;
+	this.y = y;
 	this.adjacent_zones = adjacent_zones;
 	this.is_start_position = is_start_position;
 	this.connects_to = connects_to;
@@ -110,6 +110,13 @@ models.node = function (position, adjacent_zones, is_start_position, connects_to
 	this.has_road_block = false;
 	
 };
+
+models.node.prototype.set_x = function(x) {
+	this.x = x;
+}
+models.node.prototype.set_y = function(y) {
+	this.y = y;
+}
 
 models.node.prototype.add_information_center = function () {
 	if (this.has_information_center) {
