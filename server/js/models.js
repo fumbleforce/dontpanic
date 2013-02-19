@@ -2,14 +2,19 @@ module.exports = models = {};
 
 
 
-models.game = function (players, game_template) {
+models.game = function (players, client, game_template) {
 	
 	this.map = game_template.map;
 	this.settings = game_template.settings;
 	this.players = players;
+	this.client = client;
+	this.active_player = 0;
+	this.turn = 1;
 };
 
-
+models.game.prototype.move_player = function(player_id, node) {
+	return this.players[player_id].move_player(node);
+};
 
 
 
@@ -52,10 +57,14 @@ models.player.prototype.add_info_card = function(info_card) {
 };
 
 models.player.prototype.move_player = function (node) {
-	this.node = node;
+	if (this.node.connects_to.indexOf(node) >= 0) {
+		this.node = node;
+		this.minus_one_action;
+		return true;
+	}
+	return false;
 	//update gui?
 };
-
 
 
 
@@ -105,7 +114,7 @@ models.node = function (x, y, adjacent_zones, is_start_position, connects_to) {
 	this.y = y;
 	this.adjacent_zones = adjacent_zones;
 	this.is_start_position = is_start_position;
-	this.connects_to = connects_to;
+	this.connects_to = connects_to; // Nodes
 	this.has_information_center = false;
 	this.has_road_block = false;
 	
@@ -186,10 +195,30 @@ models.zone = function (type, people, nodes, adjacent_zones, panic_level) {
 models.zone.prototype.update_panic_level = function (panic_level) {
 	this.panic_level += panic_level;		
 	if (this.panic_level >= 50) {
-		this.panic_level == 50;
+		this.panic_level = 50;
 		//send beskjed om maks panikk
+	} else if (this.panic_level < 0) {
+		this.panic_level = 0;
 	}
 };
+
+
+models.zone.prototype.dec_panic = function(player) {
+	if (player.node.adjacent_zones.indexOf(this) >= 0) {
+		this.update_panic_level(-5);
+		return true;
+	}
+	return false;
+}
+models.zone.prototype.move_people = function(player, to_zone) {
+	if (player.node.adjacent_zones.indexOf(this) >= 0 &&
+		this.adjacent_zones.indexOf(to_zone) >= 0) {
+		this.people -= 5; //TODO: add roles-difference
+		to_zone.people += 5;
+		return true;
+	}
+	return false;
+}
 
 models.zone.prototype.move_people = function (p, to_zone) {
 	if (this.zone.people >= p) {
