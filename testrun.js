@@ -8,10 +8,10 @@ var models = require ("/server/js/models.js");
 //zone1 = new zone(shopping, 50, node1, zon2, 10),
 //zone2 = new zone(industrial, 40, node1, zone1, 20),
 //info_card1 = new info_card("Panic in zone1 decreased by 10", m),
-player1 = new player(user1, node1, blue, driver, info_card1, 4);
-console.log(player1.actions_left);
+//player1 = new models.player(user1, node1, blue, driver, info_card1, 4);
+//console.log(player1.actions_left);
 //node1.adjacent_zones = [zone2];
 //node2.adjacent_zones = [zone1];
 
-player1.set_actions_left(10);
-console.log(player1.actions_left);
+//player1.set_actions_left(10);
+//console.log(player1.actions_left);

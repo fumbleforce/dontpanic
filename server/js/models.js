@@ -1,12 +1,11 @@
 module.exports = models = {};
 
-
-
 models.game = function (players, game_template) {
 	
 	this.map = game_template.map;
 	this.settings = game_template.settings;
 	this.players = players;
+	
 };
 
 
@@ -52,8 +51,13 @@ models.player.prototype.add_info_card = function(info_card) {
 };
 
 models.player.prototype.move_player = function (node) {
-	this.node = node;
-	//update gui?
+	if (this.node === node) {
+		//error, cannot move to same location	
+	}
+	else {
+		this.node = node;
+		//update gui?
+	}
 };
 
 
@@ -139,8 +143,13 @@ models.node.prototype.add_road_block = function () {
 };
 
 models.node.prototype.remove_road_block = function () {
-	this.has_road_block = false;
-	//update gui?
+	if (this.has_road_block = false) {
+		//error to gui
+	}
+	else {
+		this.has_road_block = false;
+		//update gui?
+	}	
 };
 
 
@@ -191,24 +200,19 @@ models.zone.prototype.update_panic_level = function (panic_level) {
 	}
 };
 
-<<<<<<< HEAD
-models.zone.prototype.move_people = function (p, to_zone) {
-	if (this.zone.people >= p) {
-=======
 zone.prototype.move_people = function (people, to_zone) {
 	if (this.people >= people) {
->>>>>>> .
 		for (var i = 0; i < this.adjacent_zones.length; i++) {
 			//hvis zonen er nabo kan du flytte
 			if (this.adjacent_zones[i] === to_zone) {
 				this.people -= people;
 				to_zone.people += people;
-			}
-			else {
-				//error message to gui
-				console.log("The zone is not adjacent!!");
+				return 1;
 			}
 		}
+		//error message to gui
+		console.log("The zone is not adjacent!!");
+		return 0;
 	}
 	else {
 		//error 
@@ -269,9 +273,6 @@ models.map = function (nodes, zones) {
 models.settings = function (timer_interval) {
 	var timer = new timer(timer_interval);
 };
-
-<<<<<<< HEAD
-
 
 
 
