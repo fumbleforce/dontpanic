@@ -1,3 +1,4 @@
+
 var socket = io.connect('http://localhost');
 
 
@@ -11,7 +12,7 @@ socket.on('msg', function (msg) {
     socket.emit('msg', 'Server said "' + msg + '" to me.');
 });
 
-socket.on('data', function (data) {
+socket.on('start_game', function (data) {
     var d = JSON.parse(data);
     console.log('Received data ' + data);
     //game_client.onData(d);
@@ -19,7 +20,7 @@ socket.on('data', function (data) {
 
 function command(type, c){
     var send = JSON.stringify(c);
-    console.log('Sending command "' + send + '"');
+    console.log('Sending '+ type +  '"' + send + '"');
     socket.emit(type, send);
 }
 
@@ -28,7 +29,6 @@ function msg(m){
     socket.emit('msg', m);
 }
 
-// Template command
-// command("game_command", LOLobject);
+
 
 
