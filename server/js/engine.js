@@ -31,6 +31,9 @@ ge.command = function(client, c){
 			}
 			break;
 		case 'create_info_center':
+			if(!g.players[c.player_id].node.add_information_center()){
+				client.emit('error', 'Failed to add information center');
+			}
 			break;
 		case 'create_barrier':
 			break;
