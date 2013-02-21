@@ -31,18 +31,25 @@ ge.command = function(client, c){
 			}
 			break;
 		case 'create_info_center':
-			if(!g.players[c.player_id].node.add_information_center()){
+			if(!g.players[c.player_id].add_information_center()){
 				client.emit('error', 'Failed to add information center');
 			}
 			break;
 		case 'create_barrier':
+			if(!g.player[c.player_id].add_road_block(){
+				client.emit('error', 'Failed to add barrier');
+			}
 			break;
 		case 'remove_barrier':
+			if(!g.player[c.player_id].remove_road_block(){
+				client.emit('error', 'Failed to remove road block');
+			}
 			break;		
 		case 'use_card':
 			break;
 		
 		case 'end_turn':
+		// TODO : last player gets actions back, Icards and eventcards
 			ge.next_player(g);
 			ge.save_state(client, c);
 			break;

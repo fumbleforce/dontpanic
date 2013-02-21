@@ -35,9 +35,11 @@ models.Player.prototype.set_actions_left = function (actions_left) {
 };
 
 models.Player.prototype.minus_one_action = function () {
-	if (this.actions_left !== 0) {
-		this.actions_left -= 1;		
+	if (this.actions_left != 0) {
+		this.actions_left -= 1;	
+		return true;
 	}
+	return false;
 	//update gui?
 };
 
@@ -67,6 +69,38 @@ models.Player.prototype.move_player = function (node) {
 	//update gui?
 };
 
+models.Player.prototype.add_information_center = function () {
+	if (this.node.has_information_center){
+		return false;
+	}
+	else if (this.actions_left < 4){ // TODO: finne max antall actions for player
+		return false;
+	}
+	else {
+		this.node.has_information_center = true;
+		this.set_actions_left(0);
+		return true;
+	}
+}
+
+models.Player.prototype.add_road_block = function () {
+	if(this.node.has_road_block){
+		return false;
+	}
+	else if(this.minus_one_action){
+		return this.node.add_road_block();
+	}
+	return false;
+}
+
+models.Player.prototype.remove_road_block = function () {
+	if(!this.node.has_road_block){
+		return false;
+	}
+	else if(this.minus_one_action){
+		return this.node.remove_road_block();
+	}
+	return false;
 
 models.user = function (username, password, name, email, is_admin) {
 	this.username = username;
@@ -125,32 +159,40 @@ models.node.prototype.set_y = function(y) {
 
 models.node.prototype.add_information_center = function () {
 	if (this.has_information_center) {
+		return false;
 		//error to gui
 	}
 	else {
 		this.has_information_center = true;
+		return true;
 		//update gui?		
 	}
 };
 
 models.node.prototype.add_road_block = function () {
 	if (this.has_road_block) {
+		return false;
 		//error to gui
 	}
 	else {
 		this.has_road_block = true;
+		return true;
 		//update gui?		
 	}
+	return true;
 };
 
 models.node.prototype.remove_road_block = function () {
 	if (this.has_road_block = false) {
+		return false;
 		//error to gui
 	}
 	else {
 		this.has_road_block = false;
+		return true;
 		//update gui?
 	}	
+	return true;
 };
 
 
