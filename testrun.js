@@ -1,4 +1,13 @@
-var models = require ("/server/js/models.js");
+var models = require ("./server/js/models.js");
+
+var testPlayer = new models.Player('username', {}, 'blue', 'idiot', 3);
+var stringed = JSON.stringify(testPlayer);
+var parsedBack = JSON.parse(stringed);
+
+var newPlayer = new models.Player(parsedBack);
+
+console.log(parsedBack.getUser());
+
 
 //var user = new models.user('Sindresvends', '123', 'Sindre', 'lol', 'true'),
 //position1 = new models.position (1,2,1),

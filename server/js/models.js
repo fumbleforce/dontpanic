@@ -14,7 +14,7 @@ models.game = function (players, game_template) {
 
 
 
-models.player = function (user, node, color, role, actions_left) {
+models.Player = function (user, node, color, role, actions_left) {
 	//trenger vel ikke info cards fra starten? legger til 2 ved gamestart?
 	this.user = user;
 	this.node = node;//Position of the player
@@ -22,21 +22,22 @@ models.player = function (user, node, color, role, actions_left) {
 	this.role = role;
 	this.info_cards = [];
 	this.actions_left = actions_left;
+	this.class = 'player';
 	
 };
 
-models.player.prototype.set_actions_left = function (actions_left) {
+models.Player.prototype.set_actions_left = function (actions_left) {
 	this.actions_left = actions_left;
 };
 
-models.player.prototype.minus_one_action = function () {
+models.Player.prototype.minus_one_action = function () {
 	if (this.actions_left !== 0) {
 		this.actions_left -= 1;		
 	}
 	//update gui?
 };
 
-models.player.prototype.remove_info_card = function(info_card) {
+models.Player.prototype.remove_info_card = function(info_card) {
 	for (var i = 0; i < this.info_cards.length; i++) {
 		if (this.info_cards[i] === info_card) {
 			this.info_cards.splice(i, 1);
@@ -45,12 +46,12 @@ models.player.prototype.remove_info_card = function(info_card) {
 	}
 };
 
-models.player.prototype.add_info_card = function(info_card) {
+models.Player.prototype.add_info_card = function(info_card) {
 	this.info_cards.push(info_card);
 	//update gui?
 };
 
-models.player.prototype.move_player = function (node) {
+models.Player.prototype.move_player = function (node) {
 	if (this.node === node) {
 		//error, cannot move to same location	
 	}
@@ -59,7 +60,9 @@ models.player.prototype.move_player = function (node) {
 		//update gui?
 	}
 };
-
+models.Player.prototype.getUser = function(){
+    return this.user
+}
 
 
 
@@ -200,7 +203,7 @@ models.zone.prototype.update_panic_level = function (panic_level) {
 	}
 };
 
-zone.prototype.move_people = function (people, to_zone) {
+models.zone.prototype.move_people = function (people, to_zone) {
 	if (this.people >= people) {
 		for (var i = 0; i < this.adjacent_zones.length; i++) {
 			//hvis zonen er nabo kan du flytte
