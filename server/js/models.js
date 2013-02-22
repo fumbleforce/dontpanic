@@ -10,6 +10,8 @@ models.game = function (players, client, game_template) {
 	this.turn = 1;
 };
 
+
+
 models.game.prototype.move_player = function(player_id, node) {
 	return this.players[player_id].move_player(node);
 };
@@ -18,10 +20,11 @@ models.game.prototype.move_player = function(player_id, node) {
 
 
 
-models.Player = function (user, node, color, role, actions_left) {
+models.Player = function(user, node, color, role, actions_left) {
 	//trenger vel ikke info cards fra starten? legger til 2 ved gamestart?
 	this.user = user;
 	this.node = node;//Position of the player
+	this.node.set_start_position(true);
 	this.color = color;
 	this.role = role;
 	this.info_cards = [];
@@ -29,6 +32,17 @@ models.Player = function (user, node, color, role, actions_left) {
 	this.class = 'player';
 	
 };
+
+models.Player = function(player) {
+	this.user = player.user;
+	this.node = player.node;//Position of the player
+	this.node.set_start_position(true);
+	this.color = player.color;
+	this.role = player.role;
+	this.info_cards = [];
+	this.actions_left = player.actions_left;
+	this.class = 'player';
+}
 
 models.Player.prototype.set_actions_left = function (actions_left) {
 	this.actions_left = actions_left;
@@ -139,7 +153,8 @@ models.position.prototype.set_z = function (z) {
 
 
 
-models.node = function (x, y, adjacent_zones, is_start_position, connects_to) {
+models.node = function (id, x, y, adjacent_zones, is_start_position, connects_to) {
+	this.id = id;
 	this.x = x;
 	this.y = y;
 	this.adjacent_zones = adjacent_zones;
@@ -149,6 +164,40 @@ models.node = function (x, y, adjacent_zones, is_start_position, connects_to) {
 	this.has_road_block = false;
 	
 };
+
+models.node = function(id, x, y) {
+	this.id = id;
+	this.x = x;
+	this.y = y;
+	this.adjacent_zones = [];
+	this.is_start_position = false;
+	this.connects_to = [];
+	this.has_information_center = false;
+	this.has_road_block = false;
+}
+
+models.node.prototype.add_connected_node(nodeid){
+	if(this.connects_to.indexOf(nodeid) < 0){
+		this.connects_to.push(nodeid);
+	}
+}
+models.node.prototype.add_connected_nodes(nodes[]){
+	for(var i = 0; i<nodes.length;i++){
+		this.add_connected_node(nodes[i]);
+	}
+}
+
+models.node.prototype.add_adjacent_zone(zone){
+	if(this.adjacent_zones.indexOf(zone) < 0){
+		this.adjacent_zones.push(zone);
+	}
+}
+
+models.node.prototype.add_adjacent_zones(zones[]){
+	for(var i = 0; i < zones.length; i++){
+		this.add_adjacent_zone(zones[i]);
+	}
+}
 
 models.node.prototype.set_x = function(x) {
 	this.x = x;
@@ -227,13 +276,25 @@ models.event = function (text, effect) {
 
 
 
-models.zone = function (type, people, nodes, adjacent_zones, panic_level) {
+models.zone = function (id, type, people, nodes, adjacent_zones, panic_level) {
+	this.id = id;
 	this.type = type;
 	this.people = people;
 	this.nodes = nodes;
 	this.adjacent_zones = adjacent_zones;
 	this.panic_level = panic_level;//settes til 0 i starten??
 };
+
+models.zone = function (id, nodes, zones) {
+	this.id = id;
+	this.type = "regular";
+	this.people = 50;
+	this.nodes = nodes;
+	this.adjacent_zones = zones;
+	this.panic_level = 0;//settes til 0 i starten??
+};
+
+
 
 models.zone.prototype.update_panic_level = function (panic_level) {
 	this.panic_level += panic_level;		
