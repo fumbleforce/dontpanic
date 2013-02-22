@@ -8,31 +8,44 @@ models.game = function (players, client, game_template) {
 	this.client = client;
 	this.active_player = 0;
 	this.turn = 1;
-};
+}
+
+
 
 models.game.prototype.move_player = function(player_id, node) {
 	return this.players[player_id].move_player(node);
-};
+}
 
 
 
 
-
-models.Player = function (user, node, color, role, actions_left) {
+models.Player = function(user, node, color, role, actions_left) {
 	//trenger vel ikke info cards fra starten? legger til 2 ved gamestart?
 	this.user = user;
 	this.node = node;//Position of the player
+	this.node.set_start_position(true);
 	this.color = color;
 	this.role = role;
 	this.info_cards = [];
 	this.actions_left = actions_left;
 	this.class = 'player';
 	
-};
+}
+
+models.Player = function(player) {
+	this.user = player.user;
+	this.node = player.node;//Position of the player
+	this.node.set_start_position(true);
+	this.color = player.color;
+	this.role = player.role;
+	this.info_cards = [];
+	this.actions_left = player.actions_left;
+	this.class = 'player';
+}
 
 models.Player.prototype.set_actions_left = function (actions_left) {
 	this.actions_left = actions_left;
-};
+}
 
 models.Player.prototype.minus_one_action = function () {
 	if (this.actions_left != 0) {
@@ -41,7 +54,7 @@ models.Player.prototype.minus_one_action = function () {
 	}
 	return false;
 	//update gui?
-};
+}
 
 models.Player.prototype.remove_info_card = function(info_card) {
 	for (var i = 0; i < this.info_cards.length; i++) {
@@ -50,12 +63,12 @@ models.Player.prototype.remove_info_card = function(info_card) {
 			//update gui?
 		}
 	}
-};
+}
 
 models.Player.prototype.add_info_card = function(info_card) {
 	this.info_cards.push(info_card);
 	//update gui?
-};
+}
 
 models.Player.prototype.move_player = function (node) {
 	if (this.node === node) {
@@ -67,7 +80,7 @@ models.Player.prototype.move_player = function (node) {
 	}
 	return false;
 	//update gui?
-};
+}
 
 models.Player.prototype.add_information_center = function () {
 	if (this.node.has_information_center){
@@ -108,7 +121,7 @@ models.user = function (username, password, name, email, is_admin) {
 	this.name = name;
 	this.email = email;
 	this.is_admin = is_admin;
-};
+}
 
 
 
@@ -139,7 +152,8 @@ models.position.prototype.set_z = function (z) {
 
 
 
-models.node = function (x, y, adjacent_zones, is_start_position, connects_to) {
+models.node = function (id, x, y, adjacent_zones, is_start_position, connects_to) {
+	this.id = id;
 	this.x = x;
 	this.y = y;
 	this.adjacent_zones = adjacent_zones;
@@ -148,7 +162,33 @@ models.node = function (x, y, adjacent_zones, is_start_position, connects_to) {
 	this.has_information_center = false;
 	this.has_road_block = false;
 	
-};
+}
+
+models.node = function(id, x, y) {
+	this.id = id;
+	this.x = x;
+	this.y = y;
+	this.adjacent_zones = [];
+	this.is_start_position = false;
+	this.connects_to = [];
+	this.has_information_center = false;
+	this.has_road_block = false;
+}
+
+
+models.node.prototype.add_connected_nodes = function(nodes){
+	for(var i = 0; i<nodes.length;i++){
+		this.add_connected_node(nodes[i]);
+	}
+}
+
+
+
+models.node.prototype.add_adjacent_zones = function(zones){
+	for(var i = 0; i < zones.length; i++){
+		this.add_adjacent_zone(zones[i]);
+	}
+}
 
 models.node.prototype.set_x = function(x) {
 	this.x = x;
@@ -167,7 +207,7 @@ models.node.prototype.add_information_center = function () {
 		return true;
 		//update gui?		
 	}
-};
+}
 
 models.node.prototype.add_road_block = function () {
 	if (this.has_road_block) {
@@ -180,7 +220,7 @@ models.node.prototype.add_road_block = function () {
 		//update gui?		
 	}
 	return true;
-};
+}
 
 models.node.prototype.remove_road_block = function () {
 	if (this.has_road_block = false) {
@@ -193,7 +233,7 @@ models.node.prototype.remove_road_block = function () {
 		//update gui?
 	}	
 	return true;
-};
+}
 
 
 
@@ -207,7 +247,7 @@ models.node.prototype.remove_road_block = function () {
 models.role = function (title, effect) {
 	this.title = title;
 	this.effect = effect;
-};
+}
 
 
 
@@ -217,7 +257,7 @@ models.role = function (title, effect) {
 models.event = function (text, effect) {
 	this.text = text;
 	this.effect = effect;
-};
+}
 
 
 
@@ -227,13 +267,25 @@ models.event = function (text, effect) {
 
 
 
-models.zone = function (type, people, nodes, adjacent_zones, panic_level) {
+models.zone = function (id, type, people, nodes, adjacent_zones, panic_level) {
+	this.id = id;
 	this.type = type;
 	this.people = people;
 	this.nodes = nodes;
 	this.adjacent_zones = adjacent_zones;
 	this.panic_level = panic_level;//settes til 0 i starten??
-};
+}
+
+models.zone = function (id, nodes, zones) {
+	this.id = id;
+	this.type = "regular";
+	this.people = 50;
+	this.nodes = nodes;
+	this.adjacent_zones = zones;
+	this.panic_level = 0;//settes til 0 i starten??
+}
+
+
 
 models.zone.prototype.update_panic_level = function (panic_level) {
 	this.panic_level += panic_level;		
@@ -243,7 +295,7 @@ models.zone.prototype.update_panic_level = function (panic_level) {
 	} else if (this.panic_level < 0) {
 		this.panic_level = 0;
 	}
-};
+}
 
 
 models.zone.prototype.dec_panic = function(player) {
@@ -282,7 +334,7 @@ models.zone.prototype.move_people = function (people, to_zone) {
 		//error 
 		console.log("There isnt that many people in this zone!!");
 	}
-};
+}
 
 
 
@@ -298,9 +350,7 @@ models.timer = function (timer_interval) {
 		alert("Time interval has passed, the panic is increasing in " +
 			"the city!");
 	},(interval * 60 * 1000));
-};
-
-
+}
 
 
 
@@ -319,15 +369,12 @@ models.info_card = function (text, effect) {
 
 
 
-
-
-
 models.map = function (nodes, zones) {
 	
 	this.nodes = nodes;
 	this.zones = zones;
 	
-};
+}
 
 
 
@@ -336,44 +383,6 @@ models.map = function (nodes, zones) {
 
 models.settings = function (timer_interval) {
 	var timer = new timer(timer_interval);
-};
+}
 
-
-
-
-//Testing
-/*
-zone1 = new models.zone("type", 100, "nodes", "adjacent_zones", 10);
-zone2 = new modzone("type", 10, "nodes", "adjacent_zones,", "panic_level");
-
-
-console.log("zone1ppl. " + zone1.people);
-console.log("zone2ppl: " + zone2.people);
-//zone1.move_people(50, zone2);
-console.log("zone1ppl. " + zone1.people);
-console.log("zone2ppl: " + zone2.people);
-
-=======
-zone1 = new zone("type", 100, "nodes", [], 10);
-zone2 = new zone("type", 10, "nodes", [], "panic_level");
-zone3 = new zone("type", 50, "nodes", [], 50);
-zone1.adjacent_zones.push(zone2);
-zone2.adjacent_zones.push(zone1);
-node1 = new node("position", "adjacent_zones", "is_start_position", "connects_to");
-console.log(node1.has_information_center);
-console.log(node1.has_road_block);
-node1.add_information_center();
-node1.add_road_block();
-console.log(node1.has_information_center);
-console.log(node1.has_road_block);
-node1.remove_road_block();
-console.log(node1.has_road_block);
->>>>>>> .
-position1 = new position(1,2,3);
-position2 = new position(2,1,3);
-node1 = new node(position1, "adjacent_zones", "is_start_position", "connects_to");
-node2 = new node(position2, "adjacent_zones", "is_start_position", "connects_to");
-player1 = new player("user1", node1, "blue", "driver", 4);
-info_card1 = new info_card("BOMB!", "+50 pl industrial sectors");
-*/
 
