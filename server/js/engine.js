@@ -93,56 +93,39 @@ ge.create_game = function(client, c){
 	*/
 	
 	// TODO: create test game
-	var nodes = []
-	var nodeid = 0;
-	for(var x = 10; x < 30; x = x+10){ // x of node
-		for(var y = 10; y < 40; y = y+10){ // y of node
-			
-		
-			node = new models.node(nodeid, x, y);
-			nodeid++;
-			nodes.push(node);
-		}
-	}
-	nodes[0].add_connected_nodes([1, 3]);
-	nodes[1].add_connected_nodes([0, 2, 4]);
-	nodes[2].add_connected_nodes([1, 5]);
-	nodes[3].add_connected_nodes([0, 4]);
-	nodes[4].add_connected_nodes([1, 3, 5]);
-	nodes[5].add_connected_nodes([2, 4]);
+	var nodes = [],
+	    conn = [[1, 3],[0, 2, 4],[1, 5],[0, 4],[1, 3, 5],[2, 4]],
+	    posx = [100, 350, 700, 100, 450, 600],
+	    posy = [60, 140, 80, 320, 420, 320];
 	
-	nodes[0].add_adjacent_zones([0]);
-	nodes[1].add_adjacent_zones([0,1]);
-	nodes[2].add_adjacent_zones([1]);
-	nodes[3].add_adjacent_zones([0]);
-	nodes[4].add_adjacent_zones([0,1]);
-	nodes[5].add_adjacent_zones([1]);
+	
+	for(var i = 0; i < 6; i++){
+			node = new models.node(i, posx[i], posy[i], true, conn[i]);
+			nodes.push(node);
+	}
+
 	
 	var zones = [];
 	
-	zones[0] = new models.zone(0, [0, 1, 3, 4], [1]);
-	zones[1] = new models.zone(1, [1, 2, 4, 5], [0]);
-	
+	zones[0] = new models.zone(0, [0, 1, 4, 3], [1]);
+	zones[1] = new models.zone(1, [1, 2, 5, 4], [0]);
+	zones[0].color = "yellow";
+	zones[1].color = "green";
 	var players = [];
 		
-	for(var i = 1; i < 5; i++){
-		player = new models.Player(new models.user("player" + i, "passw" + i, "name" + i,
-			"email" + i, false), nodes[i], "green", models.role("filler", "none"), 4);
+	for(var i = 0; i < 4; i++){
+		player = new models.Player(i, "player" + i, i, "blue", {}, 4);
 		players.push(player);
 	}
 	
-	var game = new models.game(players, client, {map: new models.map(nodes, zones), settings: {} }) 
-	
+	var game = new models.game(players, client, {map: {zones:zones, nodes:nodes}, settings: {} });
 
-    ge.games[id] = game;
+    ge.games[game.id] = game;
     ge.game_count++;
-    ge.start_game(client, c, game);
-
+    var temp = {players: game.players, map:game.map};
+    client.emit('start_game', JSON.stringify(temp));
 }
 
-ge.start_game = function(client, c, game) {
-	client.emit('start_game', JSON.stringify(game))
-}
 
 ge.end_game = function(client, c) {
     game.save();

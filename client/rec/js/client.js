@@ -1,10 +1,10 @@
 
-var socket = io.connect('http://localhost'),
+var socket = io.connect('http://localhost');
 
 
 socket.on('is_connected', function () {
     console.log('Connected');
-    socket.emit('msg', 'Hello server');
+    socket.emit('create_game', {});
 });
 
 socket.on('msg', function (msg) {
@@ -14,8 +14,8 @@ socket.on('msg', function (msg) {
 
 socket.on('start_game', function (data) {
     var d = JSON.parse(data);
-    console.log('Received data ' + data);
-    init_game(data.players, data.map);
+    console.log(d);
+    init_game(d.players, d.map);
 });
 
 socket.on('change', function (data) {
