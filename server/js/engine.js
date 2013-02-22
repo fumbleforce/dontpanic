@@ -14,8 +14,15 @@ ge.command = function(client, c){
     var g = ge.games[c.gameid];
     switch (c.type) {
         case 'move_player':
-            if (!g.move_player(client, c.player_id, c.node_id)) {
+            var moved = g.move_player(client, c.player_id, c.node_id);
+            if (!moved) {
 				client.emit('error', 'Failed moving player');			
+			}
+			else{
+			    client.emit('change', {
+			        type:'moved_player',
+			        player:g.players[c.player_id]
+			    }
 			}
             break;
 		case 'dec_panic':

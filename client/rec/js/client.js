@@ -15,7 +15,18 @@ socket.on('msg', function (msg) {
 socket.on('start_game', function (data) {
     var d = JSON.parse(data);
     console.log('Received data ' + data);
-    init_game(data.players, data.game_template);
+    init_game(data.players, data.map);
+});
+
+socket.on('change', function (data) {
+    switch (data.type) {
+        case 'moved_player':
+            players[data.player.id] = data.player;
+            draw();
+            break;
+    
+    
+    } 
 });
 
 function command(type, c){

@@ -2,28 +2,31 @@
 
     These are global for now, but TODO SHOULD be encapsulated.
 */
-var players, map, settings, 
-    nodes = map.nodes,
-    zones = map.zones,
+var players, 
+    nodes,
+    zones,
     canvas = document.getElementById("viewport"),
     ctx = canvas.getContext("2d"),
     cst = {};
     //timer = timer??
     
     
-function init_game(ps, g_t) {
+function init_game(ps, g) {
     players = ps;
-    map = g_t.map;
-    settings = g_t.settings;
-    set_canvas_listener();
+    zones = g.zones;
+    nodes = g.nodes;
     draw();
+    set_canvas_listener();
+    
 }
 
 
 function player_draw(player, ctx){
+    if (player.x === undefined) player.x = nodes[player.node].x;
+    if (player.y === undefined) player.y = nodes[player.node].y;
     ctx.fillStyle = player.color;
     ctx.beginPath();
-    ctx.arc(nodes[player.node].x, nodes[player.node].y, 5, 0, Math.PI*2, true); 
+    ctx.arc(player.x, player.y, 5, 0, Math.PI*2, true); 
     ctx.closePath();
     ctx.fill();
 }
@@ -158,6 +161,13 @@ function set_canvas_listener(){
                     draw();
                 }
             }
+        }
+        else {
+            cst.selection.x = nodes[cst.selection.node].x
+            cst.selection.y = nodes[cst.selection.node].y
+            cst.selection = null;
+            cst.dragging = false;
+            draw();
         }
         
     }, true);//end mouseup listener
