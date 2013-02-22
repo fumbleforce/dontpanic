@@ -1,5 +1,5 @@
 
-var socket = io.connect('http://localhost');
+var socket = io.connect('http://localhost'),
 
 
 socket.on('is_connected', function () {
@@ -15,7 +15,7 @@ socket.on('msg', function (msg) {
 socket.on('start_game', function (data) {
     var d = JSON.parse(data);
     console.log('Received data ' + data);
-    //game_client.onData(d);
+    init_game(data.players, data.game_template);
 });
 
 function command(type, c){

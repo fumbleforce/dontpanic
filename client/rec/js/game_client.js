@@ -1,4 +1,7 @@
+/*  Game and canvas variables
 
+    These are global for now, but TODO SHOULD be encapsulated.
+*/
 var players, map, settings, 
     nodes = map.nodes,
     zones = map.zones,
@@ -12,7 +15,6 @@ function init_game(ps, g_t) {
     players = ps;
     map = g_t.map;
     settings = g_t.settings;
-    
     set_canvas_listener();
     draw();
 }
@@ -51,6 +53,17 @@ function zone_draw(zone, ctx){
     ctx.fill();
 }
 
+function player_contains(player, mx, my) {
+    var dx = mx-nodes[player.node].x
+    var dy = my-nodes[player.node].y
+    return dx*dx+dy*dy <= 5*5
+}
+
+function node_contains(node, mx, my) {
+    var dx = mx-node.x
+    var dy = my-node.y
+    return dx*dx+dy*dy <= 10*10
+}
 
 function draw(){
     var to_node = {},
@@ -92,46 +105,62 @@ function set_canvas_listener(){
     canvas.addEventListener('selectstart', function(e) { e.preventDefault(); return false; }, false);
 
     canvas.addEventListener('mousedown', function(e) {
-        var mouse = getMouse(e),
-            mx = mouse.x,
+        var mouse = getMouse(e);
+        var mx = mouse.x,
             my = mouse.y,
             selected;
         
-        
         for (var i = 0; i < players.length; i++) {
-            if (players[i].contains(mx,my)){
+            if (player_contains(players[i], mx, my) {
                 selected = players[i];
                 selected.x = players[i].node.x;
                 selected.y = players[i].node.y;
-                break;
-            }
-            
-
-            cst.dragoffx = mx - selected.x;
-            cst.dragoffy = my - selected.y;
-            cst.dragging = true;
-            cst.selection = selected;
-            cst.valid = false;
-            return;
-            
+                cst.dragoffx = mx - selected.x;
+                cst.dragoffy = my - selected.y;
+                cst.dragging = true;
+                cst.selection = selected;
+                draw();
+                return;
+           }
         }
-    // havent returned means we have failed to select anything.
-    // If there was an object selected, we deselect it
+
         if (cst.selection) {
             cst.selection = null;
-            cst.valid = false;
+            draw();
         }
     }, true);//end mousedown listener
-  
   
     canvas.addEventListener('mousemove', function(e) {
         if (cst.dragging){
             var mouse = cst.getMouse(e);
             cst.selection.x = mouse.x - cst.dragoffx;
             cst.selection.y = mouse.y - cst.dragoffy;   
-            cst.valid = false; // Something's dragging so we must redraw
+            draw();
         }
     }, true);//end mousemove listener
+    
+    canvas.addEventListener('mouseup', function(e) {
+        var mouse = getMouse(e);
+        var mx = mouse.x,
+            my = mouse.y;
+                
+        if (cst.dragging && cst.selection.class === 'player') {
+            for (var i = 0; i < nodes.length; i++) {
+                if (node_contains(nodes[i], mx, my)) {
+                    
+                    command('move_player', {
+                        player : selection,
+                        node : nodes[i]
+                    });
+                    
+                    cst.selection = null;
+                    cst.dragging = false;
+                    draw();
+                }
+            }
+        }
+        
+    }, true);//end mouseup listener
     
 }//end set canvas listener
 
