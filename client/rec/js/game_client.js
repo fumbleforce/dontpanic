@@ -45,13 +45,19 @@ function player_draw(player, ctx){
     
     ctx.fillStyle = "brown";
     ctx.beginPath();
-    ctx.arc(player.x, player.y, player_size/10, 0, Math.PI*2, true); 
+    ctx.arc(player.x, player.y, player_size/5, 0, Math.PI*2, true); 
     ctx.closePath();
     ctx.fill();
+    
+    //draw player number (for testing at least)
+    ctx.fillStyle = "White";
+    ctx.font="10px Georgia",
+    ctx.fillText(player.id, (player.x-3), (player.y+2));
 }
 
 function node_draw(node, ctx){
-    if (node.info_center){
+	//TODO move info center drawing somewhere else?
+    if (node.has_information_center){
         ctx.fillStyle = 'white';
         ctx.fillRect(node.x, node.y, 20, 20);
     }
@@ -62,6 +68,12 @@ function node_draw(node, ctx){
         ctx.closePath();
         ctx.fill();
     }
+}
+
+//TODO draw road blocks (one on each node (as specification says) + something on the path between them?)
+function roadblock_draw(node, ctx){
+	context.fillStyle   = 'green';
+	//context.fillRect  (what,to,put,here);
 }
 
 function background_draw(ctx){
@@ -77,6 +89,11 @@ function zone_draw(zone, ctx){
     }
     ctx.lineTo(nodes[zone.nodes[0]].x, nodes[zone.nodes[0]].y);
     ctx.closePath();
+    //Draw outline of zones
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 5;
+    ctx.stroke();
+    //Fill zone with respective color
     ctx.fillStyle = zone.color;
     ctx.fill();
 }
@@ -109,21 +126,31 @@ function draw(){
         node = nodes[i];
         node_draw(node, ctx);
         
-        for (var j = 0; j < nodes[i].connects_to.length; j++) {
-            to_node = node.connects_to[j];
-            ctx.lineWidth = 15;
-            ctx.strokeStyle = "gray";
-            ctx.beginPath();
-            ctx.moveTo(node.x, node.y);
-            ctx.lineTo(to_node.x, to_node.y);
-            ctx.stroke();
-        }
+        //not needed as of now
+//        for (var j = 0; j < nodes[i].connects_to.length; j++) {
+//            to_node = node.connects_to[j];
+//            ctx.lineWidth = 15;
+//            ctx.strokeStyle = "gray";
+//            ctx.beginPath();
+//            ctx.moveTo(node.x, node.y);
+//            ctx.lineTo(to_node.x, to_node.y);
+//            ctx.stroke();
+//        }
     }
     
     
     for (var i = 0; i < players.length; i++) {
         pl = players[i];
         player_draw(pl, ctx);
+    }
+    
+    //road blocks (move into node draw?)
+    for (var i = 0; i < nodes.length; i++) {
+    	if (nodes[i].has_road_block){
+    		node = nodes[i]
+    		roadblock_draw(nodes[i], ctx)
+    	}
+        
     }
     
     

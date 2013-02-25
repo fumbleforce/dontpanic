@@ -98,12 +98,19 @@ ge.create_game = function(client, c){
 	    posx = [100, 350, 700, 100, 450, 600],
 	    posy = [60, 140, 80, 320, 420, 320];
 	
-	
 	for(var i = 0; i < 6; i++){
 			node = new models.node(i, posx[i], posy[i], true, conn[i]);
 			nodes.push(node);
 	}
+	
+	//test set road block between two nodes
+	nodes[1].has_road_block = true;
+	nodes[2].has_road_block = true;
 
+	//test draw info center on two nodes
+	//nodes[2].has_information_center===true;
+	//nodes[4].has_information_center===true;
+	
 	
 	var zones = [];
 	
