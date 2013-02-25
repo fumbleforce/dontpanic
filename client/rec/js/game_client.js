@@ -1,10 +1,12 @@
 /*  Game and canvas variables
 
-    These are global for now, but TODO SHOULD be encapsulated.
+    TODO These are global for now, but  SHOULD be encapsulated, along with all the functions. IMPORTANT.
 */
 var players, 
     nodes,
     zones,
+    c_height = 800,
+    c_width = 1000,
     canvas = document.getElementById("viewport"),
     ctx = canvas.getContext("2d"),
     cst = {},
@@ -28,8 +30,8 @@ function init_game(ps, map) {
 }
 
 function setup_canvas(){
-    canvas.width = 1000;
-    canvas.height = 800;
+    canvas.width = c_width;
+    canvas.height = c_height;
 }
 
 function player_draw(player, ctx){
@@ -38,6 +40,12 @@ function player_draw(player, ctx){
     ctx.fillStyle = player.color;
     ctx.beginPath();
     ctx.arc(player.x, player.y, player_size, 0, Math.PI*2, true); 
+    ctx.closePath();
+    ctx.fill();
+    
+    ctx.fillStyle = "brown";
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, player_size/10, 0, Math.PI*2, true); 
     ctx.closePath();
     ctx.fill();
 }
@@ -56,6 +64,11 @@ function node_draw(node, ctx){
     }
 }
 
+function background_draw(ctx){
+    ctx.fillStyle="white";
+    ctx.fillRect(0,0, c_width, c_height);
+}
+
 function zone_draw(zone, ctx){
     ctx.beginPath();
     ctx.moveTo(nodes[zone.nodes[0]].x, nodes[zone.nodes[0]].y);
@@ -69,15 +82,14 @@ function zone_draw(zone, ctx){
 }
 
 function player_contains(player, mx, my) {
-    var dx = mx-nodes[player.node].x
-    var dy = my-nodes[player.node].y
-    return dx*dx+dy*dy <= player_size*player_size;
+    return node_contains(nodes[player.node], mx, my);
 }
 
 function node_contains(node, mx, my) {
-    var dx = mx-node.x
-    var dy = my-node.y
-    return dx*dx+dy*dy <= node_size*node_size;
+    return (mx<=(node.x+node_size))&&
+        (mx>=(node.x-node_size))&&
+        (my<=(node.y+node_size))&&
+        (my>=(node.y-node_size));
 }
 
 function draw(){
@@ -85,6 +97,8 @@ function draw(){
         node = {},
         zone = {},
         pl;
+        
+    background_draw(ctx);    
         
     for (var i = 0; i < zones.length; i++) {
         zone = zones[i];
@@ -122,15 +136,25 @@ function set_canvas_listener(){
     canvas.addEventListener('selectstart', function(e) { e.preventDefault(); return false; }, false);
 
     canvas.addEventListener('mousedown', function(e) {
-        var mx = e.clientX,
-            my = e.clientY,
+        console.log("Mouse is down");
+        var mx = e.offsetX,
+            my = e.offsetY,
             selected;
+            
+        if (cst.selection) {
+            console.log("clearing selection");
+            cst.selection = null;
+            draw();
+        }
         
         for (var i = 0; i < players.length; i++) {
+            console.log(nodes[players[i].node]);
+            console.log(""+ mx + " "+ my);
             if (player_contains(players[i], mx, my)) {
+                console.log("Clicked on a player");
                 selected = players[i];
-                selected.x = players[i].node.x;
-                selected.y = players[i].node.y;
+                selected.x = nodes[players[i].node].x;
+                selected.y = nodes[players[i].node].y;
                 cst.dragoffx = mx - selected.x;
                 cst.dragoffy = my - selected.y;
                 cst.dragging = true;
@@ -140,16 +164,14 @@ function set_canvas_listener(){
            }
         }
 
-        if (cst.selection) {
-            cst.selection = null;
-            draw();
-        }
+        
     }, true);//end mousedown listener
   
     canvas.addEventListener('mousemove', function(e) {
         if (cst.dragging){
-            var mx = e.clientX,
-            my = e.clientY;
+            console.log("Mouse is dragging");
+            var mx = e.offsetX,
+                my = e.offsetY;
             cst.selection.x = mx - cst.dragoffx;
             cst.selection.y = my - cst.dragoffy;   
             draw();
@@ -157,19 +179,21 @@ function set_canvas_listener(){
     }, true);//end mousemove listener
     
     canvas.addEventListener('mouseup', function(e) {
-        var mx = e.clientX,
-            my = e.clientY;
-                
-        if (cst.dragging && cst.selection.class === 'player') {
+        var mx = e.offsetX,
+            my = e.offsetY;
+             
+        console.log("Mouse released");   
+        if (cst.dragging && cst.selection !== undefined) {
+            console.log("Mouse let go of player");
             for (var i = 0; i < nodes.length; i++) {
                 if (node_contains(nodes[i], mx, my)) {
                     
                     command('move_player', {
-                        player : selection,
-                        node : nodes[i]
+                        player_id : cst.selection.id,
+                        node_id : i
                     });
                     
-                    cst.selection = null;
+                    cst.selection = undefined;
                     cst.dragging = false;
                     draw();
                     return;
@@ -177,7 +201,7 @@ function set_canvas_listener(){
             }
             cst.selection.x = nodes[cst.selection.node].x
             cst.selection.y = nodes[cst.selection.node].y
-            cst.selection = null;
+            cst.selection = undefined;
             cst.dragging = false;
             draw();
         }
