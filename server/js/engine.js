@@ -93,10 +93,11 @@ ge.create_game = function(client, c){
 	*/
 	
 	// TODO: create test game
-	var nodes = [],
-	    conn = [[1, 3],[0, 2, 4],[1, 5],[0, 4],[1, 3, 5],[2, 4]],
-	    posx = [100, 350, 700, 100, 450, 600],
+	var nodes = [];
+	    conn = [[1, 3],[0, 2, 4],[1, 5],[0, 4],[1, 3, 5],[2, 4]];
+	    posx = [100, 350, 700, 100, 450, 600];
 	    posy = [60, 140, 80, 320, 420, 320];
+		player_colors = ["blue","red","yellow","grey","purple","brown","green","orange"];
 	
 	for(var i = 0; i < 6; i++){
 			node = new models.node(i, posx[i], posy[i], true, conn[i]);
@@ -104,12 +105,12 @@ ge.create_game = function(client, c){
 	}
 	
 	//test set road block between two nodes
-	nodes[1].has_road_block = true;
-	nodes[2].has_road_block = true;
+	//nodes[1].has_road_block = true;
+	//nodes[2].has_road_block = true;
 
 	//test draw info center on two nodes
-	//nodes[2].has_information_center===true;
-	//nodes[4].has_information_center===true;
+	//nodes[2].has_information_center = true;
+	//nodes[4].has_information_center = true;
 	
 	
 	var zones = [];
@@ -121,9 +122,19 @@ ge.create_game = function(client, c){
 	var players = [];
 		
 	for(var i = 0; i < 4; i++){
-		player = new models.Player(i, "player" + i, i, "blue", {}, 4);
+		player = new models.Player(i, "player" + i, 0, player_colors[i], {}, 4);
 		players.push(player);
 	}
+	//add more players to test offset
+	player4 = new models.Player(4, "player" + 4, 0, player_colors[4], {}, 4);
+	players.push(player4);
+	player5 = new models.Player(5, "player" + 5, 0, player_colors[5], {}, 4);
+	players.push(player5);
+	player6 = new models.Player(6, "player" + 6, 0, player_colors[6], {}, 4);
+	players.push(player6);
+	player7 = new models.Player(7, "player" + 7, 0, player_colors[7], {}, 4);
+	players.push(player7);
+	
 	
 	var game = new models.game(players, client, {map: {zones:zones, nodes:nodes}, settings: {} });
 
