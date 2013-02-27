@@ -12,17 +12,21 @@ socket.on('msg', function (msg) {
     socket.emit('msg', 'Server said "' + msg + '" to me.');
 });
 
+socket.on('error', function (e) {
+    console.log(e);
+});
+
 socket.on('start_game', function (data) {
     var d = JSON.parse(data);
-    console.log(d);
-    init_game(d.players, d.map);
+    init_game(d.game_id, d.players, d.map);
 });
 
 socket.on('change', function (data) {
-    switch (data.type) {
+    var d = JSON.parse(data);
+    switch (d.type) {
         case 'moved_player':
-            players[data.player.id] = data.player;
-            draw();
+            move_player(d.player);
+            console.log("Player has moved to node id: "+d.player.node);
             break;
     
     
@@ -30,9 +34,11 @@ socket.on('change', function (data) {
 });
 
 function command(type, c){
+    c.type = type;
+    c.game_id = game_id;
     var send = JSON.stringify(c);
     console.log('Sending '+ type +  '"' + send + '"');
-    socket.emit(type, send);
+    socket.emit('game_command', send);
 }
 
 function msg(m){

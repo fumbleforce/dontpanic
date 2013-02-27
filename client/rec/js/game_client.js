@@ -2,7 +2,8 @@
 
     TODO These are global for now, but  SHOULD be encapsulated, along with all the functions. IMPORTANT.
 */
-var players, 
+var game_id,
+    players, 
     nodes,
     zones,
     c_height = 800,
@@ -17,8 +18,9 @@ var players,
 
 
 
-function init_game(ps, map) {
+function init_game(id, ps, map) {
     console.log("Game initiated");
+    game_id = id;
     players = ps;
     zones = map.zones;
     nodes = map.nodes;
@@ -32,6 +34,13 @@ function init_game(ps, map) {
 function setup_canvas(){
     canvas.width = c_width;
     canvas.height = c_height;
+}
+
+function move_player(p){
+    players[p.id].node = p.node;
+    players[p.id].x = nodes[p.node].x;
+    players[p.id].y = nodes[p.node].y;
+    draw();
 }
 
 function player_draw(player, ctx){
@@ -192,11 +201,6 @@ function set_canvas_listener(){
                         player_id : cst.selection.id,
                         node_id : i
                     });
-                    
-                    cst.selection = undefined;
-                    cst.dragging = false;
-                    draw();
-                    return;
                 }
             }
             cst.selection.x = nodes[cst.selection.node].x

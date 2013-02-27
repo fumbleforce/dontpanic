@@ -1,0 +1,355 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/home/jorgen/local/bin/npm', 'install', 'db-mysql' ]
+2 info using npm@1.1.71
+3 info using node@v0.8.18
+4 verbose read json /home/jorgen/progging/dontpanic/package.json
+5 verbose read json /home/jorgen/progging/dontpanic/node_modules/socket.io/package.json
+6 verbose read json /home/jorgen/progging/dontpanic/node_modules/express/package.json
+7 verbose read json /home/jorgen/progging/dontpanic/node_modules/ejs/package.json
+8 verbose from cache /home/jorgen/progging/dontpanic/package.json
+9 verbose readDependencies using package.json deps
+10 verbose cache add [ 'db-mysql', null ]
+11 silly cache add name=undefined spec="db-mysql" args=["db-mysql",null]
+12 verbose parsed url { pathname: 'db-mysql', path: 'db-mysql', href: 'db-mysql' }
+13 silly lockFile c75423d9-db-mysql db-mysql
+14 verbose lock db-mysql /home/jorgen/.npm/c75423d9-db-mysql.lock
+15 silly lockFile c75423d9-db-mysql db-mysql
+16 verbose addNamed [ 'db-mysql', '' ]
+17 verbose addNamed [ null, '' ]
+18 silly lockFile a4731413-db-mysql db-mysql@
+19 verbose lock db-mysql@ /home/jorgen/.npm/a4731413-db-mysql.lock
+20 silly addNameRange { name: 'db-mysql', range: '', hasData: false }
+21 verbose url raw db-mysql
+22 verbose url resolving [ 'https://registry.npmjs.org/', './db-mysql' ]
+23 verbose url resolved https://registry.npmjs.org/db-mysql
+24 info trying registry request attempt 1 at 12:12:37
+25 http GET https://registry.npmjs.org/db-mysql
+26 http 200 https://registry.npmjs.org/db-mysql
+27 silly registry.get cb [ 200,
+27 silly registry.get   { vary: 'Accept',
+27 silly registry.get     server: 'CouchDB/1.2.1 (Erlang OTP/R15B03)',
+27 silly registry.get     etag: '"6DQAC56ESDZBCUEX3NM5M7ZKU"',
+27 silly registry.get     date: 'Wed, 20 Feb 2013 11:12:38 GMT',
+27 silly registry.get     'content-type': 'application/json',
+27 silly registry.get     'content-length': '58303' } ]
+28 silly addNameRange number 2 { name: 'db-mysql', range: '', hasData: true }
+29 silly addNameRange versions [ 'db-mysql',
+29 silly addNameRange   [ '0.4.0',
+29 silly addNameRange     '0.4.1',
+29 silly addNameRange     '0.4.2',
+29 silly addNameRange     '0.4.3',
+29 silly addNameRange     '0.4.4',
+29 silly addNameRange     '0.4.5',
+29 silly addNameRange     '0.4.6',
+29 silly addNameRange     '0.4.7',
+29 silly addNameRange     '0.4.8',
+29 silly addNameRange     '0.4.9',
+29 silly addNameRange     '0.5.0',
+29 silly addNameRange     '0.5.1',
+29 silly addNameRange     '0.5.2',
+29 silly addNameRange     '0.5.3',
+29 silly addNameRange     '0.5.4',
+29 silly addNameRange     '0.5.5',
+29 silly addNameRange     '0.5.6',
+29 silly addNameRange     '0.5.7',
+29 silly addNameRange     '0.5.8',
+29 silly addNameRange     '0.5.9',
+29 silly addNameRange     '0.6.0',
+29 silly addNameRange     '0.6.1',
+29 silly addNameRange     '0.6.2',
+29 silly addNameRange     '0.6.3',
+29 silly addNameRange     '0.6.4',
+29 silly addNameRange     '0.6.5',
+29 silly addNameRange     '0.6.6',
+29 silly addNameRange     '0.6.7',
+29 silly addNameRange     '0.6.8',
+29 silly addNameRange     '0.6.9',
+29 silly addNameRange     '0.7.0',
+29 silly addNameRange     '0.7.1',
+29 silly addNameRange     '0.7.2',
+29 silly addNameRange     '0.7.3',
+29 silly addNameRange     '0.7.4',
+29 silly addNameRange     '0.7.5',
+29 silly addNameRange     '0.7.6' ] ]
+30 verbose addNamed [ 'db-mysql', '0.7.6' ]
+31 verbose addNamed [ '0.7.6', '0.7.6' ]
+32 silly lockFile f70b617c-db-mysql-0-7-6 db-mysql@0.7.6
+33 verbose lock db-mysql@0.7.6 /home/jorgen/.npm/f70b617c-db-mysql-0-7-6.lock
+34 silly lockFile 46882c37--org-db-mysql-db-mysql-0-7-6-tgz https://registry.npmjs.org/db-mysql/-/db-mysql-0.7.6.tgz
+35 verbose lock https://registry.npmjs.org/db-mysql/-/db-mysql-0.7.6.tgz /home/jorgen/.npm/46882c37--org-db-mysql-db-mysql-0-7-6-tgz.lock
+36 verbose addRemoteTarball [ 'https://registry.npmjs.org/db-mysql/-/db-mysql-0.7.6.tgz',
+36 verbose addRemoteTarball   'ff870557afb1ee4197712211d26b6a05394a7aeb' ]
+37 info retry fetch attempt 1 at 12:12:39
+38 verbose fetch to= /home/jorgen/tmp/npm-3615/1361358759663-0.045297033386304975/tmp.tgz
+39 http GET https://registry.npmjs.org/db-mysql/-/db-mysql-0.7.6.tgz
+40 http 200 https://registry.npmjs.org/db-mysql/-/db-mysql-0.7.6.tgz
+41 silly shasum updated bytes 40128
+42 info shasum ff870557afb1ee4197712211d26b6a05394a7aeb
+42 info shasum /home/jorgen/tmp/npm-3615/1361358759663-0.045297033386304975/tmp.tgz
+43 verbose tar unpack /home/jorgen/tmp/npm-3615/1361358759663-0.045297033386304975/tmp.tgz
+44 silly lockFile 5c978298-663-0-045297033386304975-package /home/jorgen/tmp/npm-3615/1361358759663-0.045297033386304975/package
+45 verbose lock /home/jorgen/tmp/npm-3615/1361358759663-0.045297033386304975/package /home/jorgen/.npm/5c978298-663-0-045297033386304975-package.lock
+46 silly gunzTarPerm modes [ '755', '644' ]
+47 silly gunzTarPerm extractEntry mysql-test-sync.js
+48 silly gunzTarPerm extractEntry mysql-test-insert.js
+49 silly gunzTarPerm extractEntry mysql-test-manual-query.js
+50 silly gunzTarPerm extractEntry README.md
+51 silly gunzTarPerm extractEntry tests.js
+52 silly gunzTarPerm extractEntry mysql-test-placeholder.js
+53 silly gunzTarPerm extractEntry mysql-test-no-connection.js
+54 silly gunzTarPerm extractEntry .gitignore
+55 silly gunzTarPerm extractEntry wscript
+56 silly gunzTarPerm extractEntry CHANGELOG
+57 silly gunzTarPerm extractEntry .gitmodules
+58 silly gunzTarPerm extractEntry t.js
+59 silly gunzTarPerm extractEntry mysql-test-long.js
+60 silly gunzTarPerm extractEntry mysql-test.js
+61 silly gunzTarPerm extractEntry .npmignore
+62 silly gunzTarPerm extractEntry db-mysql.js
+63 silly gunzTarPerm extractEntry mysql-test-long-number.js
+64 silly gunzTarPerm extractEntry package.json
+65 silly gunzTarPerm extractEntry tests-settings.json
+66 silly gunzTarPerm extractEntry tests-db.js
+67 silly gunzTarPerm extractEntry mysql-test-sync-update.js
+68 silly gunzTarPerm extractEntry mysql-test-async.js
+69 silly gunzTarPerm extractEntry src/mysql.cc
+70 silly gunzTarPerm extractEntry src/result.h
+71 silly gunzTarPerm extractEntry src/query.cc
+72 silly gunzTarPerm extractEntry src/mysql_bindings.cc
+73 silly gunzTarPerm extractEntry src/connection.cc
+74 silly gunzTarPerm extractEntry src/query.h
+75 silly gunzTarPerm extractEntry src/connection.h
+76 silly gunzTarPerm extractEntry src/result.cc
+77 silly gunzTarPerm extractEntry src/mysql.h
+78 silly gunzTarPerm extractEntry doc/api.html
+79 silly gunzTarPerm extractEntry doc/changelog.html
+80 silly gunzTarPerm extractEntry doc/index.html
+81 silly gunzTarPerm extractEntry lib/node-db/binding.h
+82 silly gunzTarPerm extractEntry lib/node-db/events.h
+83 silly gunzTarPerm extractEntry lib/node-db/exception.cc
+84 silly gunzTarPerm extractEntry lib/node-db/README.md
+85 silly gunzTarPerm extractEntry lib/node-db/tests.js
+86 silly gunzTarPerm extractEntry lib/node-db/result.h
+87 silly gunzTarPerm extractEntry lib/node-db/exception.h
+88 silly gunzTarPerm extractEntry lib/node-db/events.cc
+89 silly gunzTarPerm extractEntry lib/node-db/query.cc
+90 silly gunzTarPerm extractEntry lib/node-db/binding.cc
+91 silly gunzTarPerm extractEntry lib/node-db/connection.cc
+92 silly gunzTarPerm extractEntry lib/node-db/query.h
+93 silly gunzTarPerm extractEntry lib/node-db/connection.h
+94 silly gunzTarPerm extractEntry lib/node-db/node_defs.h
+95 silly gunzTarPerm extractEntry lib/node-db/result.cc
+96 verbose read json /home/jorgen/tmp/npm-3615/1361358759663-0.045297033386304975/package/package.json
+97 silly lockFile 5c978298-663-0-045297033386304975-package /home/jorgen/tmp/npm-3615/1361358759663-0.045297033386304975/package
+98 verbose from cache /home/jorgen/tmp/npm-3615/1361358759663-0.045297033386304975/package/package.json
+99 verbose tar pack [ '/home/jorgen/.npm/db-mysql/0.7.6/package.tgz',
+99 verbose tar pack   '/home/jorgen/tmp/npm-3615/1361358759663-0.045297033386304975/package' ]
+100 verbose tarball /home/jorgen/.npm/db-mysql/0.7.6/package.tgz
+101 verbose folder /home/jorgen/tmp/npm-3615/1361358759663-0.045297033386304975/package
+102 silly lockFile 669c5b3f-n-npm-db-mysql-0-7-6-package-tgz /home/jorgen/.npm/db-mysql/0.7.6/package.tgz
+103 verbose lock /home/jorgen/.npm/db-mysql/0.7.6/package.tgz /home/jorgen/.npm/669c5b3f-n-npm-db-mysql-0-7-6-package-tgz.lock
+104 silly lockFile 669c5b3f-n-npm-db-mysql-0-7-6-package-tgz /home/jorgen/.npm/db-mysql/0.7.6/package.tgz
+105 silly lockFile 3f5756da-orgen-npm-db-mysql-0-7-6-package /home/jorgen/.npm/db-mysql/0.7.6/package
+106 verbose lock /home/jorgen/.npm/db-mysql/0.7.6/package /home/jorgen/.npm/3f5756da-orgen-npm-db-mysql-0-7-6-package.lock
+107 silly lockFile 3f5756da-orgen-npm-db-mysql-0-7-6-package /home/jorgen/.npm/db-mysql/0.7.6/package
+108 verbose tar unpack /home/jorgen/.npm/db-mysql/0.7.6/package.tgz
+109 silly lockFile 3f5756da-orgen-npm-db-mysql-0-7-6-package /home/jorgen/.npm/db-mysql/0.7.6/package
+110 verbose lock /home/jorgen/.npm/db-mysql/0.7.6/package /home/jorgen/.npm/3f5756da-orgen-npm-db-mysql-0-7-6-package.lock
+111 silly gunzTarPerm modes [ '755', '644' ]
+112 silly gunzTarPerm extractEntry package.json
+113 silly gunzTarPerm extractEntry .npmignore
+114 silly gunzTarPerm extractEntry README.md
+115 silly gunzTarPerm extractEntry db-mysql.js
+116 silly gunzTarPerm extractEntry mysql-test-manual-query.js
+117 silly gunzTarPerm extractEntry mysql-test-no-connection.js
+118 silly gunzTarPerm extractEntry mysql-test-sync-update.js
+119 silly gunzTarPerm extractEntry mysql-test-sync.js
+120 silly gunzTarPerm extractEntry mysql-test-async.js
+121 silly gunzTarPerm extractEntry mysql-test-long-number.js
+122 silly gunzTarPerm extractEntry mysql-test-long.js
+123 silly gunzTarPerm extractEntry tests.js
+124 silly gunzTarPerm extractEntry mysql-test.js
+125 silly gunzTarPerm extractEntry t.js
+126 silly gunzTarPerm extractEntry mysql-test-placeholder.js
+127 silly gunzTarPerm extractEntry tests-db.js
+128 silly gunzTarPerm extractEntry mysql-test-insert.js
+129 silly gunzTarPerm extractEntry tests-settings.json
+130 silly gunzTarPerm extractEntry src/mysql_bindings.cc
+131 silly gunzTarPerm extractEntry src/connection.h
+132 silly gunzTarPerm extractEntry src/query.cc
+133 silly gunzTarPerm extractEntry src/result.h
+134 silly gunzTarPerm extractEntry src/mysql.h
+135 silly gunzTarPerm extractEntry src/query.h
+136 silly gunzTarPerm extractEntry src/result.cc
+137 silly gunzTarPerm extractEntry src/connection.cc
+138 silly gunzTarPerm extractEntry src/mysql.cc
+139 silly gunzTarPerm extractEntry doc/index.html
+140 silly gunzTarPerm extractEntry doc/api.html
+141 silly gunzTarPerm extractEntry doc/changelog.html
+142 silly gunzTarPerm extractEntry .gitmodules
+143 silly gunzTarPerm extractEntry wscript
+144 silly gunzTarPerm extractEntry lib/node-db/README.md
+145 silly gunzTarPerm extractEntry lib/node-db/tests.js
+146 silly gunzTarPerm extractEntry lib/node-db/result.h
+147 silly gunzTarPerm extractEntry lib/node-db/query.h
+148 silly gunzTarPerm extractEntry lib/node-db/exception.cc
+149 silly gunzTarPerm extractEntry lib/node-db/node_defs.h
+150 silly gunzTarPerm extractEntry lib/node-db/events.cc
+151 silly gunzTarPerm extractEntry lib/node-db/query.cc
+152 silly gunzTarPerm extractEntry lib/node-db/result.cc
+153 silly gunzTarPerm extractEntry lib/node-db/connection.h
+154 silly gunzTarPerm extractEntry lib/node-db/exception.h
+155 silly gunzTarPerm extractEntry lib/node-db/events.h
+156 silly gunzTarPerm extractEntry lib/node-db/binding.h
+157 silly gunzTarPerm extractEntry lib/node-db/connection.cc
+158 silly gunzTarPerm extractEntry lib/node-db/binding.cc
+159 silly gunzTarPerm extractEntry CHANGELOG
+160 verbose read json /home/jorgen/.npm/db-mysql/0.7.6/package/package.json
+161 silly lockFile 3f5756da-orgen-npm-db-mysql-0-7-6-package /home/jorgen/.npm/db-mysql/0.7.6/package
+162 silly shasum updated bytes 40472
+163 info shasum e2548b607956265d0deae975d256ae4d309146f5
+163 info shasum /home/jorgen/.npm/db-mysql/0.7.6/package.tgz
+164 verbose from cache /home/jorgen/.npm/db-mysql/0.7.6/package/package.json
+165 verbose chmod /home/jorgen/.npm/db-mysql/0.7.6/package.tgz 644
+166 verbose chown /home/jorgen/.npm/db-mysql/0.7.6/package.tgz [ 1000, 1000 ]
+167 silly lockFile 46882c37--org-db-mysql-db-mysql-0-7-6-tgz https://registry.npmjs.org/db-mysql/-/db-mysql-0.7.6.tgz
+168 silly lockFile f70b617c-db-mysql-0-7-6 db-mysql@0.7.6
+169 silly lockFile a4731413-db-mysql db-mysql@
+170 silly resolved [ { name: 'db-mysql',
+170 silly resolved     description: 'MySQL database bindings for Node.JS',
+170 silly resolved     keywords:
+170 silly resolved      [ 'database',
+170 silly resolved        'db',
+170 silly resolved        'native',
+170 silly resolved        'binding',
+170 silly resolved        'library',
+170 silly resolved        'plugin',
+170 silly resolved        'client',
+170 silly resolved        'mysql',
+170 silly resolved        'libmysql' ],
+170 silly resolved     homepage: 'http://nodejsdb.org/db-mysql',
+170 silly resolved     version: '0.7.6',
+170 silly resolved     engines: { node: '>=0.4.1' },
+170 silly resolved     maintainers: [ [Object] ],
+170 silly resolved     bugs: { url: 'http://github.com/mariano/node-db-mysql/issues' },
+170 silly resolved     licenses: [ [Object] ],
+170 silly resolved     repositories: [ [Object] ],
+170 silly resolved     main: './db-mysql',
+170 silly resolved     scripts:
+170 silly resolved      { install: 'node-waf configure build',
+170 silly resolved        preuninstall: 'rm -rf build/*',
+170 silly resolved        test: 'node-waf test',
+170 silly resolved        doc: 'node-waf doc' },
+170 silly resolved     devDependencies: { nodeunit: '*', nodelint: '*' },
+170 silly resolved     readme: '# db-mysql: MySQL database bindings for Node.js #\n\nFor detailed information about this and other Node.js\ndatabase bindings visit the [Node.js db-mysql homepage] [homepage].\n\n## INSTALL ##\n\nBefore proceeding with installation, you need to have the libmysql\ndevelopment libraries and include files. Access to the mysql_config \nbinary is mandatory, and its path has to be specified prior to \ninstallation (if its not within the system\'s path). For example, if \nthe path to your mysql_config is /usr/local/bin/mysql_config make \nsure to do the following (Ubuntu users need to install the \nlibmysqlclient-dev package):\n\n```bash\n$ export MYSQL_CONFIG=/usr/local/bin/mysql_config\n```\n\nOnce you are sure that either mysql_config is part of the path or that\nyou specified the MYSQL_CONFIG environment var, install with npm:\n\n```bash\n$ npm install db-mysql\n```\n\n## QUICK START ##\n\n```javascript\nvar mysql = require(\'db-mysql\');\nnew mysql.Database({\n    hostname: \'localhost\',\n    user: \'root\',\n    password: \'password\',\n    database: \'node\'\n}).connect(function(error) {\n    if (error) {\n        return console.log("CONNECTION ERROR: " + error);\n    }\n\n    this.query().select(\'*\').from(\'users\').execute(function(error, rows) {\n        if (error) {\n            return console.log(\'ERROR: \' + error);\n        }\n        console.log(rows.length + \' ROWS\');\n    });\n});\n```\n\n## LICENSE ##\n\nThis module is released under the [MIT License] [license].\n\n[homepage]: http://nodejsdb.org/db-mysql\n[license]: http://www.opensource.org/licenses/mit-license.php\n',
+170 silly resolved     readmeFilename: 'README.md',
+170 silly resolved     _id: 'db-mysql@0.7.6',
+170 silly resolved     dist: { shasum: 'e2548b607956265d0deae975d256ae4d309146f5' },
+170 silly resolved     _from: 'db-mysql' } ]
+171 info install db-mysql@0.7.6 into /home/jorgen/progging/dontpanic
+172 info installOne db-mysql@0.7.6
+173 verbose from cache /home/jorgen/.npm/db-mysql/0.7.6/package/package.json
+174 info /home/jorgen/progging/dontpanic/node_modules/db-mysql unbuild
+175 verbose read json /home/jorgen/progging/dontpanic/node_modules/db-mysql/package.json
+176 verbose tar unpack /home/jorgen/.npm/db-mysql/0.7.6/package.tgz
+177 silly lockFile 3b0ff81c--dontpanic-node-modules-db-mysql /home/jorgen/progging/dontpanic/node_modules/db-mysql
+178 verbose lock /home/jorgen/progging/dontpanic/node_modules/db-mysql /home/jorgen/.npm/3b0ff81c--dontpanic-node-modules-db-mysql.lock
+179 silly gunzTarPerm modes [ '755', '644' ]
+180 silly gunzTarPerm extractEntry package.json
+181 silly gunzTarPerm extractEntry .npmignore
+182 silly gunzTarPerm extractEntry README.md
+183 silly gunzTarPerm extractEntry db-mysql.js
+184 silly gunzTarPerm extractEntry mysql-test-manual-query.js
+185 silly gunzTarPerm extractEntry mysql-test-no-connection.js
+186 silly gunzTarPerm extractEntry mysql-test-sync-update.js
+187 silly gunzTarPerm extractEntry mysql-test-sync.js
+188 silly gunzTarPerm extractEntry mysql-test-async.js
+189 silly gunzTarPerm extractEntry mysql-test-long-number.js
+190 silly gunzTarPerm extractEntry mysql-test-long.js
+191 silly gunzTarPerm extractEntry tests.js
+192 silly gunzTarPerm extractEntry mysql-test.js
+193 silly gunzTarPerm extractEntry t.js
+194 silly gunzTarPerm extractEntry mysql-test-placeholder.js
+195 silly gunzTarPerm extractEntry tests-db.js
+196 silly gunzTarPerm extractEntry mysql-test-insert.js
+197 silly gunzTarPerm extractEntry tests-settings.json
+198 silly gunzTarPerm extractEntry src/mysql_bindings.cc
+199 silly gunzTarPerm extractEntry src/connection.h
+200 silly gunzTarPerm extractEntry src/query.cc
+201 silly gunzTarPerm extractEntry src/result.h
+202 silly gunzTarPerm extractEntry src/mysql.h
+203 silly gunzTarPerm extractEntry src/query.h
+204 silly gunzTarPerm extractEntry src/result.cc
+205 silly gunzTarPerm extractEntry src/connection.cc
+206 silly gunzTarPerm extractEntry src/mysql.cc
+207 silly gunzTarPerm extractEntry doc/index.html
+208 silly gunzTarPerm extractEntry doc/api.html
+209 silly gunzTarPerm extractEntry doc/changelog.html
+210 silly gunzTarPerm extractEntry .gitmodules
+211 silly gunzTarPerm extractEntry wscript
+212 silly gunzTarPerm extractEntry lib/node-db/README.md
+213 silly gunzTarPerm extractEntry lib/node-db/tests.js
+214 silly gunzTarPerm extractEntry lib/node-db/result.h
+215 silly gunzTarPerm extractEntry lib/node-db/query.h
+216 silly gunzTarPerm extractEntry lib/node-db/exception.cc
+217 silly gunzTarPerm extractEntry lib/node-db/node_defs.h
+218 silly gunzTarPerm extractEntry lib/node-db/events.cc
+219 silly gunzTarPerm extractEntry lib/node-db/query.cc
+220 silly gunzTarPerm extractEntry lib/node-db/result.cc
+221 silly gunzTarPerm extractEntry lib/node-db/connection.h
+222 silly gunzTarPerm extractEntry lib/node-db/exception.h
+223 silly gunzTarPerm extractEntry lib/node-db/events.h
+224 silly gunzTarPerm extractEntry lib/node-db/binding.h
+225 silly gunzTarPerm extractEntry lib/node-db/connection.cc
+226 silly gunzTarPerm extractEntry lib/node-db/binding.cc
+227 silly gunzTarPerm extractEntry CHANGELOG
+228 verbose read json /home/jorgen/progging/dontpanic/node_modules/db-mysql/package.json
+229 silly lockFile 3b0ff81c--dontpanic-node-modules-db-mysql /home/jorgen/progging/dontpanic/node_modules/db-mysql
+230 info preinstall db-mysql@0.7.6
+231 verbose from cache /home/jorgen/progging/dontpanic/node_modules/db-mysql/package.json
+232 verbose readDependencies using package.json deps
+233 verbose from cache /home/jorgen/progging/dontpanic/node_modules/db-mysql/package.json
+234 verbose readDependencies using package.json deps
+235 silly resolved []
+236 verbose about to build /home/jorgen/progging/dontpanic/node_modules/db-mysql
+237 info build /home/jorgen/progging/dontpanic/node_modules/db-mysql
+238 verbose from cache /home/jorgen/progging/dontpanic/node_modules/db-mysql/package.json
+239 verbose linkStuff [ false,
+239 verbose linkStuff   false,
+239 verbose linkStuff   false,
+239 verbose linkStuff   '/home/jorgen/progging/dontpanic/node_modules' ]
+240 info linkStuff db-mysql@0.7.6
+241 verbose linkBins db-mysql@0.7.6
+242 verbose linkMans db-mysql@0.7.6
+243 verbose rebuildBundles db-mysql@0.7.6
+244 info install db-mysql@0.7.6
+245 verbose unsafe-perm in lifecycle true
+246 silly exec sh "-c" "node-waf configure build"
+247 silly sh,-c,node-waf configure build,/home/jorgen/progging/dontpanic/node_modules/db-mysql spawning
+248 info db-mysql@0.7.6 Failed to exec install script
+249 info /home/jorgen/progging/dontpanic/node_modules/db-mysql unbuild
+250 verbose from cache /home/jorgen/progging/dontpanic/node_modules/db-mysql/package.json
+251 info preuninstall db-mysql@0.7.6
+252 verbose unsafe-perm in lifecycle true
+253 silly exec sh "-c" "rm -rf build/*"
+254 silly sh,-c,rm -rf build/*,/home/jorgen/progging/dontpanic/node_modules/db-mysql spawning
+255 info uninstall db-mysql@0.7.6
+256 verbose true,/home/jorgen/progging/dontpanic/node_modules,/home/jorgen/progging/dontpanic/node_modules unbuild db-mysql@0.7.6
+257 info postuninstall db-mysql@0.7.6
+258 error db-mysql@0.7.6 install: `node-waf configure build`
+258 error `sh "-c" "node-waf configure build"` failed with 1
+259 error Failed at the db-mysql@0.7.6 install script.
+259 error This is most likely a problem with the db-mysql package,
+259 error not with npm itself.
+259 error Tell the author that this fails on your system:
+259 error     node-waf configure build
+259 error You can get their info via:
+259 error     npm owner ls db-mysql
+259 error There is likely additional logging output above.
+260 error System Linux 3.2.0-37-generic
+261 error command "node" "/home/jorgen/local/bin/npm" "install" "db-mysql"
+262 error cwd /home/jorgen/progging/dontpanic
+263 error node -v v0.8.18
+264 error npm -v 1.1.71
+265 error code ELIFECYCLE
+266 verbose exit [ 1, true ]

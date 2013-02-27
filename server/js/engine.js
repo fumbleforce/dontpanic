@@ -11,20 +11,27 @@ var ge = module.exports = {games : {}, game_count : 0},
     Executes in-game commands.
 */
 ge.command = function(client, c){
-    var g = ge.games[c.gameid];
+    console.log("Interpreting in-game command of type: "+c.type);
+    var g = ge.games[c.game_id];
+    var nodes = g.map.nodes;
+    var players = g.players;
+    
     switch (c.type) {
         case 'move_player':
-            var moved = g.move_player(client, c.player_id, c.node_id);
-            if (!moved) {
-				client.emit('error', 'Failed moving player');			
-			}
-			else{
-			    var stringed = JSON.stringify({
+            console.log("Trying to move player from "+player.node+" to "+c.node_id+ " when playernode connects to "+nodes[player.node].connects_to);
+            if (nodes[player.node].connects_to.indexOf(c.node_id) > -1){
+                player.node = c.node_id;
+                
+                var stringed = JSON.stringify({
 			        type:'moved_player',
-			        player:g.players[c.player_id]
+			        player:player
 			    });
+			    console.log("Emitting moved_player change");
 			    client.emit('change', stringed);
-
+            }
+            else{
+                console.log("Failed moving player");
+				client.emit('error', 'Failed moving player');			
 			}
             break;
 		case 'dec_panic':
@@ -63,9 +70,10 @@ ge.command = function(client, c){
 			ge.save_state(client, c);
 			break;
         case '':
+            
             g.event;
             break;
-            
+        console.log("No matching command types");
     }
 
 
@@ -122,7 +130,7 @@ ge.create_game = function(client, c){
 
     ge.games[game.id] = game;
     ge.game_count++;
-    var temp = {players: game.players, map:game.map};
+    var temp = {game_id:game.id, players: game.players, map:game.map};
     client.emit('start_game', JSON.stringify(temp));
 }
 
