@@ -12,6 +12,13 @@ var players,
     cst = {},
     node_size = 50;
     player_size = 20,
+    info_center_size = 35,
+    //panic info stuff
+    panic_info_size = 40,
+    averageX = 0;
+    averageY = 0;
+    
+    
     turn = 0,
     padding = 30,
     //how far from node circumference should player center be (higher = closer to center) must be >1
@@ -87,31 +94,53 @@ function player_draw(player, ctx){
     ctx.fillStyle = "White";
     ctx.font="10px Georgia",
     ctx.fillText(player.id, player.x+player_offsetX[player.id]-3, player.y+player_offsetY[player.id]+2);
+    
+    //draw circle to show active player when dragging
 }
 
 function node_draw(node, ctx){
-	//TODO move info center drawing somewhere else?
-    if (node.has_information_center){
-        ctx.fillStyle = 'white';
-        ctx.fillRect(node.x, node.y, 20, 20);
-    }
-    else{
-        ctx.fillStyle = 'black';
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, node_size, 0, Math.PI*2, true); 
-        ctx.closePath();
-        ctx.fill();
-    }
-    
+    ctx.fillStyle = 'black';
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, node_size, 0, Math.PI*2, true); 
+    ctx.closePath();
+    ctx.fill();    
+    //draw node number
     ctx.fillStyle = "White";
     ctx.font="13px Georgia",
-    ctx.fillText(node.id, node.x-3, node.y+2);
+    ctx.fillText(node.id, node.x-3, node.y-15);
+    //TODO move info center drawing somewhere else?
+    //draw info center
+    if (node.has_information_center){
+    	ctx.fillStyle = 'steelblue';
+        ctx.fillRect(node.x-(info_center_size/2), node.y-(info_center_size/2)+10, info_center_size, info_center_size);
+        ctx.fillStyle = 'white';
+        ctx.font='20px Georgia',
+        //draw i for infocenter, or number for node?
+        //
+        ctx.fillText("i", node.x-3, node.y+15);
+    }
 }
 
 //TODO draw road blocks (one on each node (as specification says) + something on the path between them?)
 function roadblock_draw(node, ctx){
-	context.fillStyle   = 'green';
-	//context.fillRect  (what,to,put,here);
+	ctx.strokeStyle = '#202020';
+	ctx.lineWidth = 25;
+	for (var i = 0; i < node.connects_to.length; i++){
+		ctx.beginPath();
+	    ctx.moveTo(node.x, node.y);
+	    //maybe: 50% road block to another node with road block (50+50=100), 
+	    // but only 10% when neighbor does not have r b (looks better...?)
+	    // for now: just draw 50% block
+	    //if (nodes[node.connects_to[i]].has_road_block){
+	    	ctx.lineTo(((nodes[node.connects_to[i]].x)+node.x)/2, ((nodes[node.connects_to[i]].y)+node.y)/2);
+	    //}
+	    //else{
+	    //	ctx.lineTo(((nodes[node.connects_to[i]].x)+node.x)/10, ((nodes[node.connects_to[i]].y)+node.y)/10);
+	    //}
+	    
+	    ctx.closePath();
+	    ctx.stroke();
+    }
 }
 
 function background_draw(ctx){
@@ -134,6 +163,9 @@ function zone_draw(zone, ctx){
     //Fill zone with respective color
     ctx.fillStyle = zone.color;
     ctx.fill();
+    //Add panic info in zones
+    //Find center of zones (center of multi-point polygon, might be hard)
+    
 }
 
 function player_contains(p, mx, my) {
@@ -163,6 +195,16 @@ function draw(){
         zone = zones[i];
         zone_draw(zone,ctx);
     }
+    
+    //road blocks (move into node draw?)
+    //road blocks are now drawn ABOVE zones, but BELOW players and nodes
+    for (var i = 0; i < nodes.length; i++) {
+    	if (nodes[i].has_road_block){
+    		node = nodes[i]
+    		roadblock_draw(nodes[i], ctx)
+    	}
+        
+    }
 
     for (var i = 0; i < nodes.length; i++) {
         node = nodes[i];
@@ -184,15 +226,6 @@ function draw(){
     for (var i = 0; i < players.length; i++) {
         pl = players[i];
         player_draw(pl, ctx);
-    }
-    
-    //road blocks (move into node draw?)
-    for (var i = 0; i < nodes.length; i++) {
-    	if (nodes[i].has_road_block){
-    		node = nodes[i]
-    		roadblock_draw(nodes[i], ctx)
-    	}
-        
     }
     
 }// end draw

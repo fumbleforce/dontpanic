@@ -26,15 +26,15 @@ var ge = module.exports = function (id, client) {
         [2, 3, 7, 8], // 5
         [1, 9, 11],
         [2, 5, 10],
-        [3, 5, 9, 13],
-        [4, 6, 8, 14],
+        [5, 9, 13, 16],
+        [4, 6, 8, 14, 16],
         [7, 12, 13], //10
         [6, 14, 17],
         [10, 15],
         [8, 10, 15, 16],
-        [9, 11, 17, 19],
+        [9, 11, 19],
         [13, 16, 18],//15
-        [13, 15, 18],
+        [8, 9, 13, 15, 18, 19],
         [11, 14, 20],
         [15, 16],
         [14, 16, 18],
@@ -64,6 +64,22 @@ var ge = module.exports = function (id, client) {
 		    node = new ge.Node(i, posx[i], posy[i], true, conn[i]);
 		    this.map.nodes.push(node);
     }
+    //add some random info centers
+    this.map.nodes[0].has_information_center=true;
+    this.map.nodes[5].has_information_center=true;
+    this.map.nodes[9].has_information_center=true;
+    this.map.nodes[13].has_information_center=true;
+    this.map.nodes[14].has_information_center=true;
+    
+    //add some road blocks for testing (also works for testing if nodes are correctly connected to each other!)
+    this.map.nodes[0].has_road_block = true;
+    this.map.nodes[2].has_road_block = true;
+    this.map.nodes[3].has_road_block = true;
+    this.map.nodes[5].has_road_block = true;
+    this.map.nodes[8].has_road_block = true;
+    this.map.nodes[13].has_road_block = true;
+    this.map.nodes[16].has_road_block = true;
+	
 
 
     var zones = [];
@@ -103,6 +119,10 @@ var ge = module.exports = function (id, client) {
     zones[14].color = "tomato";
     zones[15].color = "seashell";
     zones[16].color = "lightgoldenrodyellow";
+    
+    //add panic on a few zones
+    zones[3].panic_level = 10;
+    zones[10].panic_level = 25;
     
     this.map.zones = zones;
     
