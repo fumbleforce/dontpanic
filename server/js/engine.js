@@ -199,6 +199,7 @@ ge.command = function(client, c){
 
 
 
+<<<<<<< HEAD
 ge.prototype.start = function(client){
     var g = {players:this.players, map:this.map};
     console.log(g);
@@ -322,6 +323,7 @@ ge.Player.prototype.remove_road_block = function () {
 
 
 
+
 ge.User = function (username, password, name, email, is_admin) {
 	this.username = username;
 	this.password = password;
@@ -349,6 +351,7 @@ ge.Node = function (id, x, y, is_start_position, connects_to) {
 	this.connects_to = connects_to; // Nodes
 	this.has_information_center = false;
 	this.has_road_block = false;
+
 	
 }
 ge.Node.prototype.add_information_center = function () {
