@@ -39,7 +39,7 @@ var nodes = [];
         15*SCALE
     ];
 
-//    conn = [[1, 3],[0, 2, 4],[1, 5],[0, 4],[1, 3, 5],[2, 4]];
+
     posx = [100, 350, 700, 100, 450, 600];
     posy = [60, 140, 80, 320, 420, 320];
 	player_colors = ["blue","red","yellow","grey","purple","brown","green","orange"];
@@ -49,22 +49,9 @@ for(var i = 0; i < 6; i++){
 		nodes.push(node);
 }
 
-//test set road block between two nodes
-//nodes[1].has_road_block = true;
-//nodes[2].has_road_block = true;
-
-//test draw info center on two nodes
-//nodes[2].has_information_center = true;
-//nodes[4].has_information_center = true;
-
 
 var zones = [];
-/*
-zones[0] = new models.zone(0, [0, 1, 4, 3], [1]);
-zones[1] = new models.zone(1, [1, 2, 5, 4], [0]);
-zones[0].color = "yellow";
-zones[1].color = "green";
-*/
+
 zones[0] = new models.zone(0, [0, 1, 3, 4], [1, 2, 5]);
 zones[1] = new models.zone(1, [0, 2, 3, 5], [0, 3, 4]);
 zones[2] = new models.zone(2, [1, 4, 6, 9], [0, 5, 7]);
