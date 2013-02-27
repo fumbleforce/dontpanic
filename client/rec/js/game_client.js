@@ -12,7 +12,28 @@ var game_id,
     ctx = canvas.getContext("2d"),
     cst = {},
     node_size = 50;
-    player_size = 30;
+    player_size = 20,
+    //how far from node circumference should player center be (higher = closer to center) must be >1
+    offset_distance = node_size*1;
+    //where to put the max 8 players on the node (on circle circumference?) yay dirtytrigonometry
+    player_offsetX = [0, 
+                      Math.cos(315*(Math.PI/180))*offset_distance,
+                      offset_distance, 
+                      Math.cos(45*(Math.PI/180))*offset_distance,
+                      0, 
+                      Math.cos(225*(Math.PI/180))*offset_distance,
+                      -offset_distance, 
+                      Math.cos(135*(Math.PI/180))*offset_distance];
+    
+    player_offsetY = [-offset_distance,
+                      Math.sin(315*(Math.PI/180))*offset_distance,
+                      0,
+                      Math.sin(45*(Math.PI/180))*offset_distance,
+                      offset_distance, 
+                      Math.sin(135*(Math.PI/180))*offset_distance,
+                      0,
+                      Math.sin(225*(Math.PI/180))*offset_distance];
+    	
     //timer = timer??
     
 
@@ -48,19 +69,28 @@ function player_draw(player, ctx){
     if (player.y === undefined) player.y = nodes[player.node].y;
     ctx.fillStyle = player.color;
     ctx.beginPath();
-    ctx.arc(player.x, player.y, player_size, 0, Math.PI*2, true); 
+    //old drawing
+    //ctx.arc(player.x, player.y, player_size, 0, Math.PI*2, true);
+    //draw on same node to test offset
+    ctx.arc(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size, 0, Math.PI*2, true); 
     ctx.closePath();
     ctx.fill();
     
     ctx.fillStyle = "brown";
     ctx.beginPath();
-    ctx.arc(player.x, player.y, player_size/10, 0, Math.PI*2, true); 
+    ctx.arc(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size/5, 0, Math.PI*2, true); 
     ctx.closePath();
     ctx.fill();
+    
+    //draw player number (for testing at least)
+    ctx.fillStyle = "White";
+    ctx.font="10px Georgia",
+    ctx.fillText(player.id, player.x+player_offsetX[player.id]-3, player.y+player_offsetY[player.id]+2);
 }
 
 function node_draw(node, ctx){
-    if (node.info_center){
+	//TODO move info center drawing somewhere else?
+    if (node.has_information_center){
         ctx.fillStyle = 'white';
         ctx.fillRect(node.x, node.y, 20, 20);
     }
@@ -71,6 +101,12 @@ function node_draw(node, ctx){
         ctx.closePath();
         ctx.fill();
     }
+}
+
+//TODO draw road blocks (one on each node (as specification says) + something on the path between them?)
+function roadblock_draw(node, ctx){
+	context.fillStyle   = 'green';
+	//context.fillRect  (what,to,put,here);
 }
 
 function background_draw(ctx){
@@ -86,6 +122,11 @@ function zone_draw(zone, ctx){
     }
     ctx.lineTo(nodes[zone.nodes[0]].x, nodes[zone.nodes[0]].y);
     ctx.closePath();
+    //Draw outline of zones
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 5;
+    ctx.stroke();
+    //Fill zone with respective color
     ctx.fillStyle = zone.color;
     ctx.fill();
 }
@@ -118,21 +159,31 @@ function draw(){
         node = nodes[i];
         node_draw(node, ctx);
         
-        for (var j = 0; j < nodes[i].connects_to.length; j++) {
-            to_node = node.connects_to[j];
-            ctx.lineWidth = 15;
-            ctx.strokeStyle = "gray";
-            ctx.beginPath();
-            ctx.moveTo(node.x, node.y);
-            ctx.lineTo(to_node.x, to_node.y);
-            ctx.stroke();
-        }
+        //not needed as of now
+//        for (var j = 0; j < nodes[i].connects_to.length; j++) {
+//            to_node = node.connects_to[j];
+//            ctx.lineWidth = 15;
+//            ctx.strokeStyle = "gray";
+//            ctx.beginPath();
+//            ctx.moveTo(node.x, node.y);
+//            ctx.lineTo(to_node.x, to_node.y);
+//            ctx.stroke();
+//        }
     }
     
     
     for (var i = 0; i < players.length; i++) {
         pl = players[i];
         player_draw(pl, ctx);
+    }
+    
+    //road blocks (move into node draw?)
+    for (var i = 0; i < nodes.length; i++) {
+    	if (nodes[i].has_road_block){
+    		node = nodes[i]
+    		roadblock_draw(nodes[i], ctx)
+    	}
+        
     }
     
     
