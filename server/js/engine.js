@@ -32,10 +32,15 @@ ge.command = function(client, c){
             console.log("Trying to move player "+ c.player_id +
                 " from "+player.node+" to "+c.node_id+ 
                 " when playernode connects to "+nodes[player.node].connects_to);
-            var p = players[c.player_id]
-            if (nodes[p.node].connects_to.indexOf(c.node_id) > -1){
-                p.node = c.node_id;
-			    console.log("Player was moved");
+            var p = players[c.player_id];
+            if (nodes[p.node].connects_to.indexOf(c.node_id) > -1 && 
+					(c.player_id == g.active_player)){
+				if(p.minus_one_action()){
+					
+					p.node = c.node_id;
+				
+					console.log("Player was moved");
+				}
             }
             else{
                 console.log("Failed moving player");	

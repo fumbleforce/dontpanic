@@ -63,8 +63,9 @@ models.Player.prototype.move_player = function (node) {
 	if (this.node === node) {
 		return false
 	} else if (this.node.connects_to(node.id)) {
-		this.node = node;
+		this.node = node.id;
 		this.minus_one_action();
+		
 		return true;
 	}
 	return false;
