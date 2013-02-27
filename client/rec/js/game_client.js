@@ -115,7 +115,7 @@ function roadblock_draw(node, ctx){
 }
 
 function background_draw(ctx){
-    ctx.fillStyle="white";
+    ctx.fillStyle="lightgray";
     ctx.fillRect(0,0, c_width, c_height);
 }
 
