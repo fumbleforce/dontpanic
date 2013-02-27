@@ -44,7 +44,7 @@ var nodes = [];
     posy = [60, 140, 80, 320, 420, 320];
 	player_colors = ["blue","red","yellow","grey","purple","brown","green","orange"];
 
-for(var i = 0; i < 6; i++){
+for(var i = 0; i < 21; i++){
 		node = new models.node(i, posx[i], posy[i], true, conn[i]);
 		nodes.push(node);
 }
@@ -102,3 +102,12 @@ zones[15].color = "seashell";
 zones[16].color = "lightgoldenrodyellow";
 
 var players = [];
+player_colors = ["blue","red","yellow","grey","purple","brown","green","orange"];
+
+for(var i = 0; i < 8; i++){
+	player = new models.Player(i, "player" + i, 0, player_colors[i], {}, 4);
+	players.push(player);
+}
+
+
+
