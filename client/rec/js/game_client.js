@@ -2,11 +2,12 @@
 
     TODO These are global for now, but  SHOULD be encapsulated, along with all the functions. IMPORTANT.
 */
-var players, 
+var game_id,
+    players, 
     nodes,
     zones,
-    c_height = 800,
-    c_width = 1000,
+    c_height = 1000,
+    c_width = 1500,
     canvas = document.getElementById("viewport"),
     ctx = canvas.getContext("2d"),
     cst = {},
@@ -38,8 +39,9 @@ var players,
 
 
 
-function init_game(ps, map) {
+function init_game(id, ps, map) {
     console.log("Game initiated");
+    game_id = id;
     players = ps;
     zones = map.zones;
     nodes = map.nodes;
@@ -53,6 +55,13 @@ function init_game(ps, map) {
 function setup_canvas(){
     canvas.width = c_width;
     canvas.height = c_height;
+}
+
+function move_player(p){
+    players[p.id].node = p.node;
+    players[p.id].x = nodes[p.node].x;
+    players[p.id].y = nodes[p.node].y;
+    draw();
 }
 
 function player_draw(player, ctx){
@@ -92,6 +101,10 @@ function node_draw(node, ctx){
         ctx.closePath();
         ctx.fill();
     }
+    
+    ctx.fillStyle = "White";
+    ctx.font="13px Georgia",
+    ctx.fillText(node.id, node.x-3, node.y+2);
 }
 
 //TODO draw road blocks (one on each node (as specification says) + something on the path between them?)
@@ -122,8 +135,12 @@ function zone_draw(zone, ctx){
     ctx.fill();
 }
 
-function player_contains(player, mx, my) {
-    return node_contains(nodes[player.node], mx, my);
+function player_contains(p, mx, my) {
+    var pn = nodes[p.node];
+    return (mx<=(pn.x+player_offsetX[p.id]+player_size))&&
+        (mx>=(pn.x+player_offsetX[p.id]-player_size))&&
+        (my<=(pn.y+player_offsetY[p.id]+player_size))&&
+        (my>=(pn.y+player_offsetY[p.id]-player_size));
 }
 
 function node_contains(node, mx, my) {
@@ -177,9 +194,7 @@ function draw(){
         
     }
     
-    
-
-}
+}// end draw
 
 
 function set_canvas_listener(){
@@ -194,15 +209,17 @@ function set_canvas_listener(){
             
         if (cst.selection) {
             console.log("clearing selection");
-            cst.selection = null;
+            cst.selection.x = nodes[cst.selection.node].x
+            cst.selection.y = nodes[cst.selection.node].y
+            cst.selection = undefined;
+            cst.dragging = false;
             draw();
         }
         
         for (var i = 0; i < players.length; i++) {
-            console.log(nodes[players[i].node]);
-            console.log(""+ mx + " "+ my);
+            
             if (player_contains(players[i], mx, my)) {
-                console.log("Clicked on a player");
+                console.log("Clicked on a player "+players[i].id);
                 selected = players[i];
                 selected.x = nodes[players[i].node].x;
                 selected.y = nodes[players[i].node].y;
@@ -243,7 +260,6 @@ function set_canvas_listener(){
                         player_id : cst.selection.id,
                         node_id : i
                     });
-                    
                     cst.selection = undefined;
                     cst.dragging = false;
                     draw();

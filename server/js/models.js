@@ -11,7 +11,6 @@ models.game = function (players, client, game_template) {
 }
 
 
-
 models.game.prototype.move_player = function(player_id, node) {
 	return this.players[player_id].move_player(node);
 }
@@ -63,13 +62,13 @@ models.Player.prototype.add_info_card = function(info_card) {
 models.Player.prototype.move_player = function (node) {
 	if (this.node === node) {
 		return false
-	} else if (this.node.connects_to.indexOf(node) >= 0) {
-		this.node = node;
-		this.minus_one_action;
+	} else if (this.node.connects_to(node.id)) {
+		this.node = node.id;
+		this.minus_one_action();
+		
 		return true;
 	}
 	return false;
-	//update gui?
 }
 
 models.Player.prototype.add_information_center = function () {
@@ -180,7 +179,9 @@ models.node.prototype.remove_road_block = function () {
 	}	
 	return true;
 }
-
+models.node.prototype.connects_to = function(n){
+    return this.connects_to.indexOf(n.id) > -1;
+}
 
 
 

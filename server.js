@@ -75,9 +75,6 @@ socket_listener.sockets.on('connection', function (client) {
     //Client sent log message
     client.on('msg', function(msg) {
         console.log('**SOCKET_LISTENER** received message: '+ msg);
-        if(msg === 'Hello server'){
-            client.emit('msg', 'Oh hello there Client');
-        }
     });
             
     client.on('end_game', function(c) {
@@ -107,7 +104,8 @@ socket_listener.sockets.on('connection', function (client) {
     
     client.on('game_command', function(c) {
         console.log('**SOCKET_LISTENER** received in-game command ' + c);
-        engine.command(client, c);
+        var parsed = JSON.parse(c);
+        engine.command(client, parsed);
     });
 
     client.on('disconnect', function () {

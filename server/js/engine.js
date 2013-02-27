@@ -11,21 +11,35 @@ var ge = module.exports = {games : {}, game_count : 0},
     Executes in-game commands.
 */
 ge.command = function(client, c){
-    var g = ge.games[c.gameid];
+    
+    var g = ge.games[c.game_id];
+    var nodes = g.map.nodes;
+    var players = g.players;
+    
+    console.log("Interpreting in-game command of type: "+c.type);
     switch (c.type) {
         case 'move_player':
-            var moved = g.move_player(client, c.player_id, c.node_id);
-            if (!moved) {
-				client.emit('error', 'Failed moving player');			
+            console.log("Trying to move player "+ c.player_id +
+                " from "+player.node+" to "+c.node_id+ 
+                " when playernode connects to "+nodes[player.node].connects_to);
+            var p = players[c.player_id];
+            if (nodes[p.node].connects_to.indexOf(c.node_id) > -1 && 
+					(c.player_id == g.active_player)){
+				if(p.minus_one_action()){
+					
+					p.node = c.node_id;
+				
+					console.log("Player was moved");
+				}
+            }
+            else{
+                console.log("Failed moving player");	
 			}
-			else{
-			    var stringed = JSON.stringify({
-			        type:'moved_player',
-			        player:g.players[c.player_id]
-			    });
-			    client.emit('change', stringed);
-
-			}
+			var stringed = JSON.stringify({
+			    type:'moved_player',
+			    player:p
+			});
+			client.emit('change', stringed);	
             break;
 		case 'dec_panic':
 			if (!g.map.zones[c.zone_id].dec_panic(g.players[c.player_id])) {
@@ -63,12 +77,11 @@ ge.command = function(client, c){
 			ge.save_state(client, c);
 			break;
         case '':
+            
             g.event;
             break;
-            
+        console.log("No matching command types");
     }
-
-
 }
 
 
@@ -140,7 +153,7 @@ ge.create_game = function(client, c){
 
     ge.games[game.id] = game;
     ge.game_count++;
-    var temp = {players: game.players, map:game.map};
+    var temp = {game_id:game.id, players: game.players, map:game.map};
     client.emit('start_game', JSON.stringify(temp));
 }
 
