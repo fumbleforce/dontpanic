@@ -86,7 +86,9 @@ socket_listener.sockets.on('connection', function (client) {
         console.log('**SOCKET_LISTENER** received create command ' + c);
         var g = new engine(0, client);
         games[g.id] = g;
-        g.start();
+        client.game_id = g.id;
+        
+        g.start(client);
     });
     
     client.on('join_game', function(c) {

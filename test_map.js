@@ -45,30 +45,30 @@ var nodes = [];
 	player_colors = ["blue","red","yellow","grey","purple","brown","green","orange"];
 
 for(var i = 0; i < 21; i++){
-		node = new models.node(i, posx[i], posy[i], true, conn[i]);
+		node = new ge.Node(i, posx[i], posy[i], true, conn[i]);
 		nodes.push(node);
 }
 
 
 var zones = [];
 
-zones[0] = new models.zone(0, [0, 1, 3, 4], [1, 2, 5]);
-zones[1] = new models.zone(1, [0, 2, 3, 5], [0, 3, 4]);
-zones[2] = new models.zone(2, [1, 4, 6, 9], [0, 5, 7]);
-zones[3] = new models.zone(3, [2, 5, 7], [1, 4, 6]);
-zones[4] = new models.zone(4, [3, 5, 8], [1, 5, 6]);
-zones[5] = new models.zone(5, [3, 4, 8, 9], [0, 2, 4, 10]);
-zones[6] = new models.zone(6, [5, 7, 8, 10, 13], [3, 4, 8, 9]);
-zones[7] = new models.zone(7, [6, 9, 11, 14], [2, 11, 12]);
-zones[8] = new models.zone(8, [10, 12, 13, 15], [6, 13]);
-zones[9] = new models.zone(9, [8, 13, 16], [6, 10, 13]);
-zones[10] = new models.zone(10, [8, 9, 16], [5, 9, 11]);
-zones[11] = new models.zone(11, [9, 14, 16, 19], [7, 10, 15, 16]);
-zones[12] = new models.zone(12, [11, 14, 17], [7, 11, 16]);
-zones[13] = new models.zone(13, [13, 15, 16], [8, 9, 14]);
-zones[14] = new models.zone(14, [15, 16, 18], [13, 15]);
-zones[15] = new models.zone(15, [16, 18, 19], [11, 14]);
-zones[16] = new models.zone(16, [14, 17, 19, 20], [11, 12]);
+zones[0] = new ge.Zone(0, [0, 1, 3, 4], [1, 2, 5]);
+zones[1] = new ge.Zone(1, [0, 2, 3, 5], [0, 3, 4]);
+zones[2] = new ge.Zone(2, [1, 4, 6, 9], [0, 5, 7]);
+zones[3] = new ge.Zone(3, [2, 5, 7], [1, 4, 6]);
+zones[4] = new ge.Zone(4, [3, 5, 8], [1, 5, 6]);
+zones[5] = new ge.Zone(5, [3, 4, 8, 9], [0, 2, 4, 10]);
+zones[6] = new ge.Zone(6, [5, 7, 8, 10, 13], [3, 4, 8, 9]);
+zones[7] = new ge.Zone(7, [6, 9, 11, 14], [2, 11, 12]);
+zones[8] = new ge.Zone(8, [10, 12, 13, 15], [6, 13]);
+zones[9] = new ge.Zone(9, [8, 13, 16], [6, 10, 13]);
+zones[10] = new ge.Zone(10, [8, 9, 16], [5, 9, 11]);
+zones[11] = new ge.Zone(11, [9, 14, 16, 19], [7, 10, 15, 16]);
+zones[12] = new ge.Zone(12, [11, 14, 17], [7, 11, 16]);
+zones[13] = new ge.Zone(13, [13, 15, 16], [8, 9, 14]);
+zones[14] = new ge.Zone(14, [15, 16, 18], [13, 15]);
+zones[15] = new ge.Zone(15, [16, 18, 19], [11, 14]);
+zones[16] = new ge.Zone(16, [14, 17, 19, 20], [11, 12]);
 
 zones[0].color = "aqua";
 zones[1].color = "blue";
@@ -92,7 +92,7 @@ var players = [];
 player_colors = ["blue","red","yellow","grey","purple","brown","green","orange"];
 
 for(var i = 0; i < 8; i++){
-	player = new models.Player(i, "player" + i, 0, player_colors[i], {}, 4);
+	player = new ge.Player(i, "player" + i, 0, player_colors[i], {}, 4);
 	players.push(player);
 }
 

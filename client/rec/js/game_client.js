@@ -2,8 +2,7 @@
 
     TODO These are global for now, but  SHOULD be encapsulated, along with all the functions. IMPORTANT.
 */
-var game_id,
-    players, 
+var players, 
     nodes,
     zones,
     c_height = 1000,
@@ -40,9 +39,8 @@ var game_id,
 
 
 
-function init_game(id, ps, map) {
+function init_game(ps, map) {
     console.log("Game initiated");
-    game_id = id;
     players = ps;
     zones = map.zones;
     nodes = map.nodes;

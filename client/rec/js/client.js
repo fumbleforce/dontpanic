@@ -18,7 +18,7 @@ socket.on('error', function (e) {
 
 socket.on('start_game', function (data) {
     var d = JSON.parse(data);
-    init_game(d.game_id, d.players, d.map);
+    init_game(d.players, d.map);
 });
 
 socket.on('change', function (data) {
