@@ -13,6 +13,7 @@ var game_id,
     cst = {},
     node_size = 50;
     player_size = 20,
+    turn = 0,
     //how far from node circumference should player center be (higher = closer to center) must be >1
     offset_distance = node_size*1;
     //where to put the max 8 players on the node (on circle circumference?) yay dirtytrigonometry
@@ -48,6 +49,7 @@ function init_game(id, ps, map) {
     
     setup_canvas();
     set_canvas_listener();
+    alert("Player"+(turn+1)+"'s turn.");
     draw();
 
 }

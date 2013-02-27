@@ -7,7 +7,8 @@
 var express     = require('express'),
     server      = module.exports = express(),
     engine      = require('./server/js/engine.js'),
-    ioserver    = require('http').createServer(server);
+    ioserver    = require('http').createServer(server),
+    games       = {};
 
 
 
@@ -68,9 +69,8 @@ socket_listener.sockets.on('connection', function (client) {
     // TODO Client setup
     client.userid = 1;
     client.emit('is_connected');
-    //engine.start_game(client);
     console.log('**SOCKET_LISTENER** client ' + client.userid + ' connected');
-    //engine.create_game(client);
+
     
     //Client sent log message
     client.on('msg', function(msg) {
@@ -84,7 +84,9 @@ socket_listener.sockets.on('connection', function (client) {
     
     client.on('create_game', function(c) {
         console.log('**SOCKET_LISTENER** received create command ' + c);
-        engine.create_game(client, c);
+        var g = new engine(0, client);
+        games[g.id] = g;
+        g.start();
     });
     
     client.on('join_game', function(c) {

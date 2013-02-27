@@ -1,9 +1,21 @@
 /*  Engine module
 
-    This module will feature all game logic, keeping all games in memory and writing to the DB module.
+    This module will be a game "Class".
 */
-var ge = module.exports = {games : {}, game_count : 0},
-    models = require('./models.js');
+
+var ge = module.exports = function (id, client) {
+
+	this.id = 0;
+	this.map = {};
+	this.settings = {};
+	this.players = [];
+	this.client = client;
+	this.active_player = 0;
+	this.turn = 0;
+	
+}
+
+
 
 
 /*  Decode command
@@ -11,10 +23,8 @@ var ge = module.exports = {games : {}, game_count : 0},
     Executes in-game commands.
 */
 ge.command = function(client, c){
-    
-    var g = ge.games[c.game_id];
-    var nodes = g.map.nodes;
-    var players = g.players;
+    var nodes = ge.map.nodes,
+        players = ge.players;
     
     console.log("Interpreting in-game command of type: "+c.type);
     switch (c.type) {
@@ -77,79 +87,15 @@ ge.command = function(client, c){
             break;
         console.log("No matching command types");
     }
+
+
 }
 
 
 
-ge.create_game = function(client, c){
-    /*var players = [], 
-        game,
-        player;
+ge.start = function(client, c){
     
-    for (var i = 0;i<c.players.length;i++) {
-        player = new models.Player(c.players[i]);
-        players.push(player);
-    }
-    
-    game = new models.Game(c.players, c.game_template);
-    game.id = 1234; // TODO: Make uniqe ID, and store to database
-    game.add_client(client);
-	game.active_player = 0;
-    ge.games[id] = game;
-    ge.game_count++;
-    ge.start_game(client, c, game);
-	*/
-	
-	// TODO: create test game
-	var nodes = [];
-	    conn = [[1, 3],[0, 2, 4],[1, 5],[0, 4],[1, 3, 5],[2, 4]];
-	    posx = [100, 350, 700, 100, 450, 600];
-	    posy = [60, 140, 80, 320, 420, 320];
-		player_colors = ["blue","red","yellow","grey","purple","brown","green","orange"];
-	
-	for(var i = 0; i < 6; i++){
-			node = new models.node(i, posx[i], posy[i], true, conn[i]);
-			nodes.push(node);
-	}
-	
-	//test set road block between two nodes
-	//nodes[1].has_road_block = true;
-	//nodes[2].has_road_block = true;
-
-	//test draw info center on two nodes
-	//nodes[2].has_information_center = true;
-	//nodes[4].has_information_center = true;
-	
-	
-	var zones = [];
-	
-	zones[0] = new models.zone(0, [0, 1, 4, 3], [1]);
-	zones[1] = new models.zone(1, [1, 2, 5, 4], [0]);
-	zones[0].color = "yellow";
-	zones[1].color = "green";
-	var players = [];
-		
-	for(var i = 0; i < 4; i++){
-		player = new models.Player(i, "player" + i, 0, player_colors[i], {}, 4);
-		players.push(player);
-	}
-	//add more players to test offset
-	player4 = new models.Player(4, "player" + 4, 0, player_colors[4], {}, 4);
-	players.push(player4);
-	player5 = new models.Player(5, "player" + 5, 0, player_colors[5], {}, 4);
-	players.push(player5);
-	player6 = new models.Player(6, "player" + 6, 0, player_colors[6], {}, 4);
-	players.push(player6);
-	player7 = new models.Player(7, "player" + 7, 0, player_colors[7], {}, 4);
-	players.push(player7);
-	
-	
-	var game = new models.game(players, client, {map: {zones:zones, nodes:nodes}, settings: {} });
-
-    ge.games[game.id] = game;
-    ge.game_count++;
-    var temp = {game_id:game.id, players: game.players, map:game.map};
-    client.emit('start_game', JSON.stringify(temp));
+    client.emit('start_game', JSON.stringify(ge));
 }
 
 
@@ -203,6 +149,291 @@ ge.timer_tick = function(client, c) {
 
 
 
+
+
+
+//----------------------------
+//---------MODELS-------------
+//----------------------------
+
+
+
+
+ge.Player = function(id, user, node, color, role, actions_left) {
+	this.id = id;
+	this.user = user;
+	this.node = node;//Position of the player
+	this.color = color;
+	this.role = role;
+	this.info_cards = [];
+	this.actions_left = actions_left;
+	this.class = 'player';
+	
+}
+ge.Player.prototype.set_actions_left = function (actions_left) {
+	this.actions_left = actions_left;
+}
+ge.Player.prototype.minus_one_action = function () {
+	if (this.actions_left != 0) {
+		this.actions_left -= 1;	
+		return true;
+	}
+	return false;
+	//update gui?
+}
+ge.Player.prototype.remove_info_card = function(info_card) {
+	for (var i = 0; i < this.info_cards.length; i++) {
+		if (this.info_cards[i] === info_card) {
+			this.info_cards.splice(i, 1);
+			//update gui?
+		}
+	}
+}
+ge.Player.prototype.add_info_card = function(info_card) {
+	this.info_cards.push(info_card);
+	//update gui?
+}
+ge.Player.prototype.move_player = function (node) {
+	if (this.node === node) {
+		return false
+	} else if (this.node.connects_to(node.id)) {
+		this.node = node;
+		this.minus_one_action();
+		return true;
+	}
+	return false;
+}
+ge.Player.prototype.add_information_center = function () {
+	if (this.node.has_information_center){
+		return false;
+	}
+	else if (this.actions_left < 4){ // TODO: finne max antall actions for player
+		return false;
+	}
+	else {
+		this.node.has_information_center = true;
+		this.set_actions_left(0);
+		return true;
+	}
+}
+ge.Player.prototype.add_road_block = function () {
+	if(this.node.has_road_block){
+		return false;
+	}
+	else if(this.minus_one_action){
+		return this.node.add_road_block();
+	}
+	return false;
+}
+ge.Player.prototype.remove_road_block = function () {
+	if(!this.node.has_road_block){
+		return false;
+	}
+	else if(this.minus_one_action){
+		return this.node.remove_road_block();
+	}
+	return false;
+}
+
+
+
+ge.User = function (username, password, name, email, is_admin) {
+	this.username = username;
+	this.password = password;
+	this.name = name;
+	this.email = email;
+	this.is_admin = is_admin;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+ge.Node = function (id, x, y, is_start_position, connects_to) {
+	this.id = id;
+	this.x = x;
+	this.y = y;
+	this.is_start_position = is_start_position;
+	this.connects_to = connects_to; // Nodes
+	this.has_information_center = false;
+	this.has_road_block = false;
+	
+}
+ge.Node.prototype.add_information_center = function () {
+	if (this.has_information_center){
+	    return false;
+	}
+	else { 
+		this.has_information_center = true;
+		return true;	
+	}
+}
+
+ge.Node.prototype.add_road_block = function () {
+	if (this.has_road_block) {
+		return false;
+	}
+	else {
+		this.has_road_block = true;
+		return true;	
+	}
+	return true;
+}
+
+ge.Node.prototype.remove_road_block = function () {
+	if (this.has_road_block = false) {
+		return false;
+	}
+	else {
+		this.has_road_block = false;
+		return true;
+	}	
+	return true;
+}
+ge.Node.prototype.connects_to = function(n){
+    return this.connects_to.indexOf(n.id) > -1;
+}
+
+
+
+
+
+
+
+
+
+ge.Role = function (title, effect) {
+	this.title = title;
+	this.effect = effect;
+}
+
+
+
+
+
+
+ge.Event = function (text, effect) {
+	this.text = text;
+	this.effect = effect;
+}
+
+
+
+
+
+
+
+
+
+
+ge.Zone = function (id, nodes, zones) {
+	this.id = id;
+	this.type = "regular";
+	this.people = 50;
+	this.nodes = nodes;
+	this.adjacent_zones = zones;
+	this.panic_level = 0;//settes til 0 i starten??
+}
+ge.Zone.prototype.update_panic_level = function (panic_level) {
+	this.panic_level += panic_level;		
+	if (this.panic_level >= 50) {
+		this.panic_level = 50;
+		//send beskjed om maks panikk
+	} else if (this.panic_level < 0) {
+		this.panic_level = 0;
+	}
+}
+
+ge.Zone.prototype.dec_panic = function(player) {
+	if (player.node.adjacent_zones.indexOf(this) >= 0) {
+		this.update_panic_level(-5);
+		return true;
+	}
+	return false;
+}
+ge.Zone.prototype.move_people = function(player, to_zone) {
+	if (player.node.adjacent_zones.indexOf(this) >= 0 &&
+		this.adjacent_zones.indexOf(to_zone) >= 0) {
+		this.people -= 5; //TODO: add roles-difference
+		to_zone.people += 5;
+		return true;
+	}
+	return false;
+}
+
+ge.Zone.prototype.move_people = function (people, to_zone) {
+	if (this.people >= people) {
+		for (var i = 0; i < this.adjacent_zones.length; i++) {
+			//hvis zonen er nabo kan du flytte
+			if (this.adjacent_zones[i] === to_zone) {
+				this.people -= people;
+				to_zone.people += people;
+				return 1;
+			}
+		}
+		//error message to gui
+		console.log("The zone is not adjacent!!");
+		return 0;
+	}
+	else {
+		//error 
+		console.log("There isnt that many people in this zone!!");
+	}
+}
+
+
+
+
+
+
+
+
+
+ge.Timer = function (timer_interval) {
+	//sets the interval for increased panic in minutes
+	setInterval(function(){
+		alert("Time interval has passed, the panic is increasing in " +
+			"the city!");
+	},(interval * 60 * 1000));
+}
+
+
+
+
+
+
+
+ge.Info_card = function (text, effect) {
+	this.text = text;
+	this.effect = effect;
+}
+
+
+
+
+
+
+
+ge.Map = function (nodes, zones) {
+	this.nodes = nodes;
+	this.zones = zones;
+}
+
+
+
+
+
+
+ge.Settings = function (timer_interval) {
+	var timer = new timer(timer_interval);
+}
 
 
 
