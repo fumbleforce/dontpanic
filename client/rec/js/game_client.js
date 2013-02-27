@@ -5,7 +5,7 @@
 var players, 
     nodes,
     zones,
-    c_height = 1000,
+    c_height = 1500,
     c_width = 1500,
     canvas = document.getElementById("viewport"),
     ctx = canvas.getContext("2d"),
@@ -13,8 +13,9 @@ var players,
     node_size = 50;
     player_size = 20,
     turn = 0,
+    padding = 30,
     //how far from node circumference should player center be (higher = closer to center) must be >1
-    offset_distance = node_size*1;
+    offset_distance = node_size*1,
     //where to put the max 8 players on the node (on circle circumference?) yay dirtytrigonometry
     player_offsetX = [0, 
                       Math.cos(315*(Math.PI/180))*offset_distance,
@@ -23,7 +24,7 @@ var players,
                       0, 
                       Math.cos(225*(Math.PI/180))*offset_distance,
                       -offset_distance, 
-                      Math.cos(135*(Math.PI/180))*offset_distance];
+                      Math.cos(135*(Math.PI/180))*offset_distance],
     
     player_offsetY = [-offset_distance,
                       Math.sin(315*(Math.PI/180))*offset_distance,

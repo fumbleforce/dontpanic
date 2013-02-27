@@ -109,7 +109,7 @@ socket_listener.sockets.on('connection', function (client) {
     client.on('game_command', function(c) {
         console.log('**SOCKET_LISTENER** received in-game command ' + c);
         var parsed = JSON.parse(c);
-        engine.command(client, parsed);
+        games[client.game_id].command(client, parsed);
     });
 
     client.on('disconnect', function () {

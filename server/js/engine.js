@@ -12,7 +12,8 @@ var ge = module.exports = function (id, client) {
 	this.client = client;
 	this.active_player = 0;
 	this.turn = 0;
-	var SCALE= 10;
+	var SCALE= 90;
+	var PADD = 50;
     this.map.nodes = [];
     this.map.zones = [];
     
@@ -52,10 +53,12 @@ var ge = module.exports = function (id, client) {
         3*SCALE, 15*SCALE, 1*SCALE, 5*SCALE, 11*SCALE,
         3*SCALE, 7*SCALE, 15*SCALE, 8*SCALE, 11*SCALE,
         15*SCALE
-    ],
-    posx = [100, 350, 700, 100, 450, 600],
-    posy = [60, 140, 80, 320, 420, 320],
-	player_colors = ["blue","red","yellow","grey","purple","brown","green","orange"];
+    ];
+
+    for (var i = 0; i < conn.length; i++){
+        posy[i] = posy[i]+PADD;
+        posx[i] = posx[i]+PADD;
+    }
 
     for(var i = 0; i < 21; i++){
 		    node = new ge.Node(i, posx[i], posy[i], true, conn[i]);
@@ -65,23 +68,23 @@ var ge = module.exports = function (id, client) {
 
     var zones = [];
 
-    zones[0] = new ge.Zone(0, [0, 1, 3, 4], [1, 2, 5]);
-    zones[1] = new ge.Zone(1, [0, 2, 3, 5], [0, 3, 4]);
-    zones[2] = new ge.Zone(2, [1, 4, 6, 9], [0, 5, 7]);
+    zones[0] = new ge.Zone(0, [0, 1, 4, 3], [1, 2, 5]);
+    zones[1] = new ge.Zone(1, [0, 2, 5, 3], [0, 3, 4]);
+    zones[2] = new ge.Zone(2, [1, 4, 9, 6], [0, 5, 7]);
     zones[3] = new ge.Zone(3, [2, 5, 7], [1, 4, 6]);
     zones[4] = new ge.Zone(4, [3, 5, 8], [1, 5, 6]);
-    zones[5] = new ge.Zone(5, [3, 4, 8, 9], [0, 2, 4, 10]);
-    zones[6] = new ge.Zone(6, [5, 7, 8, 10, 13], [3, 4, 8, 9]);
-    zones[7] = new ge.Zone(7, [6, 9, 11, 14], [2, 11, 12]);
-    zones[8] = new ge.Zone(8, [10, 12, 13, 15], [6, 13]);
+    zones[5] = new ge.Zone(5, [3, 4, 9, 8], [0, 2, 4, 10]);
+    zones[6] = new ge.Zone(6, [5, 7, 10, 13, 8], [3, 4, 8, 9]);
+    zones[7] = new ge.Zone(7, [6, 9, 14, 11], [2, 11, 12]);
+    zones[8] = new ge.Zone(8, [10, 12, 15, 13], [6, 13]);
     zones[9] = new ge.Zone(9, [8, 13, 16], [6, 10, 13]);
     zones[10] = new ge.Zone(10, [8, 9, 16], [5, 9, 11]);
-    zones[11] = new ge.Zone(11, [9, 14, 16, 19], [7, 10, 15, 16]);
+    zones[11] = new ge.Zone(11, [9, 14, 19, 16], [7, 10, 15, 16]);
     zones[12] = new ge.Zone(12, [11, 14, 17], [7, 11, 16]);
     zones[13] = new ge.Zone(13, [13, 15, 16], [8, 9, 14]);
     zones[14] = new ge.Zone(14, [15, 16, 18], [13, 15]);
     zones[15] = new ge.Zone(15, [16, 18, 19], [11, 14]);
-    zones[16] = new ge.Zone(16, [14, 17, 19, 20], [11, 12]);
+    zones[16] = new ge.Zone(16, [14, 17, 20, 19], [11, 12]);
 
     zones[0].color = "aqua";
     zones[1].color = "blue";
@@ -123,9 +126,9 @@ var ge = module.exports = function (id, client) {
 
     Executes in-game commands.
 */
-ge.command = function(client, c){
-    var nodes = ge.map.nodes,
-        players = ge.players;
+ge.prototype.command = function(client, c){
+    var nodes = this.map.nodes,
+        players = this.players;
     
     console.log("Interpreting in-game command of type: "+c.type);
     switch (c.type) {
@@ -135,7 +138,7 @@ ge.command = function(client, c){
                 " when playernode connects to "+nodes[player.node].connects_to);
             var p = players[c.player_id];
             if (nodes[p.node].connects_to.indexOf(c.node_id) > -1 && 
-					(c.player_id == g.active_player)){
+					(c.player_id == this.turn)){
 				if(p.minus_one_action()){
 					
 					p.node = c.node_id;
@@ -199,10 +202,11 @@ ge.command = function(client, c){
 
 
 
-<<<<<<< HEAD
 ge.prototype.start = function(client){
     var g = {players:this.players, map:this.map};
-    console.log(g);
+    console.log(g.players);
+    console.log(g.map.nodes);
+    console.log(g.map.zones);
     client.emit('start_game', JSON.stringify(g));
 }
 

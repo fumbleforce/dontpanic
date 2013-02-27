@@ -35,7 +35,6 @@ socket.on('change', function (data) {
 
 function command(type, c){
     c.type = type;
-    c.game_id = game_id;
     var send = JSON.stringify(c);
     console.log('Sending '+ type +  '"' + send + '"');
     socket.emit('game_command', send);
