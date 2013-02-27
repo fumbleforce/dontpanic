@@ -11,28 +11,30 @@ var ge = module.exports = {games : {}, game_count : 0},
     Executes in-game commands.
 */
 ge.command = function(client, c){
-    console.log("Interpreting in-game command of type: "+c.type);
+    
     var g = ge.games[c.game_id];
     var nodes = g.map.nodes;
     var players = g.players;
     
+    console.log("Interpreting in-game command of type: "+c.type);
     switch (c.type) {
         case 'move_player':
-            console.log("Trying to move player from "+player.node+" to "+c.node_id+ " when playernode connects to "+nodes[player.node].connects_to);
-            if (nodes[player.node].connects_to.indexOf(c.node_id) > -1){
-                player.node = c.node_id;
-                
-                var stringed = JSON.stringify({
-			        type:'moved_player',
-			        player:player
-			    });
-			    console.log("Emitting moved_player change");
-			    client.emit('change', stringed);
+            console.log("Trying to move player "+ c.player_id +
+                " from "+player.node+" to "+c.node_id+ 
+                " when playernode connects to "+nodes[player.node].connects_to);
+            var p = players[c.player_id]
+            if (nodes[p.node].connects_to.indexOf(c.node_id) > -1){
+                p.node = c.node_id;
+			    console.log("Player was moved");
             }
             else{
-                console.log("Failed moving player");
-				client.emit('error', 'Failed moving player');			
+                console.log("Failed moving player");	
 			}
+			var stringed = JSON.stringify({
+			    type:'moved_player',
+			    player:p
+			});
+			client.emit('change', stringed);	
             break;
 		case 'dec_panic':
 			if (!g.map.zones[c.zone_id].dec_panic(g.players[c.player_id])) {
@@ -75,8 +77,6 @@ ge.command = function(client, c){
             break;
         console.log("No matching command types");
     }
-
-
 }
 
 

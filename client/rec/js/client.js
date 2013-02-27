@@ -28,10 +28,10 @@ socket.on('change', function (data) {
             move_player(d.player);
             console.log("Player has moved to node id: "+d.player.node);
             break;
-    
-    
+
     } 
 });
+
 
 function command(type, c){
     c.type = type;
