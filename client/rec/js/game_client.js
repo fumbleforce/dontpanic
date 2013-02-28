@@ -55,7 +55,7 @@ function init_game(ps, map) {
     
     setup_canvas();
     set_canvas_listener();
-    alert("Player"+(turn+1)+"'s turn.");
+
     draw();
 
 }
@@ -63,6 +63,7 @@ function init_game(ps, map) {
 function setup_canvas(){
     canvas.width = c_width;
     canvas.height = c_height;
+    cst.selected_zone = null;
 }
 
 function move_player(p){
@@ -168,6 +169,22 @@ function zone_draw(zone, ctx){
     
 }
 
+function selection_draw(ctx){
+    if (cst.selected_zone !== null){
+        var zone = zones[cst.selected_zone];
+        ctx.beginPath();
+        ctx.moveTo(nodes[zone.nodes[0]].x, nodes[zone.nodes[0]].y);
+        for (var j = 1; j < zone.nodes.length; j++){
+            ctx.lineTo(nodes[zone.nodes[j]].x, nodes[zone.nodes[j]].y);
+        }
+        ctx.lineTo(nodes[zone.nodes[0]].x, nodes[zone.nodes[0]].y);
+        ctx.closePath();
+        ctx.strokeStyle = "green";
+        ctx.lineWidth = 40;
+        ctx.stroke();
+    }
+}
+
 function player_contains(p, mx, my) {
     var pn = nodes[p.node];
     return (mx<=(pn.x+player_offsetX[p.id]+player_size))&&
@@ -183,6 +200,23 @@ function node_contains(node, mx, my) {
         (my>=(node.y-node_size));
 }
 
+function zone_contains(z, mx, my){
+    var n = z.nodes;
+    var r = false;
+    var j = n.length - 1;
+
+    for (var i=0; i <n.length; i++) {
+        if (nodes[n[i]].y < my && nodes[n[j]].y >= my ||  nodes[n[j]].y < my && nodes[n[i]].y >= my) {
+     
+            if (nodes[n[i]].x + (my - nodes[n[i]].y) / (nodes[n[j]].y - nodes[n[i]].y) * (nodes[n[j]].x - nodes[n[i]].x) < mx) {
+                r = !r;
+            }
+        }
+        j = i;
+    }
+    return r;
+}
+
 function draw(){
     var to_node = {},
         node = {},
@@ -195,6 +229,8 @@ function draw(){
         zone = zones[i];
         zone_draw(zone,ctx);
     }
+    
+    selection_draw(ctx);
     
     //road blocks (move into node draw?)
     //road blocks are now drawn ABOVE zones, but BELOW players and nodes
@@ -236,11 +272,13 @@ function set_canvas_listener(){
     canvas.addEventListener('selectstart', function(e) { e.preventDefault(); return false; }, false);
 
     canvas.addEventListener('mousedown', function(e) {
-        console.log("Mouse is down");
+        
         var mx = e.offsetX,
             my = e.offsetY,
             selected;
-            
+
+        cst.selected_zone = null;
+        
         if (cst.selection) {
             console.log("clearing selection");
             cst.selection.x = nodes[cst.selection.node].x
@@ -249,6 +287,7 @@ function set_canvas_listener(){
             cst.dragging = false;
             draw();
         }
+        
         
         for (var i = 0; i < players.length; i++) {
             
@@ -265,7 +304,17 @@ function set_canvas_listener(){
                 return;
            }
         }
-
+        
+        for (var i = 0; i < zones.length; i++) {
+            
+            if (zone_contains(zones[i], mx, my)) {
+                console.log("Clicked on zone "+i);
+                cst.selected_zone = i;
+                draw();
+                return;
+           }
+        }
+        draw();
         
     }, true);//end mousedown listener
   
@@ -284,7 +333,7 @@ function set_canvas_listener(){
         var mx = e.offsetX,
             my = e.offsetY;
              
-        console.log("Mouse released");   
+         
         if (cst.dragging && cst.selection !== undefined) {
             console.log("Mouse let go of player");
             for (var i = 0; i < nodes.length; i++) {
