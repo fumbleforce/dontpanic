@@ -44,7 +44,7 @@ var nodes = [];
 	player_colors = ["blue","red","yellow","grey","purple","brown","green","orange"];
 
 for(var i = 0; i < 21; i++){
-		node = new models.node(i, posx[i], posy[i], true, conn[i]);
+		node = new ge.Node(i, posx[i], posy[i], true, conn[i]);
 		nodes.push(node);
 }
 
@@ -79,7 +79,7 @@ var players = [];
 player_colors = ["blue","red","yellow","grey","purple","brown","green","orange"];
 
 for(var i = 0; i < 8; i++){
-	player = new models.Player(i, "player" + i, 0, player_colors[i], {}, 4);
+	player = new ge.Player(i, "player" + i, 0, player_colors[i], {}, 4);
 	players.push(player);
 }
 

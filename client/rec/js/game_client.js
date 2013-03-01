@@ -2,19 +2,27 @@
 
     TODO These are global for now, but  SHOULD be encapsulated, along with all the functions. IMPORTANT.
 */
-var game_id,
-    players, 
+var players, 
     nodes,
     zones,
-    c_height = 1000,
+    c_height = 1500,
     c_width = 1500,
     canvas = document.getElementById("viewport"),
     ctx = canvas.getContext("2d"),
     cst = {},
     node_size = 50;
     player_size = 20,
+    info_center_size = 35,
+    //panic info stuff
+    panic_info_size = 40,
+    averageX = 0;
+    averageY = 0;
+    
+    
+    turn = 0,
+    padding = 30,
     //how far from node circumference should player center be (higher = closer to center) must be >1
-    offset_distance = node_size*1;
+    offset_distance = node_size*1,
     //where to put the max 8 players on the node (on circle circumference?) yay dirtytrigonometry
     player_offsetX = [0, 
                       Math.cos(315*(Math.PI/180))*offset_distance,
@@ -23,7 +31,7 @@ var game_id,
                       0, 
                       Math.cos(225*(Math.PI/180))*offset_distance,
                       -offset_distance, 
-                      Math.cos(135*(Math.PI/180))*offset_distance];
+                      Math.cos(135*(Math.PI/180))*offset_distance],
     
     player_offsetY = [-offset_distance,
                       Math.sin(315*(Math.PI/180))*offset_distance,
@@ -39,15 +47,15 @@ var game_id,
 
 
 
-function init_game(id, ps, map) {
+function init_game(ps, map) {
     console.log("Game initiated");
-    game_id = id;
     players = ps;
     zones = map.zones;
     nodes = map.nodes;
     
     setup_canvas();
     set_canvas_listener();
+
     draw();
 
 }
@@ -55,6 +63,7 @@ function init_game(id, ps, map) {
 function setup_canvas(){
     canvas.width = c_width;
     canvas.height = c_height;
+    cst.selected_zone = null;
 }
 
 function move_player(p){
@@ -86,35 +95,57 @@ function player_draw(player, ctx){
     ctx.fillStyle = "White";
     ctx.font="10px Georgia",
     ctx.fillText(player.id, player.x+player_offsetX[player.id]-3, player.y+player_offsetY[player.id]+2);
+    
+    //draw circle to show active player when dragging
 }
 
 function node_draw(node, ctx){
-	//TODO move info center drawing somewhere else?
-    if (node.has_information_center){
-        ctx.fillStyle = 'white';
-        ctx.fillRect(node.x, node.y, 20, 20);
-    }
-    else{
-        ctx.fillStyle = 'black';
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, node_size, 0, Math.PI*2, true); 
-        ctx.closePath();
-        ctx.fill();
-    }
-    
+    ctx.fillStyle = 'black';
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, node_size, 0, Math.PI*2, true); 
+    ctx.closePath();
+    ctx.fill();    
+    //draw node number
     ctx.fillStyle = "White";
     ctx.font="13px Georgia",
-    ctx.fillText(node.id, node.x-3, node.y+2);
+    ctx.fillText(node.id, node.x-3, node.y-15);
+    //TODO move info center drawing somewhere else?
+    //draw info center
+    if (node.has_information_center){
+    	ctx.fillStyle = 'steelblue';
+        ctx.fillRect(node.x-(info_center_size/2), node.y-(info_center_size/2)+10, info_center_size, info_center_size);
+        ctx.fillStyle = 'white';
+        ctx.font='20px Georgia',
+        //draw i for infocenter, or number for node?
+        //
+        ctx.fillText("i", node.x-3, node.y+15);
+    }
 }
 
 //TODO draw road blocks (one on each node (as specification says) + something on the path between them?)
 function roadblock_draw(node, ctx){
-	context.fillStyle   = 'green';
-	//context.fillRect  (what,to,put,here);
+	ctx.strokeStyle = '#202020';
+	ctx.lineWidth = 25;
+	for (var i = 0; i < node.connects_to.length; i++){
+		ctx.beginPath();
+	    ctx.moveTo(node.x, node.y);
+	    //maybe: 50% road block to another node with road block (50+50=100), 
+	    // but only 10% when neighbor does not have r b (looks better...?)
+	    // for now: just draw 50% block
+	    //if (nodes[node.connects_to[i]].has_road_block){
+	    	ctx.lineTo(((nodes[node.connects_to[i]].x)+node.x)/2, ((nodes[node.connects_to[i]].y)+node.y)/2);
+	    //}
+	    //else{
+	    //	ctx.lineTo(((nodes[node.connects_to[i]].x)+node.x)/10, ((nodes[node.connects_to[i]].y)+node.y)/10);
+	    //}
+	    
+	    ctx.closePath();
+	    ctx.stroke();
+    }
 }
 
 function background_draw(ctx){
-    ctx.fillStyle="white";
+    ctx.fillStyle="lightgray";
     ctx.fillRect(0,0, c_width, c_height);
 }
 
@@ -133,6 +164,25 @@ function zone_draw(zone, ctx){
     //Fill zone with respective color
     ctx.fillStyle = zone.color;
     ctx.fill();
+    //Add panic info in zones
+    //Find center of zones (center of multi-point polygon, might be hard)
+    
+}
+
+function selection_draw(ctx){
+    if (cst.selected_zone !== null){
+        var zone = zones[cst.selected_zone];
+        ctx.beginPath();
+        ctx.moveTo(nodes[zone.nodes[0]].x, nodes[zone.nodes[0]].y);
+        for (var j = 1; j < zone.nodes.length; j++){
+            ctx.lineTo(nodes[zone.nodes[j]].x, nodes[zone.nodes[j]].y);
+        }
+        ctx.lineTo(nodes[zone.nodes[0]].x, nodes[zone.nodes[0]].y);
+        ctx.closePath();
+        ctx.strokeStyle = "green";
+        ctx.lineWidth = 40;
+        ctx.stroke();
+    }
 }
 
 function player_contains(p, mx, my) {
@@ -150,6 +200,23 @@ function node_contains(node, mx, my) {
         (my>=(node.y-node_size));
 }
 
+function zone_contains(z, mx, my){
+    var n = z.nodes;
+    var r = false;
+    var j = n.length - 1;
+
+    for (var i=0; i <n.length; i++) {
+        if (nodes[n[i]].y < my && nodes[n[j]].y >= my ||  nodes[n[j]].y < my && nodes[n[i]].y >= my) {
+     
+            if (nodes[n[i]].x + (my - nodes[n[i]].y) / (nodes[n[j]].y - nodes[n[i]].y) * (nodes[n[j]].x - nodes[n[i]].x) < mx) {
+                r = !r;
+            }
+        }
+        j = i;
+    }
+    return r;
+}
+
 function draw(){
     var to_node = {},
         node = {},
@@ -161,6 +228,18 @@ function draw(){
     for (var i = 0; i < zones.length; i++) {
         zone = zones[i];
         zone_draw(zone,ctx);
+    }
+    
+    selection_draw(ctx);
+    
+    //road blocks (move into node draw?)
+    //road blocks are now drawn ABOVE zones, but BELOW players and nodes
+    for (var i = 0; i < nodes.length; i++) {
+    	if (nodes[i].has_road_block){
+    		node = nodes[i]
+    		roadblock_draw(nodes[i], ctx)
+    	}
+        
     }
 
     for (var i = 0; i < nodes.length; i++) {
@@ -185,15 +264,6 @@ function draw(){
         player_draw(pl, ctx);
     }
     
-    //road blocks (move into node draw?)
-    for (var i = 0; i < nodes.length; i++) {
-    	if (nodes[i].has_road_block){
-    		node = nodes[i]
-    		roadblock_draw(nodes[i], ctx)
-    	}
-        
-    }
-    
 }// end draw
 
 
@@ -202,11 +272,13 @@ function set_canvas_listener(){
     canvas.addEventListener('selectstart', function(e) { e.preventDefault(); return false; }, false);
 
     canvas.addEventListener('mousedown', function(e) {
-        console.log("Mouse is down");
+        
         var mx = e.offsetX,
             my = e.offsetY,
             selected;
-            
+
+        cst.selected_zone = null;
+        
         if (cst.selection) {
             console.log("clearing selection");
             cst.selection.x = nodes[cst.selection.node].x
@@ -215,6 +287,7 @@ function set_canvas_listener(){
             cst.dragging = false;
             draw();
         }
+        
         
         for (var i = 0; i < players.length; i++) {
             
@@ -231,7 +304,17 @@ function set_canvas_listener(){
                 return;
            }
         }
-
+        
+        for (var i = 0; i < zones.length; i++) {
+            
+            if (zone_contains(zones[i], mx, my)) {
+                console.log("Clicked on zone "+i);
+                cst.selected_zone = i;
+                draw();
+                return;
+           }
+        }
+        draw();
         
     }, true);//end mousedown listener
   
@@ -250,7 +333,7 @@ function set_canvas_listener(){
         var mx = e.offsetX,
             my = e.offsetY;
              
-        console.log("Mouse released");   
+         
         if (cst.dragging && cst.selection !== undefined) {
             console.log("Mouse let go of player");
             for (var i = 0; i < nodes.length; i++) {
