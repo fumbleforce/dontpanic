@@ -30,7 +30,7 @@ socket.on('change', function (data) {
             break;
 		case 'decreased_panic':
 			change_panic(d.zone);
-			console.log("Panic has changed in zone id: "+d.zone);
+			console.log("Panic has changed in zone id: "+d.zone.id);
 			break;
 
     } 
