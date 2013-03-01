@@ -28,6 +28,10 @@ socket.on('change', function (data) {
             move_player(d.player);
             console.log("Player has moved to node id: "+d.player.node);
             break;
+		case 'change_panic':
+			change_panic(d.zone);
+			console.log("Panic has changed in zone id: "+d.zone.id);
+			break;
 
     } 
 });
