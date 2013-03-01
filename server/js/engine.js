@@ -172,9 +172,11 @@ var ge = module.exports = function (id, client) {
 */
 ge.prototype.command = function(client, c){
     var nodes = this.map.nodes,
+		zones = this.map.zones,
         players = this.players;
     
     console.log("Interpreting in-game command of type: "+c.type);
+	
     switch (c.type) {
         case 'move_player':
             console.log("Trying to move player "+ c.player_id +
@@ -200,12 +202,29 @@ ge.prototype.command = function(client, c){
 			client.emit('change', stringed);	
             break;
 		case 'decrease_panic':
-			console.log("Trying to decrease panic in zone: " + c.zone_id;
+			console.log("Trying to decrease panic in zone: " + c.zone_id);
 			
-			if (!this.map.zones[c.zone_id].dec_panic(players[this.active_player])) {
-				client.emit('error', 'Failed decreasing panic');
+			
+			if (zones[c.zone_id].nodes.indexOf(players[this.active_player].node) >= 0 && 
+				(zones[c.zone_id].panic_level >= 5)){
+					
+				
+				if(players[this.active_player].minus_one_action()){
+					
+					zones[c.zone_id].update_panic_level(-5); //TODO: add roles-difference
+						
+				}
+				else{ 
+					client.emit('error', 'Player is out of moves');
+					break;
+				}
+			}
+			else{
+				client.emit('error', 'Could not decrease panic');
 				break;
 			}
+			
+			
 			var stringed = JSON.stringify({
 				type:'decreased_panic',
 				zone:this.map.zones[c.zone_id]
@@ -511,8 +530,10 @@ ge.Zone.prototype.update_panic_level = function (panic_level) {
 }
 
 ge.Zone.prototype.dec_panic = function(player) {
+	client.emit('msg', 'dec panic in engine recieved');
 	if (player.node.adjacent_zones.indexOf(this) >= 0) {
 		if(this.panic_level >= 5){
+			client.emit('msg', 'dec panic in engine recieved 2');
 			if(player.minus_one_action()){
 				
 				this.update_panic_level(-5); //TODO: add roles-difference
