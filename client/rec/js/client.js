@@ -29,9 +29,17 @@ socket.on('change', function (data) {
             console.log("Player has moved to node id: "+d.player.node);
             break;
 		case 'decreased_panic':
-			change_panic(d.zone);
+			decrease_panic(d.zone);
 			console.log("Panic has changed in zone id: "+d.zone.id);
 			break;
+		case 'moved_people':
+			moved_people(d.from_zone);
+			moved_people(d.to_zone);
+			console.log("People have been moved from zone: "+d.from_zone.id + 
+				" to zone: "+d.to_zone.id);
+			break;
+				
+			
 
     } 
 });
