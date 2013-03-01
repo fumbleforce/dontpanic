@@ -194,8 +194,8 @@ function selection_draw(ctx){
         ctx.strokeStyle = "green";
         ctx.lineWidth = 40;
         ctx.stroke();
-        //TODO for testing, we add 'decrease_panic' when selecting zones
-        command('decrease_panic', {zone_id : cst.selected_zone});
+      //TODO for testing, we add 'decrease_panic' when selecting zones
+        //command('decrease_panic', {zone_id : cst.selected_zone});
     }
 }
 
@@ -291,6 +291,8 @@ function set_canvas_listener(){
             my = e.offsetY,
             selected;
 
+      
+        
         cst.selected_zone = null;
         
         if (cst.selection) {
@@ -324,6 +326,8 @@ function set_canvas_listener(){
             if (zone_contains(zones[i], mx, my)) {
                 console.log("Clicked on zone "+i);
                 cst.selected_zone = i;
+                //TODO for testing, we add 'decrease_panic' when selecting zones
+                command('decrease_panic', {zone_id : cst.selected_zone});
                 draw();
                 return;
            }
