@@ -32,12 +32,12 @@ var ge = module.exports = function (id, client) {
         [6, 14, 17],
         [10, 15],
         [8, 10, 15, 16],
-        [9, 11, 19],
-        [13, 16, 18],//15
+        [9, 11, 17, 19],
+        [12, 13, 16, 18],//15
         [8, 9, 13, 15, 18, 19],
         [11, 14, 20],
-        [15, 16],
-        [14, 16, 18],
+        [15, 16, 19],
+        [14, 16, 18, 20],
         [17, 19] // 20
            ],
     posx = [
@@ -64,14 +64,14 @@ var ge = module.exports = function (id, client) {
 		    node = new ge.Node(i, posx[i], posy[i], true, conn[i]);
 		    this.map.nodes.push(node);
     }
-    //add some random info centers
+    //TEST add some random info centers
     this.map.nodes[0].has_information_center=true;
     this.map.nodes[5].has_information_center=true;
     this.map.nodes[9].has_information_center=true;
     this.map.nodes[13].has_information_center=true;
     this.map.nodes[14].has_information_center=true;
     
-    //add some road blocks for testing (also works for testing if nodes are correctly connected to each other!)
+    //TEST add some road blocks
     this.map.nodes[0].has_road_block = true;
     this.map.nodes[2].has_road_block = true;
     this.map.nodes[3].has_road_block = true;
@@ -79,6 +79,11 @@ var ge = module.exports = function (id, client) {
     this.map.nodes[8].has_road_block = true;
     this.map.nodes[13].has_road_block = true;
     this.map.nodes[16].has_road_block = true;
+    
+    //add road blocks on all nodes for testing node/node connections
+//    for (var i=0; i<this.map.nodes.length; i++){
+//    	this.map.nodes[i].has_road_block = true;
+//    }
 	
 
 
@@ -103,7 +108,7 @@ var ge = module.exports = function (id, client) {
     zones[16] = new ge.Zone(16, [14, 17, 20, 19], [11, 12]);
 
     zones[0].color = "aqua";
-    zones[1].color = "blue";
+    zones[1].color = "steelblue";
     zones[2].color = "brown";
     zones[3].color = "darkblue";
     zones[4].color = "darkgreen";
@@ -120,50 +125,42 @@ var ge = module.exports = function (id, client) {
     zones[15].color = "seashell";
     zones[16].color = "lightgoldenrodyellow";
     
-    //add panic on a few zones
-    zones[1].panic_level = 10;
-    zones[10].panic_level = 25;
-    
-    //set centroidX and centroidY for all zones
-//    for(var i = 0; i < zones.length; i++){
-//    	get_polygon_centroid(zones[i].id, zones[i].nodes);
-//    }
-//    
-//    function get_polygon_centroid(id, zone_nodes){
-//    	var twicearea = 0,
-//    		x = 0,
-//    		y = 0,
-//    		nPts = zone_nodes.length,
-//    		p1, p2, f;
-//    	for (var i=0, j=nPts-1 ;i<nPts;j=i++) {
-//    		p1=zone_nodes[i]; p2=zone_nodes[j];
-//    		twicearea+=p1.x*p2.y;
-//    		twicearea-=p1.y*p2.x;
-//    		f=p1.x*p2.y-p2.x*p1.y;
-//    		x+=(p1.x+p2.x)*f;
-//    		y+=(p1.y+p2.y)*f;
-//    	}
-//    	f=twicearea*3;
-//    	
-//    	zones[id].centroid = [(x/f), (y/f)];
-//    }
-    
     this.map.zones = zones;
     
+    //TEST add panic on a few random zones
+    zones[1].panic_level = 10;
+    zones[3].panic_level = 25;
+    zones[4].panic_level = 30;
+    zones[5].panic_level = 5;
+    zones[6].panic_level = 10;
+    zones[9].panic_level = 25;
+    zones[12].panic_level = 5;
+    zones[14].panic_level = 40;
+    zones[16].panic_level = 45;
+    
+    //set centroidX and centroidY for test zone
+    //TODO THIS IS ACTUALLY CENTER, NOT CENTROID. For better result, 
+    // centroid has to be calculated (might not be of use to us since
+    // polygons aren't that extreme)
+    for (var zon=0; zon<zones.length; zon++){
+    	var xx=0, yy=0;
+	    for (var i=0; i<zones[zon].nodes.length; i++){
+	    	xx+=this.map.nodes[zones[zon].nodes[i]].x;
+	    	yy+=this.map.nodes[zones[zon].nodes[i]].y;
+	    }
+    zones[zon].centroid=[xx/zones[zon].nodes.length, yy/zones[zon].nodes.length];
+    }
+    
+    
     this.players = [];
-    player_colors = ["blue","red","yellow","grey","purple","brown","green","orange"];
+    player_colors = ["red","orange","yellow","chartreuse ","green","aqua","blue","purple"];
 
     for(var i = 0; i < 8; i++){
-	    player = new ge.Player(i, "player" + i, 0, player_colors[i], {}, 4);
-	    this.players.push(player);
+    	player = new ge.Player(i, "player" + i, 0, player_colors[i], {}, 4);
+    	this.players.push(player);
     }
-
-
-
 	
 }
-
-
 
 
 /*  Decode command
@@ -516,7 +513,7 @@ ge.Zone = function (id, nodes, zones) {
 	this.nodes = nodes;
 	this.adjacent_zones = zones;
 	this.panic_level = 0;//settes til 0 i starten??
-	this.centroid = [];//center (centroid) X and Y of zone polygon to put panic info
+	this.centroid = [0,0];//center (centroid) X and Y of zone polygon to put panic info
 	
 }
 ge.Zone.prototype.update_panic_level = function (panic_level) {

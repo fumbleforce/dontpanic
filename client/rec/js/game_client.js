@@ -73,7 +73,7 @@ function move_player(p){
     draw();
 }
 
-//decrease panic (server knows if player has special -10 panic role)
+//decrease panic (server knows if player has special -10 panic role, if not decrease by 5)
 function decrease_panic(zone){
 	zones[zone.id].panic_level = zone.panic_level;
 	draw();
@@ -93,16 +93,16 @@ function player_draw(player, ctx){
     
     ctx.fillStyle = "brown";
     ctx.beginPath();
-    ctx.arc(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size/5, 0, Math.PI*2, true); 
+    ctx.arc(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size/2, 0, Math.PI*2, true); 
     ctx.closePath();
     ctx.fill();
     
     //draw player number (for testing at least)
     ctx.fillStyle = "White";
-    ctx.font="10px Georgia",
-    ctx.fillText(player.id, player.x+player_offsetX[player.id]-3, player.y+player_offsetY[player.id]+2);
+    ctx.font="15px Arial",
+    ctx.fillText(player.id, player.x+player_offsetX[player.id]-5, player.y+player_offsetY[player.id]+6);
     
-    //draw circle to show active player when dragging
+    //TODO draw circle to show active player when dragging/active?
 }
 
 function node_draw(node, ctx){
@@ -113,18 +113,23 @@ function node_draw(node, ctx){
     ctx.fill();    
     //draw node number
     ctx.fillStyle = "White";
-    ctx.font="13px Georgia",
-    ctx.fillText(node.id, node.x-3, node.y-15);
+    ctx.font="15px Arial";
+    if(node.id>9){
+    	ctx.fillText(node.id, node.x-8, node.y-15);
+    }
+    else{
+    	ctx.fillText(node.id, node.x-4, node.y-15);
+    }
     //TODO move info center drawing somewhere else?
     //draw info center
     if (node.has_information_center){
-    	ctx.fillStyle = 'steelblue';
-        ctx.fillRect(node.x-(info_center_size/2), node.y-(info_center_size/2)+10, info_center_size, info_center_size);
+    	ctx.fillStyle = 'blue';
+        ctx.fillRect(node.x-(info_center_size/2), node.y-(info_center_size/2)+6, info_center_size, info_center_size);
         ctx.fillStyle = 'white';
-        ctx.font='20px Georgia',
+        ctx.font='30px Georgia',
         //draw i for infocenter, or number for node?
         //
-        ctx.fillText("i", node.x-3, node.y+15);
+        ctx.fillText("i", node.x-4, node.y+18);
     }
     
 }
@@ -136,7 +141,7 @@ function roadblock_draw(node, ctx){
 	for (var i = 0; i < node.connects_to.length; i++){
 		ctx.beginPath();
 	    ctx.moveTo(node.x, node.y);
-	    //maybe: 50% road block to another node with road block (50+50=100), 
+	    //TODO maybe: 50% road block to another node with road block (50+50=100), 
 	    // but only 10% when neighbor does not have r b (looks better...?)
 	    // for now: just draw 50% block
 	    //if (nodes[node.connects_to[i]].has_road_block){
@@ -171,13 +176,19 @@ function zone_draw(zone, ctx){
     //Fill zone with respective color
     ctx.fillStyle = zone.color;
     ctx.fill();
-    //TODO TEMPORARY show panic info in zone 1 (test zone)
-    if (zone.id === 1)
-    {
-    	ctx.fillStyle = 'red';
-		ctx.font='50px Georgia',
-		ctx.fillText(zones[1].panic_level, nodes[zone.nodes[0]].x+120, nodes[zone.nodes[0]].y+40);
-    }
+    //TODO TEMPORARY show simple panic info
+    ctx.fillStyle = 'red';
+	if (zone.panic_level > 9){
+		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]-22,40,30); 
+	}
+	else{
+		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]-22,25,30); 
+	}
+	ctx.fillStyle = 'white';
+	ctx.font='27px Arial'
+	ctx.fillText(zone.panic_level, zone.centroid[0]-20, zone.centroid[1]+3);
+	
+	
     
 }
 
