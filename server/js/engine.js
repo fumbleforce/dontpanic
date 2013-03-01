@@ -176,9 +176,17 @@ ge.prototype.command = function(client, c){
 			client.emit('change', stringed);	
             break;
 		case 'dec_panic':
-			if (!g.map.zones[c.zone_id].dec_panic(g.players[c.player_id])) {
+			console.log("Trying to decrease panic in zone: " + c.zone_id;
+			
+			if (!this.map.zones[c.zone_id].dec_panic(g.players[this.active_player])) {
 				client.emit('error', 'Failed decreasing panic');
+				break;
 			}
+			var stringed = JSON.stringify({
+				type:'decreased_panic',
+				zone:c.zone_id
+			});
+			client.emit('change', stringed);			
 			break;
 		case 'move_people':
 			// TODO: find out how many people we can move
@@ -465,8 +473,10 @@ ge.Zone.prototype.update_panic_level = function (panic_level) {
 
 ge.Zone.prototype.dec_panic = function(player) {
 	if (player.node.adjacent_zones.indexOf(this) >= 0) {
-		this.update_panic_level(-5);
-		return true;
+		if(player.minus_one_action()){
+			this.update_panic_level(-5);
+			return true;
+		}
 	}
 	return false;
 }
