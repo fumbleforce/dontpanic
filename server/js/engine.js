@@ -121,8 +121,32 @@ var ge = module.exports = function (id, client) {
     zones[16].color = "lightgoldenrodyellow";
     
     //add panic on a few zones
-    zones[3].panic_level = 10;
+    zones[1].panic_level = 10;
     zones[10].panic_level = 25;
+    
+    //set centroidX and centroidY for all zones
+//    for(var i = 0; i < zones.length; i++){
+//    	get_polygon_centroid(zones[i].id, zones[i].nodes);
+//    }
+//    
+//    function get_polygon_centroid(id, zone_nodes){
+//    	var twicearea = 0,
+//    		x = 0,
+//    		y = 0,
+//    		nPts = zone_nodes.length,
+//    		p1, p2, f;
+//    	for (var i=0, j=nPts-1 ;i<nPts;j=i++) {
+//    		p1=zone_nodes[i]; p2=zone_nodes[j];
+//    		twicearea+=p1.x*p2.y;
+//    		twicearea-=p1.y*p2.x;
+//    		f=p1.x*p2.y-p2.x*p1.y;
+//    		x+=(p1.x+p2.x)*f;
+//    		y+=(p1.y+p2.y)*f;
+//    	}
+//    	f=twicearea*3;
+//    	
+//    	zones[id].centroid = [(x/f), (y/f)];
+//    }
     
     this.map.zones = zones;
     
@@ -452,6 +476,8 @@ ge.Zone = function (id, nodes, zones) {
 	this.nodes = nodes;
 	this.adjacent_zones = zones;
 	this.panic_level = 0;//settes til 0 i starten??
+	this.centroid = [];//center (centroid) X and Y of zone polygon to put panic info
+	
 }
 ge.Zone.prototype.update_panic_level = function (panic_level) {
 	this.panic_level += panic_level;		

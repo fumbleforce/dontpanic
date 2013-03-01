@@ -73,6 +73,12 @@ function move_player(p){
     draw();
 }
 
+//decrease panic (server knows if player has special -10 panic role)
+function decrease_panic(zone){
+	zones[zone.id].panic_level = zone.panic_level;
+	draw();
+}
+
 function player_draw(player, ctx){
     if (player.x === undefined) player.x = nodes[player.node].x;
     if (player.y === undefined) player.y = nodes[player.node].y;
@@ -120,6 +126,7 @@ function node_draw(node, ctx){
         //
         ctx.fillText("i", node.x-3, node.y+15);
     }
+    
 }
 
 //TODO draw road blocks (one on each node (as specification says) + something on the path between them?)
@@ -164,8 +171,13 @@ function zone_draw(zone, ctx){
     //Fill zone with respective color
     ctx.fillStyle = zone.color;
     ctx.fill();
-    //Add panic info in zones
-    //Find center of zones (center of multi-point polygon, might be hard)
+    //TODO TEMPORARY show panic info in zone 1 (test zone)
+    if (zone.id === 1)
+    {
+    	ctx.fillStyle = 'red';
+		ctx.font='50px Georgia',
+		ctx.fillText(zones[1].panic_level, nodes[zone.nodes[0]].x+120, nodes[zone.nodes[0]].y+40);
+    }
     
 }
 
@@ -182,6 +194,8 @@ function selection_draw(ctx){
         ctx.strokeStyle = "green";
         ctx.lineWidth = 40;
         ctx.stroke();
+        //TODO for testing, we add 'decrease_panic' when selecting zones
+        command('decrease_panic', {zone_id : cst.selected_zone});
     }
 }
 
