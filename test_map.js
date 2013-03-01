@@ -39,7 +39,6 @@ var nodes = [];
         15*SCALE
     ];
 
-
     posx = [100, 350, 700, 100, 450, 600];
     posy = [60, 140, 80, 320, 420, 320];
 	player_colors = ["blue","red","yellow","grey","purple","brown","green","orange"];
@@ -70,24 +69,11 @@ zones[14] = new models.zone(14, [15, 16, 18], [13, 15]);
 zones[15] = new models.zone(15, [16, 18, 19], [11, 14]);
 zones[16] = new models.zone(16, [14, 17, 20, 19], [11, 12]);
 
+var zone_colors = ["aqua", "blue", "brown", "darkblue", "darkgreen", "indigo", "gold", "orange", "grey", "peru", "silver", "teal", "yellow", "yellowgreen", "tomato", "seashell", "lightgoldenrodyellow", ]
 
-zones[0].color = "aqua";
-zones[1].color = "blue";
-zones[2].color = "brown";
-zones[3].color = "darkblue";
-zones[4].color = "darkgreen";
-zones[5].color = "indigo";
-zones[6].color = "gold";
-zones[7].color = "orange";
-zones[8].color = "grey";
-zones[9].color = "peru";
-zones[10].color = "silver";
-zones[11].color = "teal";
-zones[12].color = "yellow";
-zones[13].color = "yellowgreen";
-zones[14].color = "tomato";
-zones[15].color = "seashell";
-zones[16].color = "lightgoldenrodyellow";
+for(var i=0; i<=16; i++) {
+    zones[i].color = zone_colors[i];
+}
 
 var players = [];
 player_colors = ["blue","red","yellow","grey","purple","brown","green","orange"];
@@ -96,6 +82,4 @@ for(var i = 0; i < 8; i++){
 	player = new ge.Player(i, "player" + i, 0, player_colors[i], {}, 4);
 	players.push(player);
 }
-
-
 

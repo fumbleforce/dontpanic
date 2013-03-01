@@ -199,17 +199,38 @@ ge.prototype.command = function(client, c){
 			});
 			client.emit('change', stringed);	
             break;
-		case 'dec_panic':
-			if (!g.map.zones[c.zone_id].dec_panic(g.players[c.player_id])) {
+		case 'decrease_panic':
+			console.log("Trying to decrease panic in zone: " + c.zone_id;
+			
+			if (!this.map.zones[c.zone_id].dec_panic(players[this.active_player])) {
 				client.emit('error', 'Failed decreasing panic');
+				break;
 			}
+			var stringed = JSON.stringify({
+				type:'decreased_panic',
+				zone:this.map.zones[c.zone_id]
+			});
+			client.emit('change', stringed);			
 			break;
 		case 'move_people':
 			// TODO: find out how many people we can move
-			if (!g.map.zones[c.from_zone_id]
-					.move_people(g.players[c.player_id], g.zones[c.to_zone_id])) {
+			console.log("Trying to move people from zone: " + c.from_zone_id +
+				"to zone: " + c.to_zone_id);
+			
+			
+			if (!this.map.zones[c.from_zone_id]
+				.move_people(players[this.active_player], 
+				this.zones[c.to_zone_id])) {
+				
 				client.emit('error', 'Failed moving people');
+				break;
 			}
+			var stringed = JSON.stringify({
+				type:'moved_people',
+				from_zone:this.zones[c.from_zone_id],
+				to_zone:this.zones[c.to_zone_id]
+			});
+			client.emit('change', stringed);
 			break;
 		case 'create_info_center':
 			if(!g.players[c.player_id].add_information_center()){
@@ -491,17 +512,27 @@ ge.Zone.prototype.update_panic_level = function (panic_level) {
 
 ge.Zone.prototype.dec_panic = function(player) {
 	if (player.node.adjacent_zones.indexOf(this) >= 0) {
-		this.update_panic_level(-5);
-		return true;
+		if(this.panic_level >= 5){
+			if(player.minus_one_action()){
+				
+				this.update_panic_level(-5); //TODO: add roles-difference
+				return true;
+			}
+		}
 	}
 	return false;
 }
+
+
+ // should this method be different because of panic ?? 
 ge.Zone.prototype.move_people = function(player, to_zone) {
 	if (player.node.adjacent_zones.indexOf(this) >= 0 &&
 		this.adjacent_zones.indexOf(to_zone) >= 0) {
-		this.people -= 5; //TODO: add roles-difference
-		to_zone.people += 5;
-		return true;
+		if(player.minus_one_action()){
+			this.people -= 5; //TODO: add roles-difference
+			to_zone.people += 5;
+			return true;
+		}
 	}
 	return false;
 }
