@@ -15,11 +15,10 @@ var players,
     info_center_size = 35,
     //panic info stuff
     panic_info_size = 40,
-    averageX = 0;
-    averageY = 0;
-    
-    
+    averageX = 0,
+    averageY = 0,
     turn = 0,
+    active_player = 0;
     padding = 30,
     //how far from node circumference should player center be (higher = closer to center) must be >1
     offset_distance = node_size*1,
@@ -72,6 +71,17 @@ function move_player(p){
     players[p.id].y = nodes[p.node].y;
     draw();
 }
+
+function next_turn(ap, t){
+    turn = t;
+    active_player = ap;
+    draw();
+}
+function decrease_actions(){
+    players[active_player].actions_left--;
+    draw();
+}
+
 
 //decrease panic (server knows if player has special -10 panic role, if not decrease by 5)
 function decrease_panic(zone){
@@ -288,6 +298,10 @@ function draw(){
         pl = players[i];
         player_draw(pl, ctx);
     }
+    
+    document.getElementById("turn-label").innerHTML = "Turn: "+(turn); 
+    document.getElementById("player-turn-label").innerHTML = "Player "+(active_player)+"'s turn"; 
+    document.getElementById("action-label").innerHTML = "Actions left: "+(players[active_player].actions_left); 
     
 }// end draw
 

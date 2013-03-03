@@ -1,35 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
-<head></head>
-<body style="background-color:black">
 
-<div style="width:100%">
-    <table>
-        <tr>
-            <td style="width:50%"></td>
-            
-            
-            
-            <td>
-                <h1 style="color:white;text-align:center;font-size:60px;">DON'T PANIC<h1>
-                
-                <canvas id="viewport" style="margin-left:auto;margin-right:auto;margin-top:0px">
-                    <p>Your browser is terrible</p>
-                    <p>Get a good one here:<p>
-                    <p><a href="http://www.mozilla.org/en-US/firefox/new/">Firefox</a></p>
-                    <p><a href="https://www.google.com/intl/no/chrome/browser/">Chrome</a></p>
-                </canvas>
-                
-                <div style="text-align:center;font-size:20px;color:white;margin:50px;">A game by Group 10</div>
-            </td>
-            
-            
-            
-            <td style="width:50%"></td>
-        </tr>
-    </table>
-<div>
+<head>
+    <link rel="stylesheet" href="/css/styles.css" >
+</head>
 
+<body>
+<div class="content-table">
+    
+    <div class="title-row content-row">
+        <div class="content-column"></div>
+        <div class="content-column title-text">
+            DON'T PANIC
+        </div>
+        <div class="content-column"></div>
+    </div>
+    <div class="content-row">
+        <div class="content-column"></div>
+        <div class="content-column">
+            <div class="top-bar clearfix">
+                <button class="btn-end-turn" onclick="end_turn();">Next Turn</button>
+                <div id="player-turn-label" class="info-label">Player 0's turn</div>
+                <div id="turn-label" class="info-label">Turn: 0</div>
+                <div id="action-label" class="info-label">Action points left: 4</div>
+            </div>
+            <canvas id="viewport">
+                <p>Your browser is terrible</p>
+                <p>Get a good one here:<p>
+                <p><a href="http://www.mozilla.org/en-US/firefox/new/">Firefox</a></p>
+                <p><a href="https://www.google.com/intl/no/chrome/browser/">Chrome</a></p>
+            </canvas>
+                
+        </div>
+        <div class="content-column">
+        </div>
+    </div>
+</div>
+
+<footer>A game by Group 10</footer>
 
 
 <script src="/socket.io/socket.io.js"></script>

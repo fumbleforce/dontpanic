@@ -1,0 +1,87 @@
+
+footer
+{
+    text-align:center;
+    font-size:30px;
+    color:white;
+    margin:50px;
+}
+body
+{
+    background-color:black;
+}
+.clearfix:after 
+{
+	content: ".";
+	display: block;
+	clear: both;
+	visibility: hidden;
+	line-height: 0;
+	height: 0;
+}
+.clearfix {
+	display: inline-block;
+}
+.title-text
+{
+    color:white;
+    text-align:center;
+    font-size:60px;
+    margin:50px;
+}
+
+.content-table
+{
+    display:table;
+    width:100%;
+    height:auto;
+}
+.content-row
+{
+    display:table-row;
+    width:100%;
+    height:auto;
+}
+.content-column
+{
+    display:table-cell;
+    height:auto;
+    width:33%;
+}
+#viewport
+{
+
+}
+.title-row
+{
+    height:100px;
+}
+.top-bar
+{
+    margin-bottom:20px;
+}
+.info-label
+{
+    float:left;
+    color:white;
+    font-size:40px;
+    margin:30px;
+}
+#turn-label
+{
+
+}
+#player-turn-label
+{
+
+}
+#action-label
+{
+
+}
+.btn-end-turn
+{
+    float:left;
+    font-size:50px;
+    padding:20px;
+}

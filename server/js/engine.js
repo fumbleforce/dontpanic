@@ -267,9 +267,23 @@ ge.prototype.command = function(client, c){
 			break;
 		
 		case 'end_turn':
-		// TODO : last player gets Icards and eventcards
-			ge.next_player(g);
-			ge.save_state(client, c);
+		    // TODO : last player gets Icards and eventcards, add more change
+		    
+			this.turn++;
+			if (this.active_player >= this.players.length) {
+			    this.active_player = 0;
+			}
+			else {
+			    this.active_player++;
+			}
+			
+			var stringed = JSON.stringify({
+			    type:'next_turn',
+			    active_player:this.active_player,
+			    turn:this.turn
+			});
+			client.emit('change', stringed);	
+			//ge.save_state(client, c);
 			break;
         case '':
             
