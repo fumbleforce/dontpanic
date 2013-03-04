@@ -180,27 +180,33 @@ ge.prototype.command = function(client, c){
                 " from "+player.node+" to "+c.node_id+ 
                 " when playernode connects to "+nodes[player.node].connects_to);
             var p = players[c.player_id];
+            var dec_action = false;
             if (nodes[p.node].connects_to.indexOf(c.node_id) > -1 && 
-					(c.player_id == this.turn)){
+					(c.player_id == this.active_player)){
 				if(p.minus_one_action()){
 					
 					p.node = c.node_id;
-				
+				    dec_action = true;
 					console.log("Player was moved");
 				}
             }
             else{
-                console.log("Failed moving player");	
+                console.log("Failed moving player");
+                	
 			}
 			var stringed = JSON.stringify({
 			    type:'moved_player',
-			    player:p
+			    player:p,
+			    dec_action:dec_action
 			});
 			client.emit('change', stringed);	
             break;
+            
+            
+            
 		case 'decrease_panic':
 			console.log("Trying to decrease panic in zone: " + c.zone_id);
-			
+			var dec_action = false;
 			
 			if (zones[c.zone_id].nodes.indexOf(players[this.active_player].node) >= 0 && 
 				(zones[c.zone_id].panic_level >= 5)){
@@ -209,7 +215,7 @@ ge.prototype.command = function(client, c){
 				if(players[this.active_player].minus_one_action()){
 					
 					zones[c.zone_id].update_panic_level(-5); //TODO: add roles-difference
-						
+				    dec_action=true;
 				}
 				else{ 
 					client.emit('error', 'Player is out of moves');
@@ -224,15 +230,19 @@ ge.prototype.command = function(client, c){
 			
 			var stringed = JSON.stringify({
 				type:'decreased_panic',
-				zone:this.map.zones[c.zone_id]
+				zone:this.map.zones[c.zone_id],
+				dec_action:dec_action
 			});
 			client.emit('change', stringed);			
 			break;
+			
+			
+			
 		case 'move_people':
 			// TODO: find out how many people we can move
 			console.log("Trying to move people from zone: " + c.from_zone_id +
 				"to zone: " + c.to_zone_id);
-			
+			var dec_action = false;
 			
 			if (!this.map.zones[c.from_zone_id]
 				.move_people(players[this.active_player], 
@@ -241,36 +251,56 @@ ge.prototype.command = function(client, c){
 				client.emit('error', 'Failed moving people');
 				break;
 			}
+			else{
+			    dec_action = true;
+			}
 			var stringed = JSON.stringify({
 				type:'moved_people',
+				dec_action:dec_action,
 				from_zone:this.zones[c.from_zone_id],
 				to_zone:this.zones[c.to_zone_id]
 			});
 			client.emit('change', stringed);
 			break;
+			
+			
+			
 		case 'create_info_center':
 			if(!g.players[c.player_id].add_information_center()){
 				client.emit('error', 'Failed to add information center');
 			}
 			break;
+			
+			
+			
 		case 'create_barrier':
 			if(!g.player[c.player_id].add_road_block()) {
 				client.emit('error', 'Failed to add barrier');
 			}
 			break;
+			
+			
+			
 		case 'remove_barrier':
 			if(!g.player[c.player_id].remove_road_block()){
 				client.emit('error', 'Failed to remove road block');
 			}
 			break;		
+			
+			
+			
 		case 'use_card':
 			break;
+		
+		
 		
 		case 'end_turn':
 		    // TODO : last player gets Icards and eventcards, add more change
 		    
+		    players[this.active_player].actions_left = 4;
+		    
 			this.turn++;
-			if (this.active_player >= this.players.length) {
+			if (this.active_player >= this.players.length-1) {
 			    this.active_player = 0;
 			}
 			else {
@@ -279,12 +309,15 @@ ge.prototype.command = function(client, c){
 			
 			var stringed = JSON.stringify({
 			    type:'next_turn',
-			    active_player:this.active_player,
+			    player:players[this.active_player],
 			    turn:this.turn
 			});
 			client.emit('change', stringed);	
 			//ge.save_state(client, c);
 			break;
+			
+			
+			
         case '':
             
             g.event;

@@ -72,13 +72,16 @@ function move_player(p){
     draw();
 }
 
-function next_turn(ap, t){
+function next_turn(p, t){
     turn = t;
-    active_player = ap;
+    active_player = p.id;
+    players[p.id] = p;
     draw();
 }
 function decrease_actions(){
-    players[active_player].actions_left--;
+    if (players[active_player].actions_left > 0) {
+        players[active_player].actions_left--;
+    }
     draw();
 }
 

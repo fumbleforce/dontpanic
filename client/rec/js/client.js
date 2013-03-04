@@ -27,26 +27,27 @@ socket.on('change', function (data) {
         case 'moved_player':
             move_player(d.player);
             console.log("Player has moved to node id: "+d.player.node);
-            decrease_actions();
+
             break;
 		case 'decreased_panic':
 			decrease_panic(d.zone);
 			console.log("Panic has changed in zone id: "+d.zone.id);
-			decrease_actions();
+
 			break;
 		case 'moved_people':
 			moved_people(d.from_zone);
 			moved_people(d.to_zone);
 			console.log("People have been moved from zone: "+d.from_zone.id + 
 				" to zone: "+d.to_zone.id);
-			decrease_actions();
+			
 			break;
 	    case 'next_turn':
-	        next_turn(d.active_player, d.turn);
+	        next_turn(d.player, d.turn);
 	        break;
 			
 
     } 
+    if(d.dec_action) decrease_actions();
 });
 
 
