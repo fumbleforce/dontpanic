@@ -10,6 +10,13 @@ body
 {
     background-color:black;
 }
+p
+{
+    font-size:25px;
+    color:black;
+    margin:0;
+    padding:0;
+}
 .clearfix:after 
 {
 	content: ".";
@@ -47,6 +54,7 @@ body
     display:table-cell;
     height:auto;
     width:33%;
+    vertical-align:top;
 }
 #viewport
 {
@@ -59,11 +67,12 @@ body
 .top-bar
 {
     margin-bottom:20px;
+    background-color:lightgray;
 }
 .info-label
 {
     float:left;
-    color:white;
+    color:black;
     font-size:40px;
     margin:30px;
 }
@@ -85,3 +94,38 @@ body
     font-size:50px;
     padding:20px;
 }
+.sidebar-player-container
+{
+    margin:0;
+    padding:0;
+    vertical-align:top;
+    width:90%;
+    height:100%;
+    background:blue;
+    
+}
+.sidebar-player
+{
+    background:lightgray;
+    width:100%;
+    height:159px;
+    right:0px;
+    margin-bottom:10px;
+    padding:10px;
+}
+.column-wrap
+{
+    vertical-align:top;
+    right:0px;
+    float:right;
+}
+
+
+
+
+
+
+
+
+
+

@@ -5,7 +5,7 @@
 var players, 
     nodes,
     zones,
-    c_height = 1500,
+    c_height = 1502,
     c_width = 1500,
     canvas = document.getElementById("viewport"),
     ctx = canvas.getContext("2d"),
@@ -300,11 +300,17 @@ function draw(){
     for (var i = 0; i < players.length; i++) {
         pl = players[i];
         player_draw(pl, ctx);
+        var id = "p"+i;
+        document.getElementById(id).style.background = "gray";
+        console.log(id);
+        if (i === active_player) document.getElementById(id).style.background = "lightgray";
     }
     
     document.getElementById("turn-label").innerHTML = "Turn: "+(turn); 
     document.getElementById("player-turn-label").innerHTML = "Player "+(active_player)+"'s turn"; 
     document.getElementById("action-label").innerHTML = "Actions left: "+(players[active_player].actions_left); 
+    
+    
     
 }// end draw
 
