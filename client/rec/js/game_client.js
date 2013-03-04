@@ -5,7 +5,7 @@
 var players, 
     nodes,
     zones,
-    c_height = 1502,
+    c_height = 1500,
     c_width = 1500,
     canvas = document.getElementById("viewport"),
     ctx = canvas.getContext("2d"),
@@ -54,9 +54,29 @@ function init_game(ps, map) {
     
     setup_canvas();
     set_canvas_listener();
-
+    start_timer(20);
     draw();
 
+}
+
+
+
+
+function start_timer(dur){
+    console.log("Timer Started.");
+    var left = dur,
+        lab = document.getElementById("timer-label");
+    var int = setInterval(function(){
+        lab.innerHTML = "Panic Increase in: "+left;
+        draw();
+        left--;
+        if (left === -1) {
+            command('inc_panic', {});
+            clearInterval(int);
+        }
+    }, 1000);
+    
+    
 }
 
 function setup_canvas(){
@@ -302,7 +322,6 @@ function draw(){
         player_draw(pl, ctx);
         var id = "p"+i;
         document.getElementById(id).style.background = "gray";
-        console.log(id);
         if (i === active_player) document.getElementById(id).style.background = "lightgray";
     }
     

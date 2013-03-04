@@ -16,6 +16,7 @@ var ge = module.exports = function (id, client) {
 	var PADD = 50;
     this.map.nodes = [];
     this.map.zones = [];
+    this.timer = 20;
     
     var conn = [
         [1, 2, 3], // 0 
@@ -291,6 +292,21 @@ ge.prototype.command = function(client, c){
 			
 		case 'use_card':
 			break;
+			
+			
+	    case 'inc_panic':
+	        for (var i = 0; i < zones.length;i++) {
+	            zones[i].update_panic_level(10);
+	        }
+	        this.timer += 20;
+	        var stringed = JSON.stringify({
+			    type:'update_panic',
+			    zones:zones,
+			    timer:this.timer
+			});
+			client.emit('change', stringed);	
+	        
+	        break;
 		
 		
 		

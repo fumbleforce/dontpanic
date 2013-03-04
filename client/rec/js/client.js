@@ -44,6 +44,12 @@ socket.on('change', function (data) {
 	    case 'next_turn':
 	        next_turn(d.player, d.turn);
 	        break;
+	    
+	    case 'update_panic':
+	        zones = d.zones;
+	        start_timer(d.timer);
+	        draw();
+	        
 			
 
     } 

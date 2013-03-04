@@ -88,6 +88,10 @@ p
 {
 
 }
+#timer-label
+{
+
+}
 .btn-end-turn
 {
     float:left;
@@ -108,18 +112,24 @@ p
 {
     background:lightgray;
     width:100%;
-    height:159px;
+    height:350px;
     right:0px;
     margin-bottom:10px;
     padding:10px;
 }
-.column-wrap
+.sidebar-left
 {
     vertical-align:top;
     right:0px;
     float:right;
 }
 
+.sidebar-right
+{
+    vertical-align:top;
+    left:0px;
+    float:left;
+}
 
 
 
