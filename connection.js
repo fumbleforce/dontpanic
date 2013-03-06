@@ -8,10 +8,10 @@ console.log('Server running at http://127.0.0.1:1337/');
 var mysql = require('mysql');
 
 var connection = mysql.createConnection({
-    host: "studsql.idi.ntnu.no",
-    user: "dontpanic_adm",
-    password: "aebu2!Jilu",
-    database: "p_dontpanic",
+    host: "127.0.0.1",
+    user: "dontpanic",
+    password: "dont",
+    database: "dontpanic",
     debug: true, 
 });
 
@@ -23,7 +23,7 @@ connection.connect(function(err) {
 	};
 });
 
-connection.query('SELECT 1', function(err, rows) {
+/*connection.query('SELECT 1', function(err, rows) {
   // connected! (unless `err` is set)
 });
 
@@ -57,4 +57,4 @@ function handleDisconnect(connection) {
 
 handleDisconnect(connection);
 
-
+*/
