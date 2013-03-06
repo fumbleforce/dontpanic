@@ -1,6 +1,7 @@
-/*  Game and canvas variables
+/*  Settings variables
 
-    TODO These are global for now, but  SHOULD be encapsulated, along with all the functions. IMPORTANT.
+    Used for setting size of objects and 
+    positioning in drawing functions.
 */
 var c_height = 1500,
     c_width = 1500,
@@ -9,7 +10,6 @@ var c_height = 1500,
     info_center_size = 35,
     offset_distance = node_size*1,
     panic_info_size = 40;
-    
 var player_offsetX = [0, 
                       Math.cos(315*(Math.PI/180))*offset_distance,
                       offset_distance, 
@@ -29,6 +29,17 @@ var player_offsetX = [0,
                       Math.sin(225*(Math.PI/180))*offset_distance];
 
 
+
+
+/*  Game Client Object
+
+    All game-related objects and functions are encapsulated 
+    in the "gco" (game client object) object, to avoid polluting
+    the global namespace.
+    
+    Only one instance of this object is created for each client.
+    
+*/
 var gco = {
     players : [],
     nodes : [],
@@ -42,6 +53,14 @@ gco.ctx = gco.canvas.getContext("2d");
 
 
 
+/*  Initialize Game
+
+    Initializes the game by populating the Game Client Object,
+    adding listeners to the objects and starting the timer.
+    
+    List ps         List of player objects
+    Object map      The map object containing list of Zones and Nodes
+*/
 gco.init_game = function (ps, map) {
     console.log("Game initiated");
     gco.players = ps;
@@ -55,7 +74,13 @@ gco.init_game = function (ps, map) {
 
 }
 
-
+/* Start Timer
+    
+    Controls the timer label, and emits an event to server 
+    when the duration has been reached.
+    
+    Int dur         Duration of timer.
+*/
 gco.start_timer = function(dur){
     console.log("Timer Started.");
     var left = dur,
@@ -73,12 +98,24 @@ gco.start_timer = function(dur){
     
 }
 
+/*  Set up Canvas
+    
+    Configures the height and width of the canvas 
+    according to the settings variables.
+
+*/
 gco.setup_canvas = function(){
     gco.canvas.width = c_width;
     gco.canvas.height = c_height;
     gco.cst.selected_zone = null;
 }
 
+/*  Move Player
+    
+    Called by the server when a player has been moved to another node. Replaces the local player object with an updated object from the server.
+    
+    Object p        The updated player object.
+*/
 gco.move_player = function(p){
     gco.players[p.id].node = p.node;
     gco.players[p.id].x = gco.nodes[p.node].x;
@@ -86,6 +123,12 @@ gco.move_player = function(p){
     gco.draw();
 }
 
+/*  Next Turn
+    
+    
+
+
+*/
 gco.next_turn = function(p, t){
     gco.turn = t;
     gco.active_player = p.id;
