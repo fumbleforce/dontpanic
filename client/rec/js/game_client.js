@@ -2,28 +2,15 @@
 
     TODO These are global for now, but  SHOULD be encapsulated, along with all the functions. IMPORTANT.
 */
-var players, 
-    nodes,
-    zones,
-    c_height = 1500,
+var c_height = 1500,
     c_width = 1500,
-    canvas = document.getElementById("viewport"),
-    ctx = canvas.getContext("2d"),
-    cst = {},
-    node_size = 50;
+    node_size = 50,
     player_size = 20,
     info_center_size = 35,
-    //panic info stuff
-    panic_info_size = 40,
-    averageX = 0,
-    averageY = 0,
-    turn = 0,
-    active_player = 0;
-    padding = 30,
-    //how far from node circumference should player center be (higher = closer to center) must be >1
     offset_distance = node_size*1,
-    //where to put the max 8 players on the node (on circle circumference?) yay dirtytrigonometry
-    player_offsetX = [0, 
+    panic_info_size = 40;
+    
+var player_offsetX = [0, 
                       Math.cos(315*(Math.PI/180))*offset_distance,
                       offset_distance, 
                       Math.cos(45*(Math.PI/180))*offset_distance,
@@ -40,35 +27,42 @@ var players,
                       Math.sin(135*(Math.PI/180))*offset_distance,
                       0,
                       Math.sin(225*(Math.PI/180))*offset_distance];
-    	
-    //timer = timer??
-    
+
+
+var gco = {
+    players : [],
+    nodes : [],
+    zones : [],
+    canvas : document.getElementById("viewport"),
+    cst : {},
+    turn : 0,
+    active_player : 0
+}
+gco.ctx = gco.canvas.getContext("2d");
 
 
 
-function init_game(ps, map) {
+gco.init_game = function (ps, map) {
     console.log("Game initiated");
-    players = ps;
-    zones = map.zones;
-    nodes = map.nodes;
+    gco.players = ps;
+    gco.zones = map.zones;
+    gco.nodes = map.nodes;
     
-    setup_canvas();
-    set_canvas_listener();
-    start_timer(20);
-    draw();
+    gco.setup_canvas();
+    gco.set_canvas_listener();
+    gco.start_timer(20);
+    gco.draw();
 
 }
 
 
-
-
-function start_timer(dur){
+gco.start_timer = function(dur){
     console.log("Timer Started.");
     var left = dur,
         lab = document.getElementById("timer-label");
     var int = setInterval(function(){
         lab.innerHTML = "Panic Increase in: "+left;
-        draw();
+        gco.draw();
         left--;
         if (left === -1) {
             command('inc_panic', {});
@@ -79,58 +73,48 @@ function start_timer(dur){
     
 }
 
-function setup_canvas(){
-    canvas.width = c_width;
-    canvas.height = c_height;
-    cst.selected_zone = null;
+gco.setup_canvas = function(){
+    gco.canvas.width = c_width;
+    gco.canvas.height = c_height;
+    gco.cst.selected_zone = null;
 }
 
-function move_player(p){
-    players[p.id].node = p.node;
-    players[p.id].x = nodes[p.node].x;
-    players[p.id].y = nodes[p.node].y;
-    draw();
+gco.move_player = function(p){
+    gco.players[p.id].node = p.node;
+    gco.players[p.id].x = gco.nodes[p.node].x;
+    gco.players[p.id].y = gco.nodes[p.node].y;
+    gco.draw();
 }
 
-function next_turn(p, t){
-    turn = t;
-    active_player = p.id;
-    players[p.id] = p;
-    draw();
+gco.next_turn = function(p, t){
+    gco.turn = t;
+    gco.active_player = p.id;
+    gco.players[p.id] = p;
+    gco.draw();
 }
-function decrease_actions(){
-    if (players[active_player].actions_left > 0) {
-        players[active_player].actions_left--;
+gco.decrease_actions = function(){
+    if (gco.players[gco.active_player].actions_left > 0) {
+        gco.players[gco.active_player].actions_left--;
     }
-    draw();
+    gco.draw();
 }
 
 
 //decrease panic (server knows if player has special -10 panic role, if not decrease by 5)
-function decrease_panic(zone){
-	zones[zone.id].panic_level = zone.panic_level;
-	draw();
+gco.decrease_panic = function(zone){
+	gco.zones[zone.id].panic_level = zone.panic_level;
+	gco.draw();
 }
 
-function player_draw(player, ctx){
-    if (player.x === undefined) player.x = nodes[player.node].x;
-    if (player.y === undefined) player.y = nodes[player.node].y;
+gco.player_draw = function(player, ctx){
+    if (player.x === undefined) player.x = gco.nodes[player.node].x;
+    if (player.y === undefined) player.y = gco.nodes[player.node].y;
     ctx.fillStyle = player.color;
     ctx.beginPath();
-    //old drawing
-    //ctx.arc(player.x, player.y, player_size, 0, Math.PI*2, true);
-    //draw on same node to test offset
     ctx.arc(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size, 0, Math.PI*2, true); 
     ctx.closePath();
     ctx.fill();
-    
-    ctx.fillStyle = "brown";
-    ctx.beginPath();
-    ctx.arc(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size/2, 0, Math.PI*2, true); 
-    ctx.closePath();
-    ctx.fill();
-    
-    //draw player number (for testing at least)
+
     ctx.fillStyle = "White";
     ctx.font="15px Arial",
     ctx.fillText(player.id, player.x+player_offsetX[player.id]-5, player.y+player_offsetY[player.id]+6);
@@ -138,13 +122,13 @@ function player_draw(player, ctx){
     //TODO draw circle to show active player when dragging/active?
 }
 
-function node_draw(node, ctx){
+gco.node_draw = function(node, ctx){
     ctx.fillStyle = 'black';
     ctx.beginPath();
     ctx.arc(node.x, node.y, node_size, 0, Math.PI*2, true); 
     ctx.closePath();
     ctx.fill();    
-    //draw node number
+    
     ctx.fillStyle = "White";
     ctx.font="15px Arial";
     if(node.id>9){
@@ -153,8 +137,7 @@ function node_draw(node, ctx){
     else{
     	ctx.fillText(node.id, node.x-4, node.y-15);
     }
-    //TODO move info center drawing somewhere else?
-    //draw info center
+    
     if (node.has_information_center){
     	ctx.fillStyle = 'blue';
         ctx.fillRect(node.x-(info_center_size/2), node.y-(info_center_size/2)+6, info_center_size, info_center_size);
@@ -167,10 +150,12 @@ function node_draw(node, ctx){
     
 }
 
-//TODO draw road blocks (one on each node (as specification says) + something on the path between them?)
-function roadblock_draw(node, ctx){
+
+gco.roadblock_draw = function(node, ctx){
 	ctx.strokeStyle = '#202020';
 	ctx.lineWidth = 25;
+	var nodes = gco.nodes;
+	
 	for (var i = 0; i < node.connects_to.length; i++){
 		ctx.beginPath();
 	    ctx.moveTo(node.x, node.y);
@@ -189,18 +174,18 @@ function roadblock_draw(node, ctx){
     }
 }
 
-function background_draw(ctx){
+gco.background_draw = function(ctx){
     ctx.fillStyle="lightgray";
     ctx.fillRect(0,0, c_width, c_height);
 }
 
-function zone_draw(zone, ctx){
+gco.zone_draw = function(zone, ctx){
     ctx.beginPath();
-    ctx.moveTo(nodes[zone.nodes[0]].x, nodes[zone.nodes[0]].y);
+    ctx.moveTo(gco.nodes[zone.nodes[0]].x, gco.nodes[zone.nodes[0]].y);
     for (var j = 1; j < zone.nodes.length; j++){
-        ctx.lineTo(nodes[zone.nodes[j]].x, nodes[zone.nodes[j]].y);
+        ctx.lineTo(gco.nodes[zone.nodes[j]].x, gco.nodes[zone.nodes[j]].y);
     }
-    ctx.lineTo(nodes[zone.nodes[0]].x, nodes[zone.nodes[0]].y);
+    ctx.lineTo(gco.nodes[zone.nodes[0]].x, gco.nodes[zone.nodes[0]].y);
     ctx.closePath();
     //Draw outline of zones
     ctx.strokeStyle = "black";
@@ -225,7 +210,11 @@ function zone_draw(zone, ctx){
     
 }
 
-function selection_draw(ctx){
+gco.selection_draw = function(ctx){
+    var nodes = gco.nodes,
+        cst = gco.cst,
+        zones = gco.zones;
+        
     if (cst.selected_zone !== null){
         var zone = zones[cst.selected_zone];
         ctx.beginPath();
@@ -238,28 +227,28 @@ function selection_draw(ctx){
         ctx.strokeStyle = "green";
         ctx.lineWidth = 40;
         ctx.stroke();
-      //TODO for testing, we add 'decrease_panic' when selecting zones
-        //command('decrease_panic', {zone_id : cst.selected_zone});
+
     }
 }
 
-function player_contains(p, mx, my) {
-    var pn = nodes[p.node];
+gco.player_contains = function(p, mx, my) {
+    var pn = gco.nodes[p.node];
     return (mx<=(pn.x+player_offsetX[p.id]+player_size))&&
         (mx>=(pn.x+player_offsetX[p.id]-player_size))&&
         (my<=(pn.y+player_offsetY[p.id]+player_size))&&
         (my>=(pn.y+player_offsetY[p.id]-player_size));
 }
 
-function node_contains(node, mx, my) {
+gco.node_contains = function(node, mx, my) {
     return (mx<=(node.x+node_size))&&
         (mx>=(node.x-node_size))&&
         (my<=(node.y+node_size))&&
         (my>=(node.y-node_size));
 }
 
-function zone_contains(z, mx, my){
-    var n = z.nodes;
+gco.zone_contains = function(z, mx, my){
+    var n = z.nodes,
+        nodes = gco.nodes;
     var r = false;
     var j = n.length - 1;
 
@@ -275,67 +264,64 @@ function zone_contains(z, mx, my){
     return r;
 }
 
-function draw(){
+gco.draw = function(){
     var to_node = {},
         node = {},
         zone = {},
-        pl;
+        pl,
+        ctx = gco.ctx,
+        nodes = gco.nodes,
+        zones = gco.zones,
+        players = gco.players;
         
-    background_draw(ctx);    
+    gco.background_draw(ctx);    
         
     for (var i = 0; i < zones.length; i++) {
         zone = zones[i];
-        zone_draw(zone,ctx);
+        gco.zone_draw(zone,ctx);
     }
     
-    selection_draw(ctx);
+    gco.selection_draw(ctx);
     
-    //road blocks (move into node draw?)
-    //road blocks are now drawn ABOVE zones, but BELOW players and nodes
+    
     for (var i = 0; i < nodes.length; i++) {
     	if (nodes[i].has_road_block){
     		node = nodes[i]
-    		roadblock_draw(nodes[i], ctx)
+    		gco.roadblock_draw(nodes[i], ctx)
     	}
-        
     }
 
     for (var i = 0; i < nodes.length; i++) {
         node = nodes[i];
-        node_draw(node, ctx);
-        
-        //not needed as of now
-//        for (var j = 0; j < nodes[i].connects_to.length; j++) {
-//            to_node = node.connects_to[j];
-//            ctx.lineWidth = 15;
-//            ctx.strokeStyle = "gray";
-//            ctx.beginPath();
-//            ctx.moveTo(node.x, node.y);
-//            ctx.lineTo(to_node.x, to_node.y);
-//            ctx.stroke();
-//        }
+        gco.node_draw(node, ctx);
     }
     
     
     for (var i = 0; i < players.length; i++) {
         pl = players[i];
-        player_draw(pl, ctx);
+        gco.player_draw(pl, ctx);
         var id = "p"+i;
         document.getElementById(id).style.background = "gray";
-        if (i === active_player) document.getElementById(id).style.background = "lightgray";
+        if (i === gco.active_player) document.getElementById(id).style.background = "lightgray";
     }
     
-    document.getElementById("turn-label").innerHTML = "Turn: "+(turn); 
-    document.getElementById("player-turn-label").innerHTML = "Player "+(active_player)+"'s turn"; 
-    document.getElementById("action-label").innerHTML = "Actions left: "+(players[active_player].actions_left); 
-    
-    
+    if(players.length > 1){
+        document.getElementById("turn-label").innerHTML = "Turn: "+(gco.turn); 
+        document.getElementById("player-turn-label").innerHTML = "Player "+(gco.active_player)+"'s turn";
+        document.getElementById("action-label").innerHTML = "Actions left: "+(players[gco.active_player].actions_left); 
+    } 
     
 }// end draw
 
 
-function set_canvas_listener(){
- 
+gco.set_canvas_listener = function(){
+    var canvas = gco.canvas,
+        cst = gco.cst,
+        draw = gco.draw,
+        nodes = gco.nodes,
+        players = gco.players,
+        zones = gco.zones;
+        
     canvas.addEventListener('selectstart', function(e) { e.preventDefault(); return false; }, false);
 
     canvas.addEventListener('mousedown', function(e) {
@@ -354,13 +340,13 @@ function set_canvas_listener(){
             cst.selection.y = nodes[cst.selection.node].y
             cst.selection = undefined;
             cst.dragging = false;
-            draw();
+            gco.draw();
         }
         
         
         for (var i = 0; i < players.length; i++) {
             
-            if (player_contains(players[i], mx, my)) {
+            if (gco.player_contains(players[i], mx, my)) {
                 console.log("Clicked on a player "+players[i].id);
                 selected = players[i];
                 selected.x = nodes[players[i].node].x;
@@ -369,23 +355,23 @@ function set_canvas_listener(){
                 cst.dragoffy = my - selected.y;
                 cst.dragging = true;
                 cst.selection = selected;
-                draw();
+                gco.draw();
                 return;
            }
         }
         
         for (var i = 0; i < zones.length; i++) {
             
-            if (zone_contains(zones[i], mx, my)) {
+            if (gco.zone_contains(zones[i], mx, my)) {
                 console.log("Clicked on zone "+i);
                 cst.selected_zone = i;
                 //TODO for testing, we add 'decrease_panic' when selecting zones
                 command('decrease_panic', {zone_id : cst.selected_zone});
-                draw();
+                gco.draw();
                 return;
            }
         }
-        draw();
+        gco.draw();
         
     }, true);//end mousedown listener
   
@@ -396,7 +382,7 @@ function set_canvas_listener(){
                 my = e.offsetY;
             cst.selection.x = mx - cst.dragoffx;
             cst.selection.y = my - cst.dragoffy;   
-            draw();
+            gco.draw();
         }
     }, true);//end mousemove listener
     
@@ -408,7 +394,7 @@ function set_canvas_listener(){
         if (cst.dragging && cst.selection !== undefined) {
             console.log("Mouse let go of player");
             for (var i = 0; i < nodes.length; i++) {
-                if (node_contains(nodes[i], mx, my)) {
+                if (gco.node_contains(nodes[i], mx, my)) {
                     
                     command('move_player', {
                         player_id : cst.selection.id,
@@ -416,7 +402,7 @@ function set_canvas_listener(){
                     });
                     cst.selection = undefined;
                     cst.dragging = false;
-                    draw();
+                    gco.draw();
                     return;
                 }
             }
@@ -424,12 +410,13 @@ function set_canvas_listener(){
             cst.selection.y = nodes[cst.selection.node].y
             cst.selection = undefined;
             cst.dragging = false;
-            draw();
+            gco.draw();
         }
         
     }, true);//end mouseup listener
     
 }//end set canvas listener
+
 
 
 

@@ -18,42 +18,42 @@ socket.on('error', function (e) {
 
 socket.on('start_game', function (data) {
     var d = JSON.parse(data);
-    init_game(d.players, d.map);
+    gco.init_game(d.players, d.map);
 });
 
 socket.on('change', function (data) {
     var d = JSON.parse(data);
     switch (d.type) {
         case 'moved_player':
-            move_player(d.player);
+            gco.move_player(d.player);
             console.log("Player has moved to node id: "+d.player.node);
 
             break;
 		case 'decreased_panic':
-			decrease_panic(d.zone);
+			gco.decrease_panic(d.zone);
 			console.log("Panic has changed in zone id: "+d.zone.id);
 
 			break;
 		case 'moved_people':
-			moved_people(d.from_zone);
-			moved_people(d.to_zone);
+			gco.moved_people(d.from_zone);
+			gco.moved_people(d.to_zone);
 			console.log("People have been moved from zone: "+d.from_zone.id + 
 				" to zone: "+d.to_zone.id);
 			
 			break;
 	    case 'next_turn':
-	        next_turn(d.player, d.turn);
+	        gco.next_turn(d.player, d.turn);
 	        break;
 	    
 	    case 'update_panic':
 	        zones = d.zones;
-	        start_timer(d.timer);
-	        draw();
+	        gco.start_timer(d.timer);
+	        gco.draw();
 	        
 			
 
     } 
-    if(d.dec_action) decrease_actions();
+    if(d.dec_action) gco.decrease_actions();
 });
 
 
