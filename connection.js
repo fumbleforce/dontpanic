@@ -12,30 +12,25 @@ var connection = mysql.createConnection({
     user: "dontpanic_adm",
     password: "aebu2!Jilu",
     database: "p_dontpanic",
-    debug: true, 
+    debug:false,
 });
 
-connection.connect(function(err) {
-	if (err) {
-		console.log('ERROR: ' + err);
-	} else {
-		console.log('Connected to ' + server.hostname + ' (' + server.version + ')');
-	};
+connection.connect(function(err) { 
+    if (err) {
+        console.log('ERROR: ' + err);
+    } else {
+        console.log('Connected to Server');
+    };
 });
 
-connection.query('SELECT 1', function(err, rows) {
-  // connected! (unless `err` is set)
+/* Query Test */
+connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {
+  if (err) throw err;
+  console.log('The solution is: ', rows[0].solution);
 });
 
-connection.query('SELECT * FROM Effect', function(err, rows, fields) {
-  if (err) console.log('ERROR: ' + err);
 
-  for (x in rows) {
-    console.log('Row: ', x);
-  }
-});
 
-// Handle disconnect
 
 function handleDisconnect(connection) {
   connection.on('error', function(err) {
