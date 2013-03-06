@@ -296,7 +296,9 @@ ge.prototype.command = function(client, c){
 			
 	    case 'inc_panic':
 	        for (var i = 0; i < zones.length;i++) {
-	            zones[i].update_panic_level(10);
+				if (!zones[i].is_panic_zero()){
+					zones[i].update_panic_level(10);
+				}
 	        }
 	        this.timer += 20;
 	        var stringed = JSON.stringify({
@@ -587,6 +589,13 @@ ge.Zone.prototype.update_panic_level = function (panic_level) {
 	} else if (this.panic_level < 0) {
 		this.panic_level = 0;
 	}
+}
+
+ge.Zone.prototype.is_panic_zero = function () {
+	if(this.panic_level == 0){
+		return true;
+	}
+	return false;
 }
 
 ge.Zone.prototype.dec_panic = function(player) {
