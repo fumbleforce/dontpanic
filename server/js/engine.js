@@ -50,7 +50,7 @@ var ge = module.exports = function (id, client) {
     ],
     posy = [
         5*SCALE, 11*SCALE, 3*SCALE, 7*SCALE, 9*SCALE,
-        7*SCALE, 15*SCALE, 3*SCALE, 7*SCALE, 9*SCALE,
+        5*SCALE, 15*SCALE, 3*SCALE, 7*SCALE, 9*SCALE,
         3*SCALE, 15*SCALE, 1*SCALE, 5*SCALE, 11*SCALE,
         3*SCALE, 7*SCALE, 15*SCALE, 8*SCALE, 11*SCALE,
         15*SCALE
