@@ -298,6 +298,33 @@ ge.prototype.command = function(client, c){
 			
 			
 		case 'use_card':
+			switch (c.card.id) {
+				case 'change_all_panic':
+					for (var i = 0; i < zones.length;i++) {
+							zones[i].update_panic_level(c.card.value);
+						}
+					}
+					var stringed = JSON.stringify({
+						type:'update_panic',
+						zones:zones
+					});
+					client.emit('card_change', stringed);
+					break;
+				
+				case 'increase_actions':
+					players[this.active_player].increase_actions_left(c.card.value);
+					
+					var stringed = JSON.stringify({
+						type:'added_actions',
+						actions:players[this.active_player].actions_left
+					)};
+					client.emit('card_change', stringed);
+					break;
+						
+					
+					
+				
+				
 			break;
 			
 			
@@ -415,6 +442,9 @@ ge.Player = function(id, user, node, color, role, actions_left) {
 }
 ge.Player.prototype.set_actions_left = function (actions_left) {
 	this.actions_left = actions_left;
+}
+ge.Player.prototype.increase_actions_left = function (actions) {
+	this.actions_left += actions;
 }
 ge.Player.prototype.minus_one_action = function () {
 	if (this.actions_left != 0) {
@@ -672,13 +702,17 @@ ge.Timer = function (timer_interval) {
 
 
 
+/*
+	
 
-
-
-
-ge.Info_card = function (text, effect) {
+	text 	What to be shown to the users when looking at the card
+	id 		identification to what case sentence to be called when using the card
+	value	value to be used in the effect of the card
+*/
+ge.Info_card = function (text, id, value) {
 	this.text = text;
-	this.effect = effect;
+	this.id = id;
+	this.value = value;
 }
 
 
