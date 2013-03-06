@@ -267,9 +267,16 @@ ge.prototype.command = function(client, c){
 			
 			
 		case 'create_info_center':
-			if(!g.players[c.player_id].add_information_center()){
+		
+			if(!players[this.active_player].add_information_center()){
 				client.emit('error', 'Failed to add information center');
+				break;
 			}
+			var stringed = JSON.stringify({
+				type:'added_information_center',
+				node:players[this.active_player].node
+			});
+			client.emit('change', stringed);
 			break;
 			
 			
