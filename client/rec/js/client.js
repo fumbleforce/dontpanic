@@ -48,6 +48,7 @@ socket.on('change', function (data) {
 	    case 'update_panic':
 	        zones = d.zones;
 	        gco.start_timer(d.timer);
+	        //TODO shouldn't this draw new panic? It doesn't, not until zone is selected again
 	        gco.draw();
 	        
 			

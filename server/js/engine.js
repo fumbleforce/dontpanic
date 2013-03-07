@@ -317,7 +317,7 @@ ge.prototype.command = function(client, c){
 					var stringed = JSON.stringify({
 						type:'added_actions',
 						actions:players[this.active_player].actions_left
-					)};
+					});
 					client.emit('card_change', stringed);
 					break;
 						

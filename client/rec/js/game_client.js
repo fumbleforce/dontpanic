@@ -156,13 +156,22 @@ gco.player_draw = function(player, ctx){
     ctx.beginPath();
     ctx.arc(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size, 0, Math.PI*2, true); 
     ctx.closePath();
-    ctx.fill();
-
-    ctx.fillStyle = "White";
-    ctx.font="15px Arial",
-    ctx.fillText(player.id, player.x+player_offsetX[player.id]-5, player.y+player_offsetY[player.id]+6);
-    
+    //ctx.fill();
     //TODO draw circle to show active player when dragging/active?
+    if (this.active_player===player.id){
+    	var gradiant = ctx.createRadialGradient(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size-10, player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size);
+    	gradiant.addColorStop(0, player.color);
+    	gradiant.addColorStop(1, 'white');
+    	ctx.fillStyle=gradiant;
+    	ctx.fill();
+    }
+    else{
+    	ctx.fill();
+    }
+
+    ctx.fillStyle = "Black";
+    ctx.font="bold 15px Arial",
+    ctx.fillText(player.id, player.x+player_offsetX[player.id]-5, player.y+player_offsetY[player.id]+6);
 }
 
 gco.node_draw = function(node, ctx){
