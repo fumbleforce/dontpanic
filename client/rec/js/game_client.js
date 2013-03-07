@@ -52,7 +52,6 @@ var gco = {
 gco.ctx = gco.canvas.getContext("2d");
 
 
-
 /*  Initialize Game
 
     Initializes the game by populating the Game Client Object,
@@ -68,11 +67,14 @@ gco.init_game = function (ps, map) {
     gco.nodes = map.nodes;
     
     gco.setup_canvas();
+
     gco.set_canvas_listener();
     gco.start_timer(20);
     gco.draw();
+    gco.update_cards();
 
 }
+
 
 /* Start Timer
     
@@ -98,6 +100,7 @@ gco.start_timer = function(dur){
     
 }
 
+
 /*  Set up Canvas
     
     Configures the height and width of the canvas 
@@ -110,9 +113,13 @@ gco.setup_canvas = function(){
     gco.cst.selected_zone = null;
 }
 
+
+
+
 /*  Move Player
     
-    Called by the server when a player has been moved to another node. Replaces the local player object with an updated object from the server.
+    Called by the server when a player has been moved to another node. 
+    Replaces the local player object with an updated object from the server.
     
     Object p        The updated player object.
 */
@@ -121,6 +128,35 @@ gco.move_player = function(p){
     gco.players[p.id].x = gco.nodes[p.node].x;
     gco.players[p.id].y = gco.nodes[p.node].y;
     gco.draw();
+}
+
+
+
+gco.update_cards = function() {
+    var ps = gco.players,
+        $con,
+        c,
+        i,
+        cards,
+        button;
+        
+    console.log("Updating info cards..");
+    for (i = 0; i < ps.length; i++){
+        cards = ps[i].info_cards;
+
+        $con = $("#"+i+"_cards");
+
+        for (c = 0; c < cards.length; c++){
+            button = $("<button id='"+i+"-"+c+"' class='info-card' onclick='gco.info_card_click(this.id)'>"+cards[c].name+ "</button>");
+            button.appendTo($con);
+        }
+    }
+}
+
+
+gco.info_card_click = function(id) {
+    console.log(id);
+    command('activate_info_card', {id:id});
 }
 
 /*  Next Turn
@@ -135,6 +171,9 @@ gco.next_turn = function(p, t){
     gco.players[p.id] = p;
     gco.draw();
 }
+
+
+
 gco.decrease_actions = function(){
     if (gco.players[gco.active_player].actions_left > 0) {
         gco.players[gco.active_player].actions_left--;

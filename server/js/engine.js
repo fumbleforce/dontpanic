@@ -18,6 +18,13 @@ var ge = module.exports = function (id, client) {
     this.map.zones = [];
     this.timer = 20;
     
+    this.info_cards = [
+        {   id:0,
+            name:"Decrease all red",
+            effect: 0
+        }
+    ];
+    
     var conn = [
         [1, 2, 3], // 0 
         [0, 4, 6],
@@ -158,6 +165,8 @@ var ge = module.exports = function (id, client) {
 
     for(var i = 0; i < 8; i++){
     	player = new ge.Player(i, "player" + i, 0, player_colors[i], {}, 4);
+    	player.info_cards.push(this.info_cards[0]);
+    	player.info_cards.push(this.info_cards[0]);
     	this.players.push(player);
     }
 	
