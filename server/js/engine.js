@@ -21,7 +21,12 @@ var ge = module.exports = function (id, client) {
     this.info_cards = [
         {   id:0,
             name:"Decrease all red",
-            effect: 0
+            effects: [{
+                domain:'zone',
+                type:'panic',
+                panic:(-5),
+                affects:[0,1,2,3,4,5,6,7,8,9]
+            }]
         }
     ];
     
@@ -180,7 +185,8 @@ var ge = module.exports = function (id, client) {
 ge.prototype.command = function(client, c){
     var nodes = this.map.nodes,
 		zones = this.map.zones,
-        players = this.players;
+        players = this.players,
+        changed = {type:'none'};
     
     console.log("Interpreting in-game command of type: "+c.type);
 	
@@ -189,8 +195,8 @@ ge.prototype.command = function(client, c){
             console.log("Trying to move player "+ c.player_id +
                 " from "+player.node+" to "+c.node_id+ 
                 " when playernode connects to "+nodes[player.node].connects_to);
-            var p = players[c.player_id];
-            var dec_action = false;
+            var p = players[c.player_id],
+                dec_action = false;
             if (nodes[p.node].connects_to.indexOf(c.node_id) > -1 && 
 					(c.player_id == this.active_player)){
 				if(p.minus_one_action()){
@@ -204,12 +210,12 @@ ge.prototype.command = function(client, c){
                 console.log("Failed moving player");
                 	
 			}
-			var stringed = JSON.stringify({
+			changed = {
 			    type:'moved_player',
 			    player:p,
 			    dec_action:dec_action
-			});
-			client.emit('change', stringed);	
+			};
+	
             break;
             
             
@@ -238,12 +244,12 @@ ge.prototype.command = function(client, c){
 			}
 			
 			
-			var stringed = JSON.stringify({
+			changed = {
 				type:'decreased_panic',
 				zone:this.map.zones[c.zone_id],
 				dec_action:dec_action
-			});
-			client.emit('change', stringed);			
+			};
+					
 			break;
 			
 			
@@ -264,13 +270,13 @@ ge.prototype.command = function(client, c){
 			else{
 			    dec_action = true;
 			}
-			var stringed = JSON.stringify({
+			changed = {
 				type:'moved_people',
 				dec_action:dec_action,
 				from_zone:this.zones[c.from_zone_id],
 				to_zone:this.zones[c.to_zone_id]
-			});
-			client.emit('change', stringed);
+			};
+
 			break;
 			
 			
@@ -281,11 +287,11 @@ ge.prototype.command = function(client, c){
 				client.emit('error', 'Failed to add information center');
 				break;
 			}
-			var stringed = JSON.stringify({
+			changed = {
 				type:'added_information_center',
 				node:players[this.active_player].node
-			});
-			client.emit('change', stringed);
+			};
+
 			break;
 			
 			
@@ -307,33 +313,10 @@ ge.prototype.command = function(client, c){
 			
 			
 		case 'use_card':
-			switch (c.card.id) {
-				case 'change_all_panic':
-					for (var i = 0; i < zones.length;i++) {
-							zones[i].update_panic_level(c.card.value);
-						}
-					}
-					var stringed = JSON.stringify({
-						type:'update_panic',
-						zones:zones
-					});
-					client.emit('card_change', stringed);
-					break;
-				
-				case 'increase_actions':
-					players[this.active_player].increase_actions_left(c.card.value);
-					
-					var stringed = JSON.stringify({
-						type:'added_actions',
-						actions:players[this.active_player].actions_left
-					});
-					client.emit('card_change', stringed);
-					break;
-						
-					
-					
-				
-				
+			var ic = players[c.player].info_cards.pop(c.info_card);
+			
+			changed = effect(ic, this);
+            changed.players.push(players[c.player]);
 			break;
 			
 			
@@ -344,12 +327,12 @@ ge.prototype.command = function(client, c){
 				}
 	        }
 	        this.timer += 20;
-	        var stringed = JSON.stringify({
+	        
+	        changed = {
 			    type:'update_panic',
 			    zones:zones,
 			    timer:this.timer
-			});
-			client.emit('change', stringed);	
+			};
 	        
 	        break;
 		
@@ -368,12 +351,14 @@ ge.prototype.command = function(client, c){
 			    this.active_player++;
 			}
 			
-			var stringed = JSON.stringify({
+			players[this.active_player].info_cards.push(this.info_cards[0]);
+			
+			changed = {
 			    type:'next_turn',
 			    player:players[this.active_player],
 			    turn:this.turn
-			});
-			client.emit('change', stringed);	
+			};
+	
 			//ge.save_state(client, c);
 			break;
 			
@@ -383,10 +368,16 @@ ge.prototype.command = function(client, c){
             
             g.event;
             break;
+        
+        
         console.log("No matching command types");
+            
     }
-
-
+    
+    if(changed.type !== 'none'){
+        var stringed = JSON.stringify(changed);
+        client.emit('change', stringed);	
+    }
 }
 
 
@@ -426,10 +417,79 @@ ge.prototype.timer_tick = function(client, c) {
 	// Full panic spreads, and gives +5 to neighbours
 }
 
+function effect(card, g) {
+    var effects = card.effects,
+        e, i, z,
+        zones = g.map.zones,
+        nodes = g.map.nodes,
+        players = g.players,
+        changed = empty_state();
+        
+    changed.type='effect';   
+     
+    console.log("Executing card");
+    console.log(card);
+    for (i = 0; i<effects.length; i++){
+        e = effects[i];
+        console.log("Effect nr "+i);
+        console.log(e);
+        switch(e.domain){
+            case 'zone':
+                switch(e.type){
+                    case 'panic':
+                        for (z = 0; z<e.affects.length; z++){
+                            zones[e.affects[z]].update_panic_level(e.panic);
+                            changed.zones.push(zones[e.affects[z]]);
+                        }
+                        break;
+                        
+                    case 'what':
+                        
+                        break;
+                
+                }
+            
+            
+            
+                break;
+            case 'player':
+                switch(e.type){
+                    case 'hang yourself':
+                    
+                        break;
+                    case 'kill the president':
+                        
+                        break;
+                }
+            
+            
+            
+                break;
+        }
+        
+        
+    }//end effect list for
+    
+    return changed;
+}//end effect()
 
 
-
-
+function state(g){
+    return {
+        type : 'state',
+        zones : g.map.zones,
+        nodes : g.map.nodes,
+        players : g.players
+    };
+}
+function empty_state(g){
+    return {
+        type : 'none',
+        zones : [],
+        nodes : [],
+        players : []
+    };
+}
 
 //----------------------------
 //---------MODELS-------------
@@ -659,6 +719,10 @@ ge.Zone.prototype.dec_panic = function(player) {
 	return false;
 }
 
+// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
+// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
+// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
+// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
 
  // should this method be different because of panic ?? 
 ge.Zone.prototype.move_people = function(player, to_zone) {
@@ -672,6 +736,7 @@ ge.Zone.prototype.move_people = function(player, to_zone) {
 	}
 	return false;
 }
+
 
 ge.Zone.prototype.move_people = function (people, to_zone) {
 	if (this.people >= people) {
@@ -692,7 +757,10 @@ ge.Zone.prototype.move_people = function (people, to_zone) {
 		console.log("There isnt that many people in this zone!!");
 	}
 }
-
+// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
+// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
+// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
+// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
 
 
 

@@ -24,8 +24,16 @@ socket.on('start_game', function (data) {
 socket.on('change', function (data) {
     var d = JSON.parse(data);
     switch (d.type) {
+        case 'effect':
+            console.log("updating state");
+            gco.update_players(d.players);
+            gco.update_nodes(d.nodes);
+            gco.update_zones(d.zones);
+            gco.update_cards();
+            gco.draw();
+            break;
         case 'moved_player':
-            gco.move_player(d.player);
+            gco.update_player(d.player);
             console.log("Player has moved to node id: "+d.player.node);
 
             break;
@@ -42,11 +50,15 @@ socket.on('change', function (data) {
 			
 			break;
 	    case 'next_turn':
-	        gco.next_turn(d.player, d.turn);
+	        gco.turn = d.turn;
+            gco.active_player = d.player.id;
+            gco.update_player(d.player)
+            gco.draw();
+            gco.update_cards();
 	        break;
 	    
 	    case 'update_panic':
-	        zones = d.zones;
+	        gco.zones = d.zones;
 	        gco.start_timer(d.timer);
 	        //TODO shouldn't this draw new panic? It doesn't, not until zone is selected again
 	        gco.draw();

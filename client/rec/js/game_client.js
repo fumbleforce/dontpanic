@@ -123,14 +123,30 @@ gco.setup_canvas = function(){
     
     Object p        The updated player object.
 */
-gco.move_player = function(p){
-    gco.players[p.id].node = p.node;
+gco.update_player = function(p){
+    gco.players[p.id] = p;
     gco.players[p.id].x = gco.nodes[p.node].x;
     gco.players[p.id].y = gco.nodes[p.node].y;
     gco.draw();
 }
 
+gco.update_players = function(ps){
+    for(var i = 0; i < ps.length; i++) {
+        gco.update_player(ps[i]);
+    }
+}
 
+gco.update_nodes = function(ns){
+    for(var i = 0; i < ns.length;i++){
+        gco.nodes[ns[i].id] = ns[i];
+    }
+}
+
+gco.update_zones = function(zs){
+    for(var i = 0; i < zs.length;i++){
+        gco.zones[zs[i].id] = zs[i];
+    }
+}
 
 gco.update_cards = function() {
     var ps = gco.players,
@@ -141,11 +157,12 @@ gco.update_cards = function() {
         button;
         
     console.log("Updating info cards..");
+    
     for (i = 0; i < ps.length; i++){
         cards = ps[i].info_cards;
 
         $con = $("#"+i+"_cards");
-
+        $con.empty();
         for (c = 0; c < cards.length; c++){
             button = $("<button id='"+i+"-"+c+"' class='info-card' onclick='gco.info_card_click(this.id)'>"+cards[c].name+ "</button>");
             button.appendTo($con);
@@ -155,22 +172,13 @@ gco.update_cards = function() {
 
 
 gco.info_card_click = function(id) {
-    console.log(id);
-    command('activate_info_card', {id:id});
+    var p = id.charAt(0),
+        c = id.charAt(2);
+    
+    command('use_card', {player:p, card:c});
 }
 
-/*  Next Turn
-    
-    
 
-
-*/
-gco.next_turn = function(p, t){
-    gco.turn = t;
-    gco.active_player = p.id;
-    gco.players[p.id] = p;
-    gco.draw();
-}
 
 
 
