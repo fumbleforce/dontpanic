@@ -60,20 +60,25 @@ socket.on('change', function (data) {
 	    case 'update_panic':
 	        gco.zones = d.zones;
 	        gco.start_timer(d.timer);
-	        //TODO shouldn't this draw new panic? It doesn't, not until zone is selected again
 	        gco.draw();
-	        
-			
-
+	        break;
+	    
+	    //TODO implement this
+	    case 'added_information_center':
+	    	gco.nodes[gco.players[gco.active_player].node] = d.node;
+	    	gco.draw();
+	    	break;
+	    	
     } 
     if(d.dec_action) gco.decrease_actions();
+    if(d.dec_4_actions) gco.decrease_4_actions();
 });
 
 
 function command(type, c){
     c.type = type;
     var send = JSON.stringify(c);
-    console.log('Sending '+ type +  '"' + send + '"');
+    console.log('Sending '+ type +  ' "' + send + '" ');
     socket.emit('game_command', send);
 }
 
@@ -87,4 +92,7 @@ function end_turn(){
     command("end_turn", c);
 }
 
-
+function create_info_center(){
+    var c = {};
+    command("create_info_center", c);
+}

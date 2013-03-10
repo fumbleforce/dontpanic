@@ -17,6 +17,11 @@ var ge = module.exports = function (id, client) {
     this.map.nodes = [];
     this.map.zones = [];
     this.timer = 20;
+    this.information_centers = 0;
+    this.road_blocks = 0;
+    this.max_information_centers = 5;
+    this.max_road_blocks = 10;
+    
     
     this.info_cards = [
         {   id:0,
@@ -77,12 +82,6 @@ var ge = module.exports = function (id, client) {
 		    node = new ge.Node(i, posx[i], posy[i], true, conn[i]);
 		    this.map.nodes.push(node);
     }
-    //TEST add some random info centers
-    this.map.nodes[0].has_information_center=true;
-    this.map.nodes[5].has_information_center=true;
-    this.map.nodes[9].has_information_center=true;
-    this.map.nodes[13].has_information_center=true;
-    this.map.nodes[14].has_information_center=true;
     
     //TEST add some road blocks
     this.map.nodes[0].has_road_block = true;
@@ -280,17 +279,42 @@ ge.prototype.command = function(client, c){
 			break;
 			
 			
-			
+		//TODO Finish this
 		case 'create_info_center':
 		
-			if(!players[this.active_player].add_information_center()){
-				client.emit('error', 'Failed to add information center');
+			console.log("Trying to place info center in node " + nodes[players[this.active_player].node].id);
+			var dec_4_actions = false;
+
+			if(this.information_centers === this.max_information_centers){
+				client.emit('error', "Player "+this.active_player+" failed to add information center, no information centers left!");
 				break;
 			}
-			changed = {
+
+			if(!nodes[players[this.active_player].node].has_information_center){
+				
+				//TODO do this differently (minus_all_actions)? yes.
+				if(players[this.active_player].minus_all_actions()){
+					nodes[players[this.active_player].node].has_information_center = true;
+					this.information_centers++;
+					dec_4_actions = true;
+				}
+				else{
+					client.emit('error', "Player "+this.active_player+" failed to add information center, player does not have enough actions");
+					break;	
+				}	
+			}
+			else{
+				client.emit('error', "Player "+this.active_player+" failed to add information center, node "+nodes[players[this.active_player].node].id+" already has center");
+				break;	
+			}
+
+			
+			var stringed = JSON.stringify({
 				type:'added_information_center',
-				node:players[this.active_player].node
-			};
+				node:nodes[players[this.active_player].node],
+				dec_4_actions:dec_4_actions
+			});
+			client.emit('change', stringed);
 
 			break;
 			
@@ -361,7 +385,6 @@ ge.prototype.command = function(client, c){
 	
 			//ge.save_state(client, c);
 			break;
-			
 			
 			
         case '':
@@ -523,6 +546,17 @@ ge.Player.prototype.minus_one_action = function () {
 	return false;
 	//update gui?
 }
+
+//TODO after placing info centers, remove 4
+ge.Player.prototype.minus_all_actions = function () {
+	if (this.actions_left >= 4) {
+		this.actions_left -= 4;	
+		return true;
+	}
+	return false;
+	//update gui?
+}
+
 ge.Player.prototype.remove_info_card = function(info_card) {
 	for (var i = 0; i < this.info_cards.length; i++) {
 		if (this.info_cards[i] === info_card) {
@@ -545,19 +579,16 @@ ge.Player.prototype.move_player = function (node) {
 	}
 	return false;
 }
-ge.Player.prototype.add_information_center = function () {
-	if (this.node.has_information_center){
-		return false;
-	}
-	else if (this.actions_left < 4){ // TODO: finne max antall actions for player
-		return false;
-	}
-	else {
-		this.node.has_information_center = true;
-		this.set_actions_left(0);
-		return true;
-	}
-}
+//ge.Player.prototype.add_information_center = function () {
+//	if (this.node.has_information_center || this.actions_left < 4){
+//		return false;
+//	}
+//	else {
+//		this.node.has_information_center = true;
+//		this.set_actions_left(0);
+//		return true;
+//	}
+//}
 ge.Player.prototype.add_road_block = function () {
 	if(this.node.has_road_block){
 		return false;

@@ -189,6 +189,13 @@ gco.decrease_actions = function(){
     gco.draw();
 }
 
+gco.decrease_4_actions = function(){
+    if (gco.players[gco.active_player].actions_left > 0) {
+        gco.players[gco.active_player].actions_left -= 4;
+    }
+    gco.draw();
+}
+
 
 //decrease panic (server knows if player has special -10 panic role, if not decrease by 5)
 gco.decrease_panic = function(zone){
