@@ -69,6 +69,11 @@ socket.on('change', function (data) {
 	    	gco.draw();
 	    	break;
 	    	
+	    case 'added_road_block':
+	    	gco.nodes[gco.players[gco.active_player].node] = d.node;
+	    	gco.draw();
+	    	break;
+	    	
     } 
     if(d.dec_action) gco.decrease_actions();
     if(d.dec_4_actions) gco.decrease_4_actions();
@@ -95,4 +100,9 @@ function end_turn(){
 function create_info_center(){
     var c = {};
     command("create_info_center", c);
+}
+
+function create_road_block(){
+    var c = {};
+    command("create_road_block", c);
 }
