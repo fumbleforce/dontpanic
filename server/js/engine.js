@@ -44,7 +44,7 @@ var ge = module.exports = function (id, client) {
         [2, 3, 7, 8], // 5
         [1, 9, 11],
         [2, 5, 10],
-        [5, 9, 13, 16],
+        [3, 5, 9, 13, 16],
         [4, 6, 8, 14, 16],
         [7, 12, 13], //10
         [6, 14, 17],
@@ -84,13 +84,13 @@ var ge = module.exports = function (id, client) {
     }
     
     //TEST add some road blocks
-    this.map.nodes[0].has_road_block = true;
-    this.map.nodes[2].has_road_block = true;
-    this.map.nodes[3].has_road_block = true;
-    this.map.nodes[5].has_road_block = true;
-    this.map.nodes[8].has_road_block = true;
-    this.map.nodes[13].has_road_block = true;
-    this.map.nodes[16].has_road_block = true;
+//    this.map.nodes[0].has_road_block = true;
+//    this.map.nodes[2].has_road_block = true;
+//    this.map.nodes[3].has_road_block = true;
+//    this.map.nodes[5].has_road_block = true;
+//    this.map.nodes[8].has_road_block = true;
+//    this.map.nodes[13].has_road_block = true;
+//    this.map.nodes[16].has_road_block = true;
     
     //add road blocks on all nodes for testing node/node connections
 //    for (var i=0; i<this.map.nodes.length; i++){
@@ -147,8 +147,8 @@ var ge = module.exports = function (id, client) {
     zones[6].panic_level = 10;
     zones[9].panic_level = 25;
     zones[12].panic_level = 5;
-    zones[14].panic_level = 40;
-    zones[16].panic_level = 45;
+    zones[14].panic_level = 15;
+    zones[16].panic_level = 5;
     
     //set centroidX and centroidY for test zone
     //TODO THIS IS ACTUALLY CENTER, NOT CENTROID. For better result, 
@@ -201,7 +201,7 @@ ge.prototype.command = function(client, c){
 				if(p.minus_one_action()){
 					
 					p.node = c.node_id;
-				    dec_action = true;
+				    //dec_action = true;
 					console.log("Player was moved");
 				}
             }
@@ -318,15 +318,64 @@ ge.prototype.command = function(client, c){
 
 			break;
 			
+		//TODO finish this
+		case 'create_road_block':
 			
-			
-		case 'create_barrier':
-			if(!g.player[c.player_id].add_road_block()) {
-				client.emit('error', 'Failed to add barrier');
+			console.log("Trying to place road block in node " + nodes[players[this.active_player].node].id);
+			var dec_action = false;
+			//Is there another player on the node? Must be, if player is not OPERATION_EXPERT
+			var another_player = false;
+
+			if(this.road_blocks === this.max_road_blocks){
+				client.emit('error', "Player "+this.active_player+" failed to add road block, no road blocks left!");
+				break;
 			}
+			
+			//TODO Roles?
+			//Also, this is not very efficient way to create roadblocks, I think.
+			//Could set another_player=true if player is OPERATION_EXPERT, the easy way
+			//if (!this.active_player.role === OPERATION_EXPERT){
+				//Check if there is another player on the node (do not need to do this if player is OPERATION_EXPERT)
+			for (var i = 0; i < players.length; i++) {
+				if ((nodes[players[i].node].id===nodes[players[this.active_player].node].id)&&(!(i===this.active_player))) {
+					another_player = true;
+				}
+			}
+			if (!another_player){
+				client.emit('error', "Player "+this.active_player+" failed to add road block, no other players on node!");
+				break;
+			}
+			//}
+
+			//Check actions and number of roadblocks
+			if(!nodes[players[this.active_player].node].has_road_block){
+
+				//TODO do this differently (minus_all_actions)? yes.
+				if(players[this.active_player].minus_one_action()){
+					nodes[players[this.active_player].node].has_road_block = true;
+					this.road_blocks++;
+					dec_action = true;
+				}
+				else{
+					client.emit('error', "Player "+this.active_player+" failed to add road block, player does not have enough actions");
+					break;	
+				}	
+			}
+			else{
+				client.emit('error', "Player "+this.active_player+" failed to add road block, node "+nodes[players[this.active_player].node].id+" already has one!");
+				break;	
+			}
+
+
+			var stringed = JSON.stringify({
+			type:'added_road_block',
+			node:nodes[players[this.active_player].node],
+			dec_action:dec_action
+			});
+			client.emit('change', stringed);
+
 			break;
-			
-			
+
 			
 		case 'remove_barrier':
 			if(!g.player[c.player_id].remove_road_block()){
