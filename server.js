@@ -44,7 +44,7 @@ console.log('Server running at http://127.0.0.1:8008/');
     The socket.IO server listens to a http-server that listens to the express server.
 */
 ioserver.listen(server.get('port'));
-var socket_listener = require('socket.io').listen(ioserver);
+var socket_listener = require('socket.io').listen(ioserver, {log:false});
 
 
 /*  TODO Configures the socket.io server
@@ -107,8 +107,9 @@ socket_listener.sockets.on('connection', function (client) {
     });
     
     client.on('game_command', function(c) {
-        console.log('**SOCKET_LISTENER** received in-game command ' + c);
+        console.log('**SOCKET_LISTENER** Received:');
         var parsed = JSON.parse(c);
+        console.log(parsed);
         games[client.game_id].command(client, parsed);
     });
 
@@ -120,6 +121,3 @@ socket_listener.sockets.on('connection', function (client) {
 });// end onConnection
 
    
-    
-    
-    

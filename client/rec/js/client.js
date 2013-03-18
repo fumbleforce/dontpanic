@@ -23,6 +23,26 @@ socket.on('start_game', function (data) {
 
 socket.on('change', function (data) {
     var d = JSON.parse(data);
+    
+    if (d.players) { 
+        gco.update_players(d.players);
+        gco.update_cards();
+    }
+    if (d.zones) {
+        gco.update_zones(d.zones);
+    }
+    if (d.nodes) {
+        gco.update_nodes(d.nodes);
+    }
+    if (d.timer) {
+        gco.start_timer(d.timer);
+    }
+    if (d.none) {
+        gco.reset();
+    }
+    gco.draw();
+    
+    /*
     switch (d.type) {
         case 'effect':
             console.log("updating state");
@@ -72,6 +92,7 @@ socket.on('change', function (data) {
     } 
     if(d.dec_action) gco.decrease_actions();
     if(d.dec_4_actions) gco.decrease_4_actions();
+    */
 });
 
 

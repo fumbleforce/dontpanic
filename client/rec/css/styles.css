@@ -122,6 +122,7 @@ p
     vertical-align:top;
     right:0px;
     float:right;
+    width:500px;
 }
 
 .sidebar-right
@@ -129,6 +130,7 @@ p
     vertical-align:top;
     left:0px;
     float:left;
+    width:500px;
 }
 .card-container
 {
