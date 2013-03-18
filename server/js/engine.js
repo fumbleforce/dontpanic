@@ -44,7 +44,7 @@ var ge = module.exports = function (id, client) {
         [2, 3, 7, 8], // 5
         [1, 9, 11],
         [2, 5, 10],
-        [5, 9, 13, 16],
+        [3, 5, 9, 13, 16],
         [4, 6, 8, 14, 16],
         [7, 12, 13], //10
         [6, 14, 17],
@@ -84,13 +84,13 @@ var ge = module.exports = function (id, client) {
     }
     
     //TEST add some road blocks
-    this.map.nodes[0].has_road_block = true;
-    this.map.nodes[2].has_road_block = true;
-    this.map.nodes[3].has_road_block = true;
-    this.map.nodes[5].has_road_block = true;
-    this.map.nodes[8].has_road_block = true;
-    this.map.nodes[13].has_road_block = true;
-    this.map.nodes[16].has_road_block = true;
+//    this.map.nodes[0].has_road_block = true;
+//    this.map.nodes[2].has_road_block = true;
+//    this.map.nodes[3].has_road_block = true;
+//    this.map.nodes[5].has_road_block = true;
+//    this.map.nodes[8].has_road_block = true;
+//    this.map.nodes[13].has_road_block = true;
+//    this.map.nodes[16].has_road_block = true;
     
     //add road blocks on all nodes for testing node/node connections
 //    for (var i=0; i<this.map.nodes.length; i++){
@@ -147,8 +147,8 @@ var ge = module.exports = function (id, client) {
     zones[6].panic_level = 10;
     zones[9].panic_level = 25;
     zones[12].panic_level = 5;
-    zones[14].panic_level = 40;
-    zones[16].panic_level = 45;
+    zones[14].panic_level = 15;
+    zones[16].panic_level = 5;
     
     //set centroidX and centroidY for test zone
     //TODO THIS IS ACTUALLY CENTER, NOT CENTROID. For better result, 
@@ -190,8 +190,10 @@ ge.prototype.command = function(client, c){
 	
     switch (c.type) {
         case 'move_player':
+
             var p = players[c.player_id];
             if(p.move_player(nodes[p.node], nodes[c.node_id])) changed.players = [p];
+
             break;
             
   
@@ -270,18 +272,43 @@ ge.prototype.command = function(client, c){
 			
 			break;
 			
+		//TODO finish this
+		case 'create_road_block':
 			
+			console.log("Trying to place road block in node " + nodes[players[this.active_player].node].id);
+			var dec_action = false;
+			//Is there another player on the node? Must be, if player is not OPERATION_EXPERT
+			var another_player = false;
+
+			if(this.road_blocks === this.max_road_blocks){
+				client.emit('error', "Player "+this.active_player+" failed to add road block, no road blocks left!");
+				break;
+			}
 			
+
 		case 'create_barrier':
 			if(players[c.player_id].add_road_block()) {
 				changed.node = [players[c.player_id]];
 			}
 			else {
 			    client.emit('error', 'Failed to add barrier');
+
 			}
+			else{
+				client.emit('error', "Player "+this.active_player+" failed to add road block, node "+nodes[players[this.active_player].node].id+" already has one!");
+				break;	
+			}
+
+
+			var stringed = JSON.stringify({
+			type:'added_road_block',
+			node:nodes[players[this.active_player].node],
+			dec_action:dec_action
+			});
+			client.emit('change', stringed);
+
 			break;
-			
-			
+
 			
 		case 'remove_barrier':
 			if(player[c.player_id].remove_road_block()){
