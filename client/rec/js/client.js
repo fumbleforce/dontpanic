@@ -24,8 +24,16 @@ socket.on('start_game', function (data) {
 socket.on('change', function (data) {
     var d = JSON.parse(data);
     switch (d.type) {
+        case 'effect':
+            console.log("updating state");
+            gco.update_players(d.players);
+            gco.update_nodes(d.nodes);
+            gco.update_zones(d.zones);
+            gco.update_cards();
+            gco.draw();
+            break;
         case 'moved_player':
-            gco.move_player(d.player);
+            gco.update_player(d.player);
             console.log("Player has moved to node id: "+d.player.node);
 
             break;
@@ -42,25 +50,35 @@ socket.on('change', function (data) {
 			
 			break;
 	    case 'next_turn':
-	        gco.next_turn(d.player, d.turn);
+	        gco.turn = d.turn;
+            gco.active_player = d.player.id;
+            gco.update_player(d.player)
+            gco.draw();
+            gco.update_cards();
 	        break;
 	    
 	    case 'update_panic':
-	        zones = d.zones;
+	        gco.zones = d.zones;
 	        gco.start_timer(d.timer);
 	        gco.draw();
-	        
-			
-
+	        break;
+	    
+	    //TODO implement this
+	    case 'added_information_center':
+	    	gco.nodes[gco.players[gco.active_player].node] = d.node;
+	    	gco.draw();
+	    	break;
+	    	
     } 
     if(d.dec_action) gco.decrease_actions();
+    if(d.dec_4_actions) gco.decrease_4_actions();
 });
 
 
 function command(type, c){
     c.type = type;
     var send = JSON.stringify(c);
-    console.log('Sending '+ type +  '"' + send + '"');
+    console.log('Sending '+ type +  ' "' + send + '" ');
     socket.emit('game_command', send);
 }
 
@@ -74,4 +92,7 @@ function end_turn(){
     command("end_turn", c);
 }
 
-
+function create_info_center(){
+    var c = {};
+    command("create_info_center", c);
+}

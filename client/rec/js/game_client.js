@@ -52,7 +52,6 @@ var gco = {
 gco.ctx = gco.canvas.getContext("2d");
 
 
-
 /*  Initialize Game
 
     Initializes the game by populating the Game Client Object,
@@ -68,11 +67,14 @@ gco.init_game = function (ps, map) {
     gco.nodes = map.nodes;
     
     gco.setup_canvas();
+
     gco.set_canvas_listener();
     gco.start_timer(20);
     gco.draw();
+    gco.update_cards();
 
 }
+
 
 /* Start Timer
     
@@ -98,6 +100,7 @@ gco.start_timer = function(dur){
     
 }
 
+
 /*  Set up Canvas
     
     Configures the height and width of the canvas 
@@ -110,34 +113,85 @@ gco.setup_canvas = function(){
     gco.cst.selected_zone = null;
 }
 
+
+
+
 /*  Move Player
     
-    Called by the server when a player has been moved to another node. Replaces the local player object with an updated object from the server.
+    Called by the server when a player has been moved to another node. 
+    Replaces the local player object with an updated object from the server.
     
     Object p        The updated player object.
 */
-gco.move_player = function(p){
-    gco.players[p.id].node = p.node;
+gco.update_player = function(p){
+    gco.players[p.id] = p;
     gco.players[p.id].x = gco.nodes[p.node].x;
     gco.players[p.id].y = gco.nodes[p.node].y;
     gco.draw();
 }
 
-/*  Next Turn
-    
-    
-
-
-*/
-gco.next_turn = function(p, t){
-    gco.turn = t;
-    gco.active_player = p.id;
-    gco.players[p.id] = p;
-    gco.draw();
+gco.update_players = function(ps){
+    for(var i = 0; i < ps.length; i++) {
+        gco.update_player(ps[i]);
+    }
 }
+
+gco.update_nodes = function(ns){
+    for(var i = 0; i < ns.length;i++){
+        gco.nodes[ns[i].id] = ns[i];
+    }
+}
+
+gco.update_zones = function(zs){
+    for(var i = 0; i < zs.length;i++){
+        gco.zones[zs[i].id] = zs[i];
+    }
+}
+
+gco.update_cards = function() {
+    var ps = gco.players,
+        $con,
+        c,
+        i,
+        cards,
+        button;
+        
+    console.log("Updating info cards..");
+    
+    for (i = 0; i < ps.length; i++){
+        cards = ps[i].info_cards;
+
+        $con = $("#"+i+"_cards");
+        $con.empty();
+        for (c = 0; c < cards.length; c++){
+            button = $("<button id='"+i+"-"+c+"' class='info-card' onclick='gco.info_card_click(this.id)'>"+cards[c].name+ "</button>");
+            button.appendTo($con);
+        }
+    }
+}
+
+
+gco.info_card_click = function(id) {
+    var p = id.charAt(0),
+        c = id.charAt(2);
+    
+    command('use_card', {player:p, card:c});
+}
+
+
+
+
+
 gco.decrease_actions = function(){
     if (gco.players[gco.active_player].actions_left > 0) {
         gco.players[gco.active_player].actions_left--;
+    }
+    gco.draw();
+}
+
+gco.decrease_4_actions = function(){
+    if (gco.players[gco.active_player].actions_left > 0) {
+        gco.players[gco.active_player].actions_left -= 4;
     }
     gco.draw();
 }
@@ -156,13 +210,22 @@ gco.player_draw = function(player, ctx){
     ctx.beginPath();
     ctx.arc(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size, 0, Math.PI*2, true); 
     ctx.closePath();
-    ctx.fill();
-
-    ctx.fillStyle = "White";
-    ctx.font="15px Arial",
-    ctx.fillText(player.id, player.x+player_offsetX[player.id]-5, player.y+player_offsetY[player.id]+6);
-    
+    //ctx.fill();
     //TODO draw circle to show active player when dragging/active?
+    if (this.active_player===player.id){
+    	var gradiant = ctx.createRadialGradient(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size-10, player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size);
+    	gradiant.addColorStop(0, player.color);
+    	gradiant.addColorStop(1, 'white');
+    	ctx.fillStyle=gradiant;
+    	ctx.fill();
+    }
+    else{
+    	ctx.fill();
+    }
+
+    ctx.fillStyle = "Black";
+    ctx.font="bold 15px Arial",
+    ctx.fillText(player.id, player.x+player_offsetX[player.id]-5, player.y+player_offsetY[player.id]+6);
 }
 
 gco.node_draw = function(node, ctx){
