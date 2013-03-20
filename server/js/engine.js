@@ -5,7 +5,7 @@
 
 var ge = module.exports = function (id, client) {
 
-	this.id = 0;
+	this.id = id || 0;
 	this.map = {};
 	this.settings = {};
 	this.players = [];
@@ -205,6 +205,7 @@ ge.prototype.command = function(client, c){
             
             if (z.dec_panic(p, nodes[p.node])){
                 changed.zones = [z];
+                changed.players = [p];
             }
 			
 			else {
@@ -258,6 +259,7 @@ ge.prototype.command = function(client, c){
 			if(!node.has_information_center){
 				if(n.add_information_center(p)){
 					change.nodes = [n];
+					change.players = [p];
 					this.information_centers++;
 				}
 				else {
@@ -333,13 +335,14 @@ ge.prototype.command = function(client, c){
 			this.turn++;
 			this.active_player = this.active_player >= this.players.length-1 ?  0 : this.active_player+1;
 
-            ap.actions_left = tap.role === 'activist' ?  5 : 4;
+            ap.actions_left = ap.role === 'activist' ?  5 : 4;
             
             //TODO Add random info cards
 			ap.info_cards.push(this.info_cards[0]);
 			
 			changed.players = [ap];
 			changed.turn = this.turn;
+			changed.active_player = this.active_player;
 			break;
         
         console.log("No matching command types");
@@ -365,16 +368,16 @@ ge.prototype.command = function(client, c){
 
 
 
-ge.prototype.start = function(client){
-    var g = {players:this.players, map:this.map};
-    client.emit('start_game', JSON.stringify(g));
+ge.prototype.start = function(){
+    var g = state(this);
+    this.client.emit('start_game', JSON.stringify(g));
 }
 
 
 
 
 ge.prototype.reconnect_game = function(client, c) {
-    // TODO Users reconnect to existing game
+    
 }
 
 ge.prototype.save_state = function(client, c) {
@@ -466,6 +469,7 @@ function state(g){
         nodes : g.map.nodes,
         players : g.players,
         turn : g.turn,
+        timer : g.timer,
         active_player : g.active_player
     };
 }
@@ -673,7 +677,7 @@ ge.Zone.prototype.is_panic_zero = function () {
 }
 ge.Zone.prototype.dec_panic = function(player, node) {
 
-	if (node.adjacent_zones.indexOf(this) >= 0) {
+	if (this.nodes.indexOf(node.id) >= 0) {
 		if(this.panic_level >= 5){
 			
 			if(player.update_actions(-1)){

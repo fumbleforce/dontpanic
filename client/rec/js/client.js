@@ -4,12 +4,24 @@ var socket = io.connect('http://localhost');
 
 socket.on('is_connected', function () {
     console.log('Connected');
-    socket.emit('create_game', {});
+    var cookie = read_cookie('dp_user_id');
+    if (cookie !== null) {
+        socket.emit('dp_user_id', {id:cookie});
+    }
+    else {
+        socket.emit('dp_user_id', {});
+    }
+    
 });
 
 socket.on('msg', function (msg) {
     console.log(msg);
     socket.emit('msg', 'Server said "' + msg + '" to me.');
+});
+
+socket.on('not_in_game', function(o){
+    console.log("Client is not associated with a game");
+    socket.emit('create_game', {});
 });
 
 socket.on('error', function (e) {
@@ -18,7 +30,8 @@ socket.on('error', function (e) {
 
 socket.on('start_game', function (data) {
     var d = JSON.parse(data);
-    gco.init_game(d.players, d.map);
+    create_cookie('dp_user_id', data.userid, 1);
+    gco.init_game(d);
 });
 
 socket.on('change', function (data) {
@@ -36,6 +49,9 @@ socket.on('change', function (data) {
     }
     if (d.timer) {
         gco.start_timer(d.timer);
+    }
+    if (d.turn) {
+        gco.update_turn(d.turn, d.active_player);
     }
     if (d.none) {
         gco.reset();
@@ -101,7 +117,8 @@ socket.on('change', function (data) {
 });
 
 
-function command(type, c){
+function command(type, o){
+    var c = o || {}
     c.type = type;
     var send = JSON.stringify(c);
     console.log('Sending '+ type +  ' "' + send + '" ');
@@ -113,17 +130,28 @@ function msg(m){
     socket.emit('msg', m);
 }
 
-function end_turn(){
-    var c = {};
-    command("end_turn", c);
+
+function create_cookie(name,value,days) {
+	if (days) {
+		var date = new Date();
+		date.setTime(date.getTime()+(days*24*60*60*1000));
+		var expires = "; expires="+date.toGMTString();
+	}
+	else var expires = "";
+	document.cookie = name+"="+value+expires+"; path=/";
 }
 
-function create_info_center(){
-    var c = {};
-    command("create_info_center", c);
+function read_cookie(name) {
+	var nameEQ = name + "=";
+	var ca = document.cookie.split(';');
+	for(var i=0;i < ca.length;i++) {
+		var c = ca[i];
+		while (c.charAt(0)==' ') c = c.substring(1,c.length);
+		if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+	}
+	return null;
 }
 
-function create_road_block(){
-    var c = {};
-    command("create_road_block", c);
+function erase_cookie(name) {
+	createCookie(name,"",-1);
 }

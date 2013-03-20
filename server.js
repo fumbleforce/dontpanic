@@ -8,7 +8,8 @@ var express     = require('express'),
     server      = module.exports = express(),
     engine      = require('./server/js/engine.js'),
     ioserver    = require('http').createServer(server),
-    games       = {};
+    games       = {},
+    uuid        = require('node-uuid');
 
 
 
@@ -25,7 +26,7 @@ server.use(express.static(__dirname + '/client/rec'));
 server.set('view engine', 'html');
 server.set('port', process.env.PORT || 8008);
 
-
+console.log('Server running at http://127.0.0.1:8008/');
 
 /*  Handle http requests:
     
@@ -35,8 +36,19 @@ server.set('port', process.env.PORT || 8008);
 server.get('/', function(request, response){
     response.render('index');
 })
-console.log('Server running at http://127.0.0.1:8008/');
 
+server.get('/create', function(request, response){
+    response.render('create_game_view');
+})
+
+server.get('/login', function(request, response){
+    console.log("Request for '/login'");
+    response.render('loginScreen');
+})
+
+server.get('/game', function(request, response){
+    response.render('index');
+})
 
 
 /* Configure Socket.IO:
@@ -67,15 +79,34 @@ var socket_listener = require('socket.io').listen(ioserver, {log:false});
 socket_listener.sockets.on('connection', function (client) {
 
     // TODO Client setup
-    client.userid = 1;
+    client.userid = uuid.v1();
     client.emit('is_connected');
     console.log('**SOCKET_LISTENER** client ' + client.userid + ' connected');
-
+    
+    client.on('dp_user_id', function(o) {
+        console.log("Checking for user ID");
+        if (o.id) {
+            console.log("Found client with ID "+o.id);
+            client.userid = o.id;
+            if (games[client.userid]) {
+                games[client.userid].client = client;
+                games[client.userid].start();
+            }
+            else{
+                client.emit('not_in_game', {});
+            }
+        }
+        else{
+            client.emit('not_in_game', {});
+        }
+    });
     
     //Client sent log message
     client.on('msg', function(msg) {
         console.log('**SOCKET_LISTENER** received message: '+ msg);
     });
+    
+
             
     client.on('end_game', function(c) {
         console.log('**SOCKET_LISTENER** received command ' + c);
@@ -84,10 +115,9 @@ socket_listener.sockets.on('connection', function (client) {
     
     client.on('create_game', function(c) {
         console.log('**SOCKET_LISTENER** received create command ' + c);
-        var g = new engine(0, client);
+        var g = new engine(client.userid, client);
         games[g.id] = g;
         client.game_id = g.id;
-        
         g.start(client);
     });
     
@@ -101,16 +131,13 @@ socket_listener.sockets.on('connection', function (client) {
         engine.leave_game(client, c);
     });
     
-    client.on('reconnect_game', function(c) {
-        console.log('**SOCKET_LISTENER** received reconnect command ' + c);
-        engine.reconnect_game(client, c);
-    });
     
     client.on('game_command', function(c) {
+        console.log('');
         console.log('**SOCKET_LISTENER** Received:');
         var parsed = JSON.parse(c);
         console.log(parsed);
-        games[client.game_id].command(client, parsed);
+        if(games[client.userid]) games[client.game_id].command(client, parsed);
     });
 
     client.on('disconnect', function () {

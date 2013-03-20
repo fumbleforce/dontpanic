@@ -61,16 +61,18 @@ gco.ctx = gco.canvas.getContext("2d");
     List ps         List of player objects
     Object map      The map object containing list of Zones and Nodes
 */
-gco.init_game = function (ps, map) {
+gco.init_game = function (d) {
     console.log("Game initiated");
-    gco.players = ps;
-    gco.zones = map.zones;
-    gco.nodes = map.nodes;
+    gco.players = d.players;
+    gco.zones = d.zones;
+    gco.nodes = d.nodes;
+    gco.turn = d.turn;
+    gco.active_player = d.active_player;
     
     gco.setup_canvas();
-
     gco.set_canvas_listener();
-    gco.start_timer(20);
+    gco.start_timer(d.timer);
+    
     gco.draw();
     gco.update_cards();
 
@@ -120,6 +122,12 @@ gco.reset = function(){
     p.x = gco.nodes[p.node].x;
     p.y = gco.nodes[p.node].y;
 }
+
+gco.update_turn = function(turn, ap){
+    gco.turn = turn;
+    gco.active_player = ap;
+}
+
 
 /*  Update Player
     
@@ -185,6 +193,10 @@ gco.info_card_click = function(id) {
     
     command('use_card', {player:p, card:c});
 }
+
+
+
+
 
 
 

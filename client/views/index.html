@@ -19,9 +19,9 @@
     <div class="content-row">
         <div class="content-column"></div>
         <div class="content-column top-bar clearfix">
-            <button class="btn-end-turn" onclick="end_turn();">Next Turn</button>
-            <button class="btn-create-info-center" onclick="create_info_center();">Info Center</button>
-            <button class="btn-create-road-block" onclick="create_road_block();">Roadblock</button>
+            <button class="btn-end-turn" onclick="command('end_turn');">Next Turn</button>
+            <button class="btn-create-info-center" onclick="command('create_info_center');">Info Center</button>
+            <button class="btn-create-road-block" onclick="command('create_road_block');">Roadblock</button>
             <div id="player-turn-label" class="info-label">Player 0's turn</div>
             <div id="turn-label" class="info-label">Turn: 0</div>
             <div id="action-label" class="info-label">Action points left: 4</div>
@@ -121,7 +121,7 @@
 
 <footer>A game by Group 10</footer>
 
-<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script src="/js/jquery-1.9.1.min.js"></script>
 <script src="/js/game_client.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/client.js"></script>
