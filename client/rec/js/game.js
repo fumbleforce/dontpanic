@@ -9,7 +9,8 @@ var c_height = 1500,
     player_size = 20,
     info_center_size = 35,
     offset_distance = node_size*1,
-    panic_info_size = 40;
+    panic_info_size = 40,
+    w_inc = 0;
 var player_offsetX = [0, 
                       Math.cos(315*(Math.PI/180))*offset_distance,
                       offset_distance, 
@@ -60,16 +61,18 @@ gco.ctx = gco.canvas.getContext("2d");
     List ps         List of player objects
     Object map      The map object containing list of Zones and Nodes
 */
-gco.init_game = function (ps, map) {
+gco.init_game = function (d) {
     console.log("Game initiated");
-    gco.players = ps;
-    gco.zones = map.zones;
-    gco.nodes = map.nodes;
+    gco.players = d.players;
+    gco.zones = d.zones;
+    gco.nodes = d.nodes;
+    gco.turn = d.turn;
+    gco.active_player = d.active_player;
     
     gco.setup_canvas();
-
     gco.set_canvas_listener();
-    gco.start_timer(20);
+    gco.start_timer(d.timer);
+    
     gco.draw();
     gco.update_cards();
 
@@ -114,11 +117,21 @@ gco.setup_canvas = function(){
 }
 
 
+gco.reset = function(){
+    var p = gco.players[gco.active_player];
+    p.x = gco.nodes[p.node].x;
+    p.y = gco.nodes[p.node].y;
+}
+
+gco.update_turn = function(turn, ap){
+    gco.turn = turn;
+    gco.active_player = ap;
+}
 
 
-/*  Move Player
+/*  Update Player
     
-    Called by the server when a player has been moved to another node. 
+    Called by the server when a player has been updated with new information. 
     Replaces the local player object with an updated object from the server.
     
     Object p        The updated player object.
@@ -127,7 +140,6 @@ gco.update_player = function(p){
     gco.players[p.id] = p;
     gco.players[p.id].x = gco.nodes[p.node].x;
     gco.players[p.id].y = gco.nodes[p.node].y;
-    gco.draw();
 }
 
 gco.update_players = function(ps){
@@ -163,6 +175,10 @@ gco.update_cards = function() {
 
         $con = $("#"+i+"_cards");
         $con.empty();
+        if (cards.length > 4 && w_inc === 0) {
+            $con.parent().parent().css('width', ''+(parseInt($con.parent().parent().css('width'))+100)+'px');
+            w_inc++;
+        }
         for (c = 0; c < cards.length; c++){
             button = $("<button id='"+i+"-"+c+"' class='info-card' onclick='gco.info_card_click(this.id)'>"+cards[c].name+ "</button>");
             button.appendTo($con);
@@ -182,6 +198,10 @@ gco.info_card_click = function(id) {
 
 
 
+
+
+
+/* deprecated - Update whole player instead
 gco.decrease_actions = function(){
     if (gco.players[gco.active_player].actions_left > 0) {
         gco.players[gco.active_player].actions_left--;
@@ -195,13 +215,17 @@ gco.decrease_4_actions = function(){
     }
     gco.draw();
 }
+*/
 
-
+/* Update whole zone instead
 //decrease panic (server knows if player has special -10 panic role, if not decrease by 5)
 gco.decrease_panic = function(zone){
 	gco.zones[zone.id].panic_level = zone.panic_level;
 	gco.draw();
 }
+*/
+
+
 
 gco.player_draw = function(player, ctx){
     if (player.x === undefined) player.x = gco.nodes[player.node].x;
@@ -478,8 +502,6 @@ gco.set_canvas_listener = function(){
             my = e.offsetY,
             selected;
 
-      
-        
         cst.selected_zone = null;
         
         if (cst.selection) {
@@ -490,7 +512,6 @@ gco.set_canvas_listener = function(){
             cst.dragging = false;
             gco.draw();
         }
-        
         
         for (var i = 0; i < players.length; i++) {
             
@@ -538,7 +559,6 @@ gco.set_canvas_listener = function(){
         var mx = e.offsetX,
             my = e.offsetY;
              
-         
         if (cst.dragging && cst.selection !== undefined) {
             console.log("Mouse let go of player");
             for (var i = 0; i < nodes.length; i++) {

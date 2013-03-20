@@ -24,25 +24,20 @@ connection.connect(function(err) {
 
 
 /* Query Test */
-connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {
-  if (err) throw err;
-  console.log('The solution is: ', rows[0].solution);
-});
 
 var test_query = function () {
 	connection.query('SELECT text AS solution FROM test WHERE ID = 1', 
 	function(err, rows, fields) {
  		if (err) throw err;
- 		return rows[0].solution;
+ 		console.log(rows[0].solution);
 	});
 }
-
+//test_query();
 /*
+	get_password checks if the password parameter matches the database password for the 
+	given user
 
-get_password checks if the password parameter matches the database password for the 
-given user, callback on correct_password or wrong_password, callback fungerer ikke nå, men 
-tror selve kallet fungerer
-
+	Works, but dont know how to use callback.
 */
 
 var get_password = function (username, password, callback) {
@@ -50,15 +45,19 @@ var get_password = function (username, password, callback) {
 	connection.escape(username), function(err, rows, fields) {
 		if (err) throw err;
 		if (rows[0].solution === password) {
-			callback.correct_password(username);
+			console.log('Riktig passord: ', rows[0].solution);
+			//callback.correct_password(username);
 		}		
 		else {
-			callback.wrong_password();
+			console.log('Feil passord');
+			//callback.wrong_password();
 		}
 	});
 }
 
-/* for å teste sql spørringene */
+//get_password('dontpanic', '123');
+
+/* for å teste sql spørringene, får feil på at caller ikke har metodene?? */
 
 function caller () {
     this.correct_password = function(username) {
@@ -79,19 +78,34 @@ function caller () {
     };
 }
 
-//get_password('dontpanic', '1243', caller);
 
 /*
 	Sends a callback with the replay state for the given game id and turn id
 */
 
-/*var get_replay_state = function (game_id, turn_id, callback) {
-	connection.query('SELECT State_array AS solution FROM Replay WHERE Game_ID = ' + 
-	game_ID, 'AND Turn_ID = ' turn_id, function (err, rows, fields) {
+/* 
+	Puts the given replay string to Replay in the database
+*/
+
+var set_replay_state = function (game_id, turn_id, replay_string)  {
+	connection.query('INSERT INTO Replay SET?', {Game_ID: game_id, 
+	Turn_id: turn_id, State_array: replay_string}, function (err, result) {
 		if (err) throw err;
-		callback(rows[0].solution);
-	} 
-}*/
+		console.log('Sucessfully added', replay_string, 'to replay state');
+	});
+}
+//set_replay_state(2, 1, 'player1node3');
+
+var get_replay_state = function (game_id, turn_id, callback) {
+	connection.query('SELECT State_array AS solution FROM Replay WHERE Game_ID = ' + 
+	game_id, 'AND Turn_ID = ' + turn_id, function (err, rows, fields) {
+		if (err) throw err;
+		console.log(rows[0].solution);
+		//callback(rows[0].solution);
+	});
+}
+
+get_replay_state(1,1);
 
 /* 
 	Puts the texttest in the table test
@@ -104,28 +118,34 @@ var test = function (texttest) {
 
 }
 
-/* 
-	Puts the given replay string to Replay in the database  
-*/
-var set_replay_state = function (game_id, turn_id, replay_string)  {
-	connection.query('INSERT INTO Replay SET?', {Game_ID: game_id, 
-	Turn_id: turn_id, State_array: replay_string}, function (err, result) {
-		if (err) throw err;
-		console.log('Sucessfully added', replay_string, 'to replay state');
-	});
-}
-/* get if User admin*/
+/* get if User admin, works*/
 
 var is_user_admin = function (username, callback) {
 	connection.query('SELECT Is_Admin AS solution FROM User WHERE User_Name = ' + 
 	connection.escape(username), function(err, rows, fields) {
 		if (err) throw err;
-		callback(rows[0].solution);
+		console.log(rows[0].solution);
+		//callback(rows[0].solution);
 	});
 }
+
+//is_user_admin('dontpanic');
+//is_user_admin('administrator');
+
 /* get Username */ 
 
-/* */
+/* Adds new user with the giver parameters to the database, works */
+
+var add_user = function (username, password, id, email, name, is_admin) {
+	connection.query('INSERT INTO User SET?', {User_name: username, Password: password, 
+	ID: id, Email: email, Name: name, Is_Admin: is_admin}, function (err, result) {
+		if (err) throw err;
+		console.log('Successfully added player', username, password, id, email, name, 
+		is_admin);
+	});
+}	
+
+
 function handleDisconnect(connection) {
   connection.on('error', function(err) {
     if (!err.fatal) {
@@ -144,5 +164,8 @@ function handleDisconnect(connection) {
   });
 }
 handleDisconnect(connection);
+<<<<<<< HEAD
 
 */
+=======
+>>>>>>> cc9e4ccc82e2d8392059ef1f32d074b4bd7f1eeb
