@@ -286,20 +286,60 @@ gco.background_draw = function(ctx){
 }
 
 gco.zone_draw = function(zone, ctx){
-    ctx.beginPath();
+var img = new Image();
+	img.src = "http://oi48.tinypic.com/2dkxohl.jpg";
+
+
+	ctx.save();
+	var minx = 2000;
+	var miny = 2000;
+	
+    for (var j = 0; j < zone.nodes.length; j++){
+       	if (gco.nodes[zone.nodes[j]].x < minx){
+		minx = gco.nodes[zone.nodes[j]].x;
+		}
+		if (gco.nodes[zone.nodes[j]].y < miny){
+		miny = gco.nodes[zone.nodes[j]].y;
+		}
+    }
+	    ctx.beginPath();
+
+	//var node = gco.nodes;
+	//var zones = 
     ctx.moveTo(gco.nodes[zone.nodes[0]].x, gco.nodes[zone.nodes[0]].y);
-    for (var j = 1; j < zone.nodes.length; j++){
+    for (var j = 0; j < zone.nodes.length; j++){
         ctx.lineTo(gco.nodes[zone.nodes[j]].x, gco.nodes[zone.nodes[j]].y);
     }
     ctx.lineTo(gco.nodes[zone.nodes[0]].x, gco.nodes[zone.nodes[0]].y);
-    ctx.closePath();
-    //Draw outline of zones
+    
+	
+	
+	ctx.closePath();
+	ctx.save();
+	ctx.clip();
+	
+	
+	
+	ctx.drawImage(img, minx, miny);
+	ctx.fillStyle = "rgba(255,0,0,"+(0.2*zone.panic_level/10)+")";
+	ctx.fill();
+	
+	
+
+	ctx.restore();
+	//Draw outline of zones
     ctx.strokeStyle = "black";
     ctx.lineWidth = 5;
-    ctx.stroke();
+	ctx.stroke(); // Now draw our path
+	ctx.restore(); // Put the canvas back how it was before we started
+	
+	
+	
+
+    
     //Fill zone with respective color
-    ctx.fillStyle = zone.color;
-    ctx.fill();
+	
+   
     //TODO TEMPORARY show simple panic info
     ctx.fillStyle = 'red';
 	if (zone.panic_level > 9){
@@ -312,7 +352,9 @@ gco.zone_draw = function(zone, ctx){
 	ctx.font='27px Arial'
 	ctx.fillText(zone.panic_level, zone.centroid[0]-20, zone.centroid[1]+3);
 	
+
 	
+
     
 }
 
