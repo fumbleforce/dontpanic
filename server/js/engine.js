@@ -276,17 +276,12 @@ ge.prototype.command = function(client, c){
 		case 'create_road_block':
 			
 			console.log("Trying to place road block in node " + nodes[players[this.active_player].node].id);
-			var dec_action = false;
-			//Is there another player on the node? Must be, if player is not OPERATION_EXPERT
-			var another_player = false;
 
 			if(this.road_blocks === this.max_road_blocks){
 				client.emit('error', "Player "+this.active_player+" failed to add road block, no road blocks left!");
 				break;
 			}
-			
 
-		case 'create_barrier':
 			if(players[c.player_id].add_road_block()) {
 				changed.node = [players[c.player_id]];
 			}
@@ -294,18 +289,6 @@ ge.prototype.command = function(client, c){
 			    client.emit('error', 'Failed to add barrier');
 
 			}
-			else{
-				client.emit('error', "Player "+this.active_player+" failed to add road block, node "+nodes[players[this.active_player].node].id+" already has one!");
-				break;	
-			}
-
-
-			var stringed = JSON.stringify({
-			type:'added_road_block',
-			node:nodes[players[this.active_player].node],
-			dec_action:dec_action
-			});
-			client.emit('change', stringed);
 
 			break;
 
