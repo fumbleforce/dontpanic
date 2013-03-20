@@ -100,7 +100,7 @@ var ge = module.exports = function (id, client) {
 
 
     var zones = [];
-
+    //Zones are 'residential' by default
     zones[0] = new ge.Zone(0, [0, 1, 4, 3], [1, 2, 5]);
     zones[1] = new ge.Zone(1, [0, 2, 5, 3], [0, 3, 4]);
     zones[2] = new ge.Zone(2, [1, 4, 9, 6], [0, 5, 7]);
@@ -119,6 +119,15 @@ var ge = module.exports = function (id, client) {
     zones[15] = new ge.Zone(15, [16, 18, 19], [11, 14]);
     zones[16] = new ge.Zone(16, [14, 17, 20, 19], [11, 12]);
 
+    //change some zones from residential
+    zones[5].type="park";
+    zones[16].type="park";
+    zones[6].type="industry";
+    zones[7].type="industry";
+    zones[11].type="largecity";
+    zones[10].type="largecity";
+    zones[9].type="largecity";
+    
     zones[0].color = "aqua";
     zones[1].color = "steelblue";
     zones[2].color = "brown";
@@ -140,16 +149,16 @@ var ge = module.exports = function (id, client) {
     this.map.zones = zones;
     
     //TEST add panic on a few random zones
+    zones[0].panic_level = 5;
     zones[1].panic_level = 10;
-    zones[3].panic_level = 25;
-    zones[4].panic_level = 30;
-    zones[5].panic_level = 5;
-    zones[6].panic_level = 10;
-    zones[9].panic_level = 25;
-    zones[12].panic_level = 5;
-    zones[14].panic_level = 15;
-    zones[16].panic_level = 5;
-    
+    zones[2].panic_level = 15;
+    zones[3].panic_level = 20;
+    zones[4].panic_level = 25;
+    zones[5].panic_level = 30;
+    zones[6].panic_level = 35;
+    zones[7].panic_level = 40;
+    zones[8].panic_level = 45;
+    zones[9].panic_level = 50;
     //set centroidX and centroidY for test zone
     //TODO THIS IS ACTUALLY CENTER, NOT CENTROID. For better result, 
     // centroid has to be calculated (might not be of use to us since
@@ -168,7 +177,7 @@ var ge = module.exports = function (id, client) {
     player_colors = ["red","orange","yellow","chartreuse ","green","aqua","blue","purple"];
 
     for(var i = 0; i < 8; i++){
-    	player = new ge.Player(i, "player" + i, 0, player_colors[i], {}, 4);
+    	player = new ge.Player(i, "player" + i, i*2, player_colors[i], {}, 4);
     	player.info_cards.push(this.info_cards[0]);
     	player.info_cards.push(this.info_cards[0]);
     	this.players.push(player);
@@ -242,62 +251,36 @@ ge.prototype.command = function(client, c){
 
 			break;
 			
-			
-		//TODO Finish this
+
+			//TODO Finish this
 		case 'create_info_center':
-		
-			console.log("Trying to place info center in node " + nodes[players[this.active_player].node].id);
-            
-            var n = nodes[players[this.active_player].node],
-                p = players[this.active_player];
-            
-			if(this.information_centers === this.max_information_centers){
-				client.emit('error', "Player "+this.active_player+" failed to add information center, no information centers left!");
-				break;
-			}
 
-			if(!node.has_information_center){
-				if(n.add_information_center(p)){
-					change.nodes = [n];
-					change.players = [p];
-					this.information_centers++;
-				}
-				else {
-					client.emit('error', "Player "+this.active_player+" failed to add information center, player does not have enough actions");
-					break;	
-				}	
+			var p = players[this.active_player],
+				n = nodes[p.node];
+
+			if(n.add_information_center(p) && (!(this.information_centers === this.max_information_centers))){
+				changed.nodes = [n];
+				changed.players = [p];
+				this.information_centers++;
 			}
-			else {
-				client.emit('error', "Player "+this.active_player+" failed to add information center, node "+nodes[players[this.active_player].node].id+" already has center");
-				break;	
-			}
-			
 			break;
-			
-		//TODO finish this
+
+			//TODO finish this
 		case 'create_road_block':
+
+			var p = players[this.active_player];
 			
-			console.log("Trying to place road block in node " + nodes[players[this.active_player].node].id);
-
-			if(this.road_blocks === this.max_road_blocks){
-				client.emit('error', "Player "+this.active_player+" failed to add road block, no road blocks left!");
-				break;
-			}
-
-			if(players[c.player_id].add_road_block()) {
-				changed.node = [players[c.player_id]];
-			}
-			else {
-			    client.emit('error', 'Failed to add barrier');
-
+			if(nodes[p.node].add_road_block(p, players) && (!(this.road_blocks === this.max_road_blocks))){
+				changed.nodes = [nodes[p.node]];
+				changed.players = [p];
+				this.road_blocks++;
 			}
 
 			break;
-
 			
-		case 'remove_barrier':
+		case 'remove_road_block':
 			if(player[c.player_id].remove_road_block()){
-			    changed.node = [players[c.player_id]];
+			    changed.nodes = [players[c.player_id]];
 			}
 			else {
 				client.emit('error', 'Failed to remove road block');
@@ -589,21 +572,36 @@ ge.Node = function (id, x, y, is_start_position, connects_to) {
 ge.Node.prototype.add_information_center = function (player) {
 	if (this.has_information_center) return false;
 	
-    if(player.update_actions(-1) ){
+    if(player.update_actions(-4) ){
 		this.has_information_center = true;
 		return true;
     }
     return false;
 }
 
-ge.Node.prototype.add_road_block = function () {
+ge.Node.prototype.add_road_block = function (player, players) {
 	if (this.has_road_block) {
-	    console.log("Already has roadblock");
-		return false;
+		console.log('error', "Already has road block");
+	    return false;
 	}
 	
-	this.has_road_block = true;
-	return true;	
+	var another_player = false;
+	for (var i = 0; i < players.length; i++) {
+		if ((players[i].node===player.node)&&(!(i===player.id))) {
+			another_player = true;
+		}
+	}
+	if (!another_player){
+		console.log("Player "+player+" failed to add road block, no other players on node!");
+		return false
+	}
+	
+	if(player.update_actions(-1) ){
+		this.has_road_block = true;
+		return true;
+	}
+	
+	return false;	
 
 }
 
@@ -655,7 +653,7 @@ ge.Event = function (text, effect) {
 
 ge.Zone = function (id, nodes, zones) {
 	this.id = id;
-	this.type = "regular";
+	this.type = "residential";
 	this.people = 50;
 	this.nodes = nodes;
 	this.adjacent_zones = zones;
