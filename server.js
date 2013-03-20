@@ -34,20 +34,20 @@ console.log('Server running at http://127.0.0.1:8008/');
     index.html page that contains the canvas.
 */
 server.get('/', function(request, response){
-    response.render('index');
+    response.render('game');
 })
 
 server.get('/create', function(request, response){
-    response.render('create_game_view');
+    response.render('create');
 })
 
 server.get('/login', function(request, response){
     console.log("Request for '/login'");
-    response.render('loginScreen');
+    response.render('login');
 })
 
 server.get('/game', function(request, response){
-    response.render('index');
+    response.render('game');
 })
 
 
