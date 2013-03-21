@@ -11,6 +11,16 @@ var c_height = 1550,
     offset_distance = node_size*1,
     panic_info_size = 40,
     w_inc = 0;
+
+/* TEMPORARY ZONE IMAGES
+
+industry - http://oi50.tinypic.com/2ccur05.jpg
+largecity - http://oi45.tinypic.com/pn28l.jpg
+park - http://oi46.tinypic.com/11jtevr.jpg
+residential - http://oi50.tinypic.com/96b7ud.jpg
+ 
+*/
+
 var player_offsetX = [0, 
                       Math.cos(315*(Math.PI/180))*offset_distance,
                       offset_distance, 
@@ -245,6 +255,9 @@ gco.player_draw = function(player, ctx){
     }
     else{
     	ctx.fill();
+    	ctx.strokeStyle = 'black';
+    	ctx.lineWidth = 2;
+    	ctx.stroke();
     }
 
     ctx.fillStyle = "Black";
@@ -283,7 +296,7 @@ gco.node_draw = function(node, ctx){
 
 gco.roadblock_draw = function(node, ctx){
 	ctx.strokeStyle = '#202020';
-	ctx.lineWidth = 25;
+	ctx.lineWidth = 34;
 	var nodes = gco.nodes;
 	
 	for (var i = 0; i < node.connects_to.length; i++){
@@ -310,8 +323,30 @@ gco.background_draw = function(ctx){
 }
 
 gco.zone_draw = function(zone, ctx){
-var img = new Image();
-	img.src = "http://oi48.tinypic.com/2dkxohl.jpg";
+	var img = new Image();
+//	draw appropriate images
+	if (zone.type==='residential')
+	{
+		img.src = "http://oi50.tinypic.com/96b7ud.jpg";
+		//ctx.fillStyle = "rgba(0,255,255,0.2";
+	}
+
+	else if (zone.type==='industry'){
+		img.src = "http://oi50.tinypic.com/2ccur05.jpg";
+		//ctx.fillStyle = "rgba(255,255,0,0.2)";
+	}
+
+	else if (zone.type==='park'){
+		img.src = "http://oi46.tinypic.com/11jtevr.jpg";
+		//ctx.fillStyle = "rgba(,255,0,0.2";
+	}
+
+	else if (zone.type==='largecity'){
+		img.src = "http://oi45.tinypic.com/pn28l.jpg";
+		//ctx.fillStyle = "rgba(0,0,255,0.2)";
+	}
+
+
 
 
 	ctx.save();
@@ -453,7 +488,7 @@ gco.draw = function(){
         gco.zone_draw(zone,ctx);
     }
     
-    gco.selection_draw(ctx);
+    
     
     
     for (var i = 0; i < nodes.length; i++) {
@@ -462,6 +497,8 @@ gco.draw = function(){
     		gco.roadblock_draw(nodes[i], ctx)
     	}
     }
+    
+    gco.selection_draw(ctx);
 
     for (var i = 0; i < nodes.length; i++) {
         node = nodes[i];
