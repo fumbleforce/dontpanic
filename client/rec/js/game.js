@@ -3,7 +3,7 @@
     Used for setting size of objects and 
     positioning in drawing functions.
 */
-var c_height = 1500,
+var c_height = 1550,
     c_width = 1500,
     node_size = 50,
     player_size = 20,
@@ -175,9 +175,9 @@ gco.update_cards = function() {
 
         $con = $("#"+i+"_cards");
         $con.empty();
-        if (cards.length > 4 && w_inc === 0) {
-            $con.parent().parent().css('width', ''+(parseInt($con.parent().parent().css('width'))+100)+'px');
-            w_inc++;
+        if ((cards.length)*110+75 > (parseInt($con.parent().parent().css('width')))) {
+            $con.parent().parent().css('width', ''+(parseInt($con.parent().parent().css('width'))+110)+'px');
+
         }
         for (c = 0; c < cards.length; c++){
             button = $("<button id='"+i+"-"+c+"' class='info-card' onclick='gco.info_card_click(this.id)'>"+cards[c].name+ "</button>");
@@ -239,7 +239,7 @@ gco.player_draw = function(player, ctx){
     if (this.active_player===player.id){
     	var gradiant = ctx.createRadialGradient(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size-10, player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size);
     	gradiant.addColorStop(0, player.color);
-    	gradiant.addColorStop(1, 'white');
+    	gradiant.addColorStop(1, 'blue');
     	ctx.fillStyle=gradiant;
     	ctx.fill();
     }
@@ -253,13 +253,13 @@ gco.player_draw = function(player, ctx){
 }
 
 gco.node_draw = function(node, ctx){
-    ctx.fillStyle = 'black';
+    ctx.fillStyle = 'white';
     ctx.beginPath();
     ctx.arc(node.x, node.y, node_size, 0, Math.PI*2, true); 
     ctx.closePath();
     ctx.fill();    
     
-    ctx.fillStyle = "White";
+    ctx.fillStyle = "black";
     ctx.font="15px Arial";
     if(node.id>9){
     	ctx.fillText(node.id, node.x-8, node.y-15);
@@ -305,7 +305,7 @@ gco.roadblock_draw = function(node, ctx){
 }
 
 gco.background_draw = function(ctx){
-    ctx.fillStyle="lightgray";
+    ctx.fillStyle="black";
     ctx.fillRect(0,0, c_width, c_height);
 }
 
@@ -345,15 +345,15 @@ var img = new Image();
 	
 	
 	ctx.drawImage(img, minx, miny);
-	ctx.fillStyle = "rgba(255,0,0,"+(0.2*zone.panic_level/10)+")";
+	ctx.fillStyle = "rgba(255,0,0,"+(0.2*zone.panic_level/12)+")";
 	ctx.fill();
 	
 	
 
 	ctx.restore();
 	//Draw outline of zones
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 5;
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 15;
 	ctx.stroke(); // Now draw our path
 	ctx.restore(); // Put the canvas back how it was before we started
 	
@@ -365,7 +365,7 @@ var img = new Image();
 	
    
     //TODO TEMPORARY show simple panic info
-    ctx.fillStyle = 'red';
+    ctx.fillStyle = 'black';
 	if (zone.panic_level > 9){
 		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]-22,40,30); 
 	}
@@ -396,8 +396,8 @@ gco.selection_draw = function(ctx){
         }
         ctx.lineTo(nodes[zone.nodes[0]].x, nodes[zone.nodes[0]].y);
         ctx.closePath();
-        ctx.strokeStyle = "green";
-        ctx.lineWidth = 40;
+        ctx.strokeStyle = "blue";
+        ctx.lineWidth = 20;
         ctx.stroke();
 
     }

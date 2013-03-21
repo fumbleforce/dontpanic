@@ -190,10 +190,10 @@ ge.prototype.command = function(client, c){
 	
     switch (c.type) {
         case 'move_player':
-
-            var p = players[c.player_id];
-            if(p.move_player(nodes[p.node], nodes[c.node_id])) changed.players = [p];
-
+            if (c.player_id === this.active_player) {
+                var p = players[c.player_id];
+                if(p.move_player(nodes[p.node], nodes[c.node_id])) changed.players = [p];
+            }
             break;
             
   
@@ -258,8 +258,8 @@ ge.prototype.command = function(client, c){
 
 			if(!node.has_information_center){
 				if(n.add_information_center(p)){
-					change.nodes = [n];
-					change.players = [p];
+					changed.nodes = [n];
+					changed.players = [p];
 					this.information_centers++;
 				}
 				else {
@@ -331,12 +331,12 @@ ge.prototype.command = function(client, c){
 		case 'end_turn':
 		    
 		    var ap = players[this.active_player];
-
+            ap.actions_left = ap.role === 'activist' ?  5 : 4;
+            
 			this.turn++;
 			this.active_player = this.active_player >= this.players.length-1 ?  0 : this.active_player+1;
 
-            ap.actions_left = ap.role === 'activist' ?  5 : 4;
-            
+            ap = players[this.active_player];
             //TODO Add random info cards
 			ap.info_cards.push(this.info_cards[0]);
 			

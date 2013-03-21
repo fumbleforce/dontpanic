@@ -122,27 +122,28 @@ p
 }
 .sidebar-player
 {
-    background:lightgray;
-    width:100%;
+    background:white;
+    width:98%;
     height:350px;
     right:0px;
-    margin-bottom:10px;
+    margin-bottom:30px;
     padding:10px;
+    border-radius:30px;
 }
 .sidebar-left
 {
     vertical-align:top;
-    right:0px;
+    margin-right:50px;
     float:right;
-    width:500px;
+    width:520px;
 }
 
 .sidebar-right
 {
     vertical-align:top;
-    left:0px;
-    float:left;
-    width:500px;
+    margin-left:50px;
+
+    width:520px;
 }
 .card-container
 {
@@ -154,17 +155,18 @@ p
 {
     height:100px;
     padding:5px;
-    width:100px;
+    width:110px;
     color:black;
     float:left;
-    margin-right:10px;
+    margin-right:7px;
+    margin-right:7px;
     font-size:18px;
 }
 .player-info
 {
 
     width:95%;
-    height:170px;
+    height:160px;
 }
 
 

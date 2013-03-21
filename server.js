@@ -85,7 +85,7 @@ socket_listener.sockets.on('connection', function (client) {
     
     client.on('dp_user_id', function(o) {
         console.log("Checking for user ID");
-        if (o.id) {
+        /* if (o.id) {
             console.log("Found client with ID "+o.id);
             client.userid = o.id;
             if (games[client.userid]) {
@@ -96,9 +96,9 @@ socket_listener.sockets.on('connection', function (client) {
                 client.emit('not_in_game', {});
             }
         }
-        else{
+        else{*/
             client.emit('not_in_game', {});
-        }
+        /*}*/
     });
     
     //Client sent log message
