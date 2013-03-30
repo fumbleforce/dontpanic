@@ -55,7 +55,76 @@ var get_password = function (username, password, callback) {
 	});
 }
 
+var add_node = function (is_start_position, roadblock_bool, info_senter_bool,
+adjacent_zones, connects_to, var_x, var_y) {
+	connection.query('INSERT INTO Nodes SET?' , {Is_start_position: is_start_position, 
+	Info_senter_bool: info_senter_bool, Adjacent_zones: adjacent_zones, 
+	Connects_to: connects_to, var_x: var_x, var_y: var_y},  
+	function (err, result) {
+		if (err) throw err;
+		console.log('Succsesfully added node');
+	});
+}
+
+var get_all_nodes = function () {
+	var query = connection.query('SELECT * FROM Nodes');
+	query.on('error', function(err) {
+		throw err;
+	})
+	
+	.on('result', function(result) {
+		console.log(result);
+	})
+}
+
+var add_zone = function (adjacent_zones, panic_level, people) {
+	connection.query('INSERT INTO Zones SET?' , {Adjacent_zones: adjacent_zones, 
+	Panic_level: panic_level, People_int: people}, function (err, rows, fields) {
+		if (err) throw err;
+		console.log('Successfully added new zone');
+	});
+}
+
+var get_all_zones = function() {
+	var query = connection.query('SELECT * FROM Zones');
+	query.on('error', function(err) {
+		throw err;
+	})
+	
+	.on('result', function(result) {
+		console.log(result);
+	})
+}
+
+var add_info_card = function (name) {
+	connection.query('INSERT INTO Info cards SET?', {Name: name}, 
+	function (err, rows, fields) {
+		if (err) throw err;
+		console.log('Succesfully added new info card');
+	});
+}
+
+add_info_card('decrease 15 in red');
+//gametemplate er settings, noder og soner
+var new_game = function () {
+	
+}
 //get_password('dontpanic', '123');
+
+/* get all Usernames, works*/ 
+
+var get_all_usernames = function () {
+	var query = connection.query('SELECT User_Name AS solution FROM User');
+	query.on('error', function(err) {
+		throw err;
+	})
+	
+	.on('result', function(result) {
+		console.log(result.solution);
+	})
+}
+
+//get_all_usernames();
 
 /* for å teste sql spørringene, får feil på at caller ikke har metodene?? */
 
@@ -84,7 +153,7 @@ function caller () {
 */
 
 /* 
-	Puts the given replay string to Replay in the database
+	Puts the given replay string to Replay in the database, works
 */
 
 var set_replay_state = function (game_id, turn_id, replay_string)  {
@@ -94,7 +163,10 @@ var set_replay_state = function (game_id, turn_id, replay_string)  {
 		console.log('Sucessfully added', replay_string, 'to replay state');
 	});
 }
-//set_replay_state(2, 1, 'player1node3');
+
+/* 
+	Gets the replay state of the given game and turn id. 
+*/
 
 var get_replay_state = function (game_id, turn_id, callback) {
 	connection.query('SELECT State_array AS solution FROM Replay WHERE Game_ID = ' + 
@@ -105,19 +177,18 @@ var get_replay_state = function (game_id, turn_id, callback) {
 	});
 }
 
-get_replay_state(1,1);
 
 /* 
 	Puts the texttest in the table test
 */
 var test = function (texttest) {
 	connection.query('INSERT INTO test SET ?', {text: texttest}, function(err, result) {
-  	if (err) throw err;
-  	console.log(result.insertId);
-});
+	  	if (err) throw err;
+  		console.log(result.insertId);
+	});
 
 }
-
+//test('hei');
 /* get if User admin, works*/
 
 var is_user_admin = function (username, callback) {
@@ -132,8 +203,6 @@ var is_user_admin = function (username, callback) {
 //is_user_admin('dontpanic');
 //is_user_admin('administrator');
 
-/* get Username */ 
-
 /* Adds new user with the giver parameters to the database, works */
 
 var add_user = function (username, password, id, email, name, is_admin) {
@@ -144,7 +213,6 @@ var add_user = function (username, password, id, email, name, is_admin) {
 		is_admin);
 	});
 }	
-
 
 function handleDisconnect(connection) {
   connection.on('error', function(err) {

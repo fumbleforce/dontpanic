@@ -124,6 +124,7 @@ gco.setup_canvas = function(){
     gco.canvas.width = c_width;
     gco.canvas.height = c_height;
     gco.cst.selected_zone = null;
+    gco.cst.selected_node = null;
 }
 
 
@@ -137,6 +138,8 @@ gco.reset = function(){
 gco.update_turn = function(turn, ap){
     gco.turn = turn;
     gco.active_player = ap;
+    gco.cst.selected_zone = null
+    gco.cst.selected_node = null
 }
 
 
@@ -329,22 +332,18 @@ gco.zone_draw = function(zone, ctx){
 	if (zone.type==='residential')
 	{
 		img.src = "http://oi50.tinypic.com/96b7ud.jpg";
-		//ctx.fillStyle = "rgba(0,255,255,0.2";
 	}
 
 	else if (zone.type==='industry'){
 		img.src = "http://oi50.tinypic.com/2ccur05.jpg";
-		//ctx.fillStyle = "rgba(255,255,0,0.2)";
 	}
 
 	else if (zone.type==='park'){
 		img.src = "http://oi46.tinypic.com/11jtevr.jpg";
-		//ctx.fillStyle = "rgba(,255,0,0.2";
 	}
 
 	else if (zone.type==='largecity'){
 		img.src = "http://oi45.tinypic.com/pn28l.jpg";
-		//ctx.fillStyle = "rgba(0,0,255,0.2)";
 	}
 
 
@@ -381,7 +380,11 @@ gco.zone_draw = function(zone, ctx){
 	
 	
 	ctx.drawImage(img, minx, miny);
-	ctx.fillStyle = "rgba(255,0,0,"+(0.2*zone.panic_level/12)+")";
+
+	//ctx.fill();
+	//Draw transparent red corresponding to panic level
+	//ctx.fillStyle = "rgba(255,0,0,"+(0.2*zone.panic_level/10)+")";
+	ctx.fillStyle = "rgba(255,0,0,"+(0.2+(0.12*zone.panic_level/11))+")";
 	ctx.fill();
 	
 	
@@ -397,7 +400,6 @@ gco.zone_draw = function(zone, ctx){
 	
 
     
-    //Fill zone with respective color
 	
    
     //TODO TEMPORARY show simple panic info
@@ -541,6 +543,7 @@ gco.set_canvas_listener = function(){
             selected;
 
         cst.selected_zone = null;
+        cst.selected_node = null;
         
         if (cst.selection) {
             console.log("clearing selection");
@@ -550,32 +553,36 @@ gco.set_canvas_listener = function(){
             cst.dragging = false;
             gco.draw();
         }
-        
+
         for (var i = 0; i < players.length; i++) {
-            
-            if (gco.player_contains(players[i], mx, my)) {
-                console.log("Clicked on a player "+players[i].id);
-                selected = players[i];
-                selected.x = nodes[players[i].node].x;
-                selected.y = nodes[players[i].node].y;
-                cst.dragoffx = mx - selected.x;
-                cst.dragoffy = my - selected.y;
-                cst.dragging = true;
-                cst.selection = selected;
-                gco.draw();
-                return;
-           }
+
+        	if (gco.player_contains(players[i], mx, my)) {
+        		console.log("Clicked on a player "+players[i].id);
+        		selected = players[i];
+        		//Check if player is active, so it can be moved
+        		if (i===gco.active_player){
+
+        			selected.x = nodes[players[i].node].x;
+        			selected.y = nodes[players[i].node].y;
+        			cst.dragoffx = mx - selected.x;
+        			cst.dragoffy = my - selected.y;
+        			cst.dragging = true;
+        			cst.selection = selected;
+        			gco.draw();
+        			return;
+        		}
+        	}
         }
-        
+
         for (var i = 0; i < zones.length; i++) {
-            
-            if (gco.zone_contains(zones[i], mx, my)) {
-                console.log("Clicked on zone "+i);
-                cst.selected_zone = i;
-                //TODO for testing, we add 'decrease_panic' when selecting zones
-                command('decrease_panic', {zone_id : cst.selected_zone});
-                gco.draw();
-                return;
+
+        	if (gco.zone_contains(zones[i], mx, my)) {
+        		console.log("Clicked on zone "+i);
+        		cst.selected_zone = i;
+        		//TODO for testing, we add 'decrease_panic' when selecting zones
+        		command('decrease_panic', {zone_id : cst.selected_zone});
+        		gco.draw();
+        		return;
            }
         }
         gco.draw();
@@ -622,8 +629,5 @@ gco.set_canvas_listener = function(){
     }, true);//end mouseup listener
     
 }//end set canvas listener
-
-
-
 
 

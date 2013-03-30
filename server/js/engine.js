@@ -20,7 +20,7 @@ var ge = module.exports = function (id, client) {
     this.information_centers = 0;
     this.road_blocks = 0;
     this.max_information_centers = 5;
-    this.max_road_blocks = 10;
+    this.max_road_blocks = 2;
     
     
     this.info_cards = [
@@ -61,15 +61,15 @@ var ge = module.exports = function (id, client) {
     posx = [
         1*SCALE, 1*SCALE, 3*SCALE, 3*SCALE, 3*SCALE,
         5*SCALE, 5*SCALE, 7*SCALE, 7*SCALE, 7*SCALE,
-        9*SCALE, 10*SCALE, 11*SCALE, 11*SCALE, 12*SCALE,
-        13*SCALE, 13*SCALE, 13*SCALE, 15*SCALE, 15*SCALE,
+        9*SCALE, 9*SCALE, 11*SCALE, 10*SCALE, 11*SCALE,
+        14*SCALE, 11*SCALE, 13*SCALE, 15*SCALE, 15*SCALE,
         15*SCALE
     ],
     posy = [
-        5*SCALE, 11*SCALE, 3*SCALE, 7*SCALE, 9*SCALE,
-        5*SCALE, 15*SCALE, 3*SCALE, 7*SCALE, 9*SCALE,
+        5*SCALE, 13*SCALE, 3*SCALE, 7*SCALE, 11*SCALE,
+        5*SCALE, 15*SCALE, 3*SCALE, 7*SCALE, 11*SCALE,
         3*SCALE, 15*SCALE, 1*SCALE, 5*SCALE, 11*SCALE,
-        3*SCALE, 7*SCALE, 15*SCALE, 8*SCALE, 11*SCALE,
+        3*SCALE, 8*SCALE, 15*SCALE, 7*SCALE, 11*SCALE,
         15*SCALE
     ];
 
@@ -149,16 +149,13 @@ var ge = module.exports = function (id, client) {
     this.map.zones = zones;
     
     //TEST add panic on a few random zones
-    zones[0].panic_level = 5;
-    zones[1].panic_level = 10;
+    zones[0].panic_level = 0;
+    zones[1].panic_level = 5;
     zones[2].panic_level = 15;
-    zones[3].panic_level = 20;
-    zones[4].panic_level = 25;
-    zones[5].panic_level = 30;
-    zones[6].panic_level = 35;
-    zones[7].panic_level = 40;
-    zones[8].panic_level = 45;
-    zones[9].panic_level = 50;
+    zones[3].panic_level = 30;
+    zones[6].panic_level = 40;
+    zones[11].panic_level = 50;
+
     //set centroidX and centroidY for test zone
     //TODO THIS IS ACTUALLY CENTER, NOT CENTROID. For better result, 
     // centroid has to be calculated (might not be of use to us since
@@ -259,7 +256,8 @@ ge.prototype.command = function(client, c){
 				n = nodes[p.node];
 
 
-			if(n.add_information_center(p) && (!(this.information_centers === this.max_information_centers))){
+			if((this.information_centers < this.max_information_centers) && (n.add_information_center(p))){
+
 				changed.nodes = [n];
 				changed.players = [p];
 				this.information_centers++;
@@ -271,25 +269,28 @@ ge.prototype.command = function(client, c){
 
 			var p = players[this.active_player];
 			
-			if(nodes[p.node].add_road_block(p, players) && (!(this.road_blocks === this.max_road_blocks))){
+			if((this.road_blocks < this.max_road_blocks) && nodes[p.node].add_road_block(p, players)){
 				changed.nodes = [nodes[p.node]];
 				changed.players = [p];
 				this.road_blocks++;
 			}
 
 			break;
-			
+
 		case 'remove_road_block':
-			if(player[c.player_id].remove_road_block()){
-			    changed.nodes = [players[c.player_id]];
+			
+			var p = players[this.active_player];
+
+			if(nodes[p.node].remove_road_block(p, players)){
+				changed.nodes = [nodes[p.node]];
+				changed.players = [p];
+				this.road_blocks--;
 			}
-			else {
-				client.emit('error', 'Failed to remove road block');
-			}
+
 			break;		
-			
-			
-			
+
+
+
 		case 'use_card':
 			var ic = players[c.player].info_cards.pop(c.info_card);
 			changed = effect(ic, this);
@@ -467,25 +468,9 @@ function empty_state(g){
     };
 }
 
-
-
-
-
-
-
-
-
-
 //----------------------------
 //---------MODELS-------------
 //----------------------------
-
-
-
-
-
-
-
 
 ge.Player = function(id, user, node, color, role, actions_left) {
 	this.id = id;
@@ -606,15 +591,29 @@ ge.Node.prototype.add_road_block = function (player, players) {
 
 }
 
-ge.Node.prototype.remove_road_block = function () {
-	if (this.has_road_block = false) {
-		return false;
+ge.Node.prototype.remove_road_block = function (player, players) {
+	if (!this.has_road_block) {
+		console.log('error', "No road block here!");
+	    return false;
 	}
-	else {
+	
+	var another_player = false;
+	for (var i = 0; i < players.length; i++) {
+		if ((players[i].node===player.node)&&(!(i===player.id))) {
+			another_player = true;
+		}
+	}
+	if (!another_player){
+		console.log("Player "+player+" failed to remove road block, no other players on node!");
+		return false
+	}
+	
+	if(player.update_actions(-1) ){
 		this.has_road_block = false;
 		return true;
-	}	
-	return true;
+	}
+	
+	return false;	
 }
 ge.Node.prototype.connects_with = function(n){
     return this.connects_to.indexOf(n.id) > -1;
