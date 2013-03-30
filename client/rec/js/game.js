@@ -128,9 +128,10 @@ gco.setup_canvas = function(){
 
 
 gco.reset = function(){
-    var p = gco.players[gco.active_player];
+    /*var p = gco.players[gco.active_player];
     p.x = gco.nodes[p.node].x;
-    p.y = gco.nodes[p.node].y;
+    p.y = gco.nodes[p.node].y;*/
+    gco.update_players(gco.players);
 }
 
 gco.update_turn = function(turn, ap){
