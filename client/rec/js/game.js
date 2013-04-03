@@ -166,8 +166,10 @@ gco.update_player = function(p){
 }
 
 gco.update_players = function(ps){
+	var $con;
     for(var i = 0; i < ps.length; i++) {
         gco.update_player(ps[i]);
+     
     }
 }
 
@@ -195,6 +197,12 @@ gco.update_cards = function() {
     
     for (i = 0; i < ps.length; i++){
         cards = ps[i].info_cards;
+		
+		$con = $("#"+i+"_text");
+		$con.empty();
+		something = $("<p>"+ps[i].role+"</p>");
+		something.appendTo($con);
+		
 
         $con = $("#"+i+"_cards");
         $con.empty();
@@ -205,7 +213,9 @@ gco.update_cards = function() {
         for (c = 0; c < cards.length; c++){
             button = $("<button id='"+i+"-"+c+"' class='info-card' onclick='gco.info_card_click(this.id)'>"+cards[c].name+ "</button>");
             button.appendTo($con);
+			
         }
+		
     }
 }
 

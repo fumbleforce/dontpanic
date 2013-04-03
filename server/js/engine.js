@@ -21,6 +21,7 @@ var ge = module.exports = function (id, client) {
     this.road_blocks = 0;
     this.max_information_centers = 5;
     this.max_road_blocks = 2;
+	this.cards_left = 10;
     
     
     this.info_cards = [
@@ -172,11 +173,26 @@ var ge = module.exports = function (id, client) {
     
     this.players = [];
     player_colors = ["red","orange","yellow","chartreuse ","green","aqua","blue","purple"];
-
+	
+	/*this.randomrole =  
+		[{title: "Constructor",
+		
+        info:"Can create roadblocs alone",
+		effects: [{
+            domain:'zone',
+			type:'panic',
+			panic:(-5),
+			affects:[0,1,2,3,4,5,6,7,8,9]
+		}]
+		}];
+	*/
+	
     for(var i = 0; i < 8; i++){
-    	player = new ge.Player(i, "player" + i, i*2, player_colors[i], {}, 4);
+    	player = new ge.Player(i, "player" + i, i*2, player_colors[i], "ADSFADSFGaSDFG: " + i, 4);
     	player.info_cards.push(this.info_cards[0]);
     	player.info_cards.push(this.info_cards[0]);
+		
+		
     	this.players.push(player);
     }
 	
@@ -323,7 +339,11 @@ ge.prototype.command = function(client, c){
 
             ap = players[this.active_player];
             //TODO Add random info cards
-			ap.info_cards.push(this.info_cards[0]);
+			client.emit('msg', this.cards_left);
+			if(this.cards_left > 0){
+				ap.info_cards.push(this.info_cards[0]);
+				this.cards_left -= 1;
+			}
 			
 			changed.players = [ap];
 			changed.turn = this.turn;
@@ -627,8 +647,9 @@ ge.Node.prototype.connects_with = function(n){
 
 
 
-ge.Role = function (title, effect) {
+ge.Role = function (title, info, effect) {
 	this.title = title;
+	this.info = info;
 	this.effect = effect;
 }
 
