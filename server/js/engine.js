@@ -22,6 +22,7 @@ var ge = module.exports = function (id, client) {
     this.max_information_centers = 5;
     this.max_road_blocks = 2;
 	this.cards_left = 10;
+
     
     
     this.info_cards = [
