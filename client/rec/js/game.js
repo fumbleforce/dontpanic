@@ -204,8 +204,9 @@ gco.update_cards = function() {
 gco.info_card_click = function(id) {
     var p = id.charAt(0),
         c = id.charAt(2);
-    
-    command('use_card', {player:p, card:c});
+    if(gco.active_player == p){
+		command('use_card', {player:p, card:c});
+	}
 }
 
 
