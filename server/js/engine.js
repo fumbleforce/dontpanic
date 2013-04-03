@@ -20,7 +20,7 @@ var ge = module.exports = function (id, client) {
     this.information_centers = 0;
     this.road_blocks = 0;
     this.max_information_centers = 5;
-    this.max_road_blocks = 2;
+    this.max_road_blocks = 10;
     
     
     this.info_cards = [
