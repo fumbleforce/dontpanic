@@ -23,6 +23,7 @@ var express     = require('express'),
 server.engine('.html', require('ejs').__express);
 server.set('views', __dirname + '/client/views');
 server.use(express.static(__dirname + '/client/rec'));
+server.use('/img', (__dirname + '/client/rec/img'));
 server.set('view engine', 'html');
 server.set('port', process.env.PORT || 8008);
 
