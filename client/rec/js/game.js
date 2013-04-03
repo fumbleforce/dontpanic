@@ -286,15 +286,18 @@ gco.node_draw = function(node, ctx){
     	ctx.fillText(node.id, node.x-4, node.y-15);
     }
     
-    if (node.has_information_center){
-    	ctx.fillStyle = 'blue';
+if (node.has_information_center){
+     	ctx.fillStyle = 'blue';
         ctx.fillRect(node.x-(info_center_size/2), node.y-(info_center_size/2)+6, info_center_size, info_center_size);
+		ctx.fill();
+        //ctx.fillRect(node.x-(info_center_size/2), node.y-(info_center_size/2)+6, info_center_size, info_center_size);
         ctx.fillStyle = 'white';
-        ctx.font='30px Georgia',
-        //draw i for infocenter, or number for node?
-        //
-        ctx.fillText("i", node.x-4, node.y+18);
-    }
+		ctx.font='30px Georgia',
+        ctx.font='50px Georgia',
+         //draw i for infocenter, or number for node?
+         //
+         ctx.fillText("i", node.x-4, node.y+18);
+     }
     
 }
 
