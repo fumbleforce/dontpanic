@@ -11,6 +11,15 @@ var c_height = 1550,
     offset_distance = node_size*1,
     panic_info_size = 40,
     w_inc = 0;
+	//set images
+	var residential_img = new Image();
+	residential_img.src = "/img/residential.jpg";
+	var park_img = new Image();
+	park_img.src = "/img/park.jpg";
+	var industry_img = new Image();
+	industry_img.src = "/img/industry.jpg";
+	var largecity_img = new Image();
+	largecity_img.src = "/img/largecity.jpg";
 
 /* TEMPORARY ZONE IMAGES
 
@@ -328,27 +337,6 @@ gco.background_draw = function(ctx){
 }
 
 gco.zone_draw = function(zone, ctx){
-	var img = new Image();
-//	draw appropriate images
-	if (zone.type==='residential')
-	{
-		img.src = "http://oi50.tinypic.com/96b7ud.jpg";
-	}
-
-	else if (zone.type==='industry'){
-		img.src = "http://oi50.tinypic.com/2ccur05.jpg";
-	}
-
-	else if (zone.type==='park'){
-		img.src = "http://oi46.tinypic.com/11jtevr.jpg";
-	}
-
-	else if (zone.type==='largecity'){
-		img.src = "http://oi45.tinypic.com/pn28l.jpg";
-	}
-
-
-
 
 	ctx.save();
 	var minx = 2000;
@@ -379,8 +367,21 @@ gco.zone_draw = function(zone, ctx){
 	ctx.clip();
 	
 	
+	//draw the images
+	if (zone.type==='residential'){
+		ctx.drawImage(residential_img, minx, miny);
+	}
+	else if (zone.type==='industry'){
+		ctx.drawImage(industry_img, minx, miny);
 	
-	ctx.drawImage(img, minx, miny);
+	}
+	else if (zone.type==='park'){
+		ctx.drawImage(park_img, minx, miny);
+	}
+	else if (zone.type==='largecity'){
+		ctx.drawImage(largecity_img, minx, miny);	
+	}
+	
 
 	//ctx.fill();
 	//Draw transparent red corresponding to panic level
