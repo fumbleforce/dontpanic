@@ -20,6 +20,22 @@ var c_height = 1550,
 	industry_img.src = "/img/industry.jpg";
 	var largecity_img = new Image();
 	largecity_img.src = "/img/largecity.jpg";
+	
+	var cat_img = new Image();
+	cat_img.src = "/img/cat.png"
+	
+	var penguin_img = new Image();
+	penguin_img.src = "/img/cat.png"
+	
+	var tophat_img = new Image();
+	tophat_img.src = "/img/cat.png"
+	
+	var lifejacket_img = new Image();
+	lifejacket_img.src = "/img/cat.png"
+	
+	var book_img = new Image();
+	book_img.src = "/img/cat.png"
+	
 
 /* TEMPORARY ZONE IMAGES
 
@@ -264,7 +280,29 @@ gco.decrease_panic = function(zone){
 gco.player_draw = function(player, ctx){
     if (player.x === undefined) player.x = gco.nodes[player.node].x;
     if (player.y === undefined) player.y = gco.nodes[player.node].y;
-    ctx.fillStyle = player.color;
+	
+	/*	//draw the images
+	if (player.type==='coordinator'){
+		ctx.drawImage(cat_img);
+	}
+	else if (player.type==='crowd manager'){
+		ctx.drawImage(tophat_img);
+	}
+	else if (player.type==='driver'){
+		ctx.drawImage(lifejacket_img);
+	}
+	else if (player.type==='operation expert'){
+		ctx.drawImage(book_img);	
+		
+	else if (player.type==='volunteer'){
+		ctx.drawImage(map_img);	
+		
+	else if (player.type==='passer by'){
+		ctx.drawImage(penguin_img);	
+	}*/
+	
+    //ctx.fillStyle = player.color;
+	
     ctx.beginPath();
     ctx.arc(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size, 0, Math.PI*2, true); 
     ctx.closePath();
