@@ -151,6 +151,29 @@ gco.update_turn = function(turn, ap){
     gco.cst.selected_node = null
 }
 
+gco.update_options = function(o){
+	var $s = $('#selection'),
+		inner = '';
+	for (var i=0; i<o.length;i++){
+		switch(o[i]){
+			case 'block':
+				inner += "<button class='btn' onclick='command("+'"'+"create_road_block"+'"'+");'>Add road block</button>";
+				break;
+			case 'info':
+				inner += "<button class='btn' onclick='command("+'"'+"create_info_center"+'"'+");'>Add information center</button>";
+				break;
+			case 'panic':
+				inner += "<button class='btn' onclick='command("+'"'+"decrease_panic"+'"'+");'>Decrease panic</button>";
+				break;
+			case 'people':
+				inner += "<button class='btn' onclick='gco.move_people();'>Move people</button>";
+				break;
+
+		}
+	}
+	$s.html(inner);
+}
+
 
 /*  Update Player
     
@@ -232,7 +255,12 @@ gco.info_card_click = function(id) {
 
 
 
-
+gco.move_people = function(){
+	if(gco.cst.selected_zone !== null){
+		gco.cst.moving_people = true;
+		gco.cst.moving_from = gco.cst.selected_zone;
+	}
+}
 
 
 /* deprecated - Update whole player instead
@@ -428,7 +456,20 @@ gco.zone_draw = function(zone, ctx){
 	ctx.font='27px Arial'
 	ctx.fillText(zone.panic_level, zone.centroid[0]-20, zone.centroid[1]+3);
 	
-
+	//TODO simple people info
+	ctx.fillStyle = 'black';
+	if (zone.people > 9 && zone.people < 100){
+		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]+28,40,30); 
+	}
+	else if(zone.people > 99){
+		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]+28,60,30); 
+	}
+	else{
+		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]+28,25,30); 
+	}
+	ctx.fillStyle = 'white';
+	ctx.font='27px Arial'
+	ctx.fillText(zone.people, zone.centroid[0]-20, zone.centroid[1]+54);
 	
 
     
@@ -451,7 +492,16 @@ gco.selection_draw = function(ctx){
         ctx.strokeStyle = "blue";
         ctx.lineWidth = 20;
         ctx.stroke();
-
+    }
+    if (cst.selected_node !== null){
+        var node = nodes[cst.selected_node];
+        ctx.beginPath();
+        ctx.beginPath();
+		ctx.arc(node.x, node.y, node_size, 15, Math.PI*2, true); 
+		ctx.closePath();
+        ctx.strokeStyle = "blue";
+        ctx.lineWidth = 20;
+        ctx.stroke();
     }
 }
 
@@ -547,7 +597,10 @@ gco.set_canvas_listener = function(){
         nodes = gco.nodes,
         players = gco.players,
         zones = gco.zones;
-        
+    
+    cst.moving_people = false;
+    cst.moving_from = null;
+    
     canvas.addEventListener('selectstart', function(e) { e.preventDefault(); return false; }, false);
 
     canvas.addEventListener('mousedown', function(e) {
@@ -588,18 +641,40 @@ gco.set_canvas_listener = function(){
         	}
         }
 
+		for (var i = 0; i < nodes.length; i++) {
+
+        	if (gco.node_contains(nodes[i], mx, my)) {
+        		console.log("Clicked on node "+i);
+        		cst.selected_node = i;
+				command('select_node', {node_id : cst.selected_node});
+        		gco.draw();
+        		return;
+           }
+        }
+		
         for (var i = 0; i < zones.length; i++) {
 
         	if (gco.zone_contains(zones[i], mx, my)) {
         		console.log("Clicked on zone "+i);
         		cst.selected_zone = i;
         		//TODO for testing, we add 'decrease_panic' when selecting zones
-        		command('decrease_panic', {zone_id : cst.selected_zone});
+        		if(cst.moving_people){
+        			command('move_people', {zone_from: cst.moving_from, zone_to:i});
+        			cst.moving_from = null;
+        			cst.moving_people = false;
+        		}
+        		else{
+        			command('select_zone', {zone_id : cst.selected_zone});
+        		}
         		gco.draw();
         		return;
            }
         }
+
+        
+        
         gco.draw();
+        
         
     }, true);//end mousedown listener
   

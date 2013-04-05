@@ -157,6 +157,17 @@ var ge = module.exports = function (id, client) {
     zones[3].panic_level = 30;
     zones[6].panic_level = 40;
     zones[11].panic_level = 50;
+	
+	zones[0].people = 20;
+	zones[1].people = 25;
+	zones[3].people = 80;
+	zones[5].people = 5;
+	zones[7].people = 35;
+	zones[9].people = 50;
+	zones[11].people = 15;
+	zones[8].people = 125;
+	zones[4].people = 10;
+	
 
     //set centroidX and centroidY for test zone
     //TODO THIS IS ACTUALLY CENTER, NOT CENTROID. For better result, 
@@ -219,11 +230,35 @@ ge.prototype.command = function(client, c){
             }
             break;
             
+  		case 'select_node':
+  			var n = c.node_id,
+  				options = [],
+  				p = players[this.active_player];
+  				if(p.actions_left >=4 ) {
+  					options.push('info');
+  					options.push('block');
+  				}
+  			changed.options = options;
+  			
+  			break;
+  			
+  		case 'select_zone':
+  			var z = c.zone_id,
+  				options = [],
+  				p = players[this.active_player];
+  				
+  			if(p.actions_left >=1) {
+  					options.push('panic');
+  					options.push('people');
+  				}
+  			changed.options = options;
+  			break;
+  
   
 		case 'decrease_panic':
 			console.log("Trying to decrease panic in zone: " + c.zone_id);
             
-            var z = zones[c.zone_id],
+            var z = zones[c.selected_zone],
                 p = players[this.active_player]
             
             if (z.dec_panic(p, nodes[p.node])){
@@ -242,26 +277,16 @@ ge.prototype.command = function(client, c){
 			
 		case 'move_people':
 			// TODO: find out how many people we can move
-			console.log("Trying to move people from zone: " + c.from_zone_id +
-				"to zone: " + c.to_zone_id);
-			var dec_action = false;
+			console.log("Trying to move people from zone: " + c.zone_from+
+				"to zone: " + c.zone_to);
+
 			
-			if (!this.map.zones[c.from_zone_id]
-				.move_people(players[this.active_player], 
-				this.zones[c.to_zone_id])) {
-				
-				client.emit('error', 'Failed moving people');
-				break;
+			if (zones[c.zone_from].move_people(players[this.active_player], zones[c.zone_to], 5)) {
+				changed.zones=[zones[c.zone_to], zones[c.zone_from]];
+				changed.players = [players[this.active_player]];
 			}
-			else{
-			    dec_action = true;
-			}
-			changed = {
-				type:'moved_people',
-				dec_action:dec_action,
-				from_zone:this.zones[c.from_zone_id],
-				to_zone:this.zones[c.to_zone_id]
-			};
+			
+
 
 			break;
 			
@@ -273,7 +298,7 @@ ge.prototype.command = function(client, c){
 				n = nodes[p.node];
 
 
-			if((this.information_centers < this.max_information_centers) && (n.add_information_center(p))){
+			if((this.information_centers < this.max_information_centers) && (n.add_information_center(p)) && n===c.selected_node){
 
 				changed.nodes = [n];
 				changed.players = [p];
@@ -346,6 +371,9 @@ ge.prototype.command = function(client, c){
 				this.cards_left -= 1;
 			}
 			
+			c
+			
+			
 			changed.players = [ap];
 			changed.turn = this.turn;
 			changed.active_player = this.active_player;
@@ -355,7 +383,7 @@ ge.prototype.command = function(client, c){
             
     }
     
-    if(changed.players || changed.nodes || changed.zones || changed.turn){
+    if(changed.players || changed.nodes || changed.zones || changed.turn || changed.options){
         changed.none = false;
     }
     
@@ -676,7 +704,7 @@ ge.Event = function (text, effect) {
 ge.Zone = function (id, nodes, zones) {
 	this.id = id;
 	this.type = "residential";
-	this.people = 50;
+	this.people = 0;
 	this.nodes = nodes;
 	this.adjacent_zones = zones;
 	this.panic_level = 0;//settes til 0 i starten??
@@ -710,48 +738,30 @@ ge.Zone.prototype.dec_panic = function(player, node) {
 	return false;
 }
 
-// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
-// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
-// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
-// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
-
- // should this method be different because of panic ?? 
-ge.Zone.prototype.move_people = function(player, to_zone) {
-	if (player.node.adjacent_zones.indexOf(this) >= 0 &&
-		this.adjacent_zones.indexOf(to_zone) >= 0) {
-		if(player.update_actions(-1)){
-			this.people -= 5; //TODO: add roles-difference
-			to_zone.people += 5;
-			return true;
-		}
-	}
-	return false;
-}
 
 
-ge.Zone.prototype.move_people = function (people, to_zone) {
-	if (this.people >= people) {
-		for (var i = 0; i < this.adjacent_zones.length; i++) {
-			//hvis zonen er nabo kan du flytte
-			if (this.adjacent_zones[i] === to_zone) {
-				this.people -= people;
-				to_zone.people += people;
-				return 1;
+ge.Zone.prototype.move_people = function (p, to_zone, num) {
+	if (this.people >= num){
+		if(this.adjacent_zones.indexOf(to_zone.id)>=0 ){
+			if(p.update_actions(-1)) {
+				this.people -= num;
+				to_zone.people += num;
+				return true;
+			}
+			else{
+				console.log("Not enough actions");
 			}
 		}
-		//error message to gui
-		console.log("The zone is not adjacent");
-		return 0;
+		else{
+			console.log("Not an adjacent zone");
+		}
 	}
 	else {
 		//error 
-		console.log("There isnt that many people in this zone!!");
+		console.log("There isnt that many people in this zone");
 	}
 }
-// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
-// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
-// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
-// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
+
 
 
 
