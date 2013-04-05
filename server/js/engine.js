@@ -22,21 +22,24 @@ var ge = module.exports = function (id, client) {
     this.max_information_centers = 5;
     this.max_road_blocks = 2;
 	this.cards_left = 10;
+	//how often events should fire
+	this.eventTurns = 3;
+	this.turnsSinceEvent = 0;
 
     
+	this.info_cards = [
+                       {   id:0,
+                    	   name:"Decrease all red",
+                    	   effects: [{
+                    		   domain:'zone',
+                    		   type:'panic',
+                    		   panic:(-5),
+                    		   affects:[0,1,2,3,4,5,6,7,8,9]
+                    	   }]
+                       }
+                       ];
     
-    this.info_cards = [
-        {   id:0,
-            name:"Decrease all red",
-            effects: [{
-                domain:'zone',
-                type:'panic',
-                panic:(-5),
-                affects:[0,1,2,3,4,5,6,7,8,9]
-            }]
-        }
-    ];
-    
+
     var conn = [
         [1, 2, 3], // 0 
         [0, 4, 6],
@@ -155,6 +158,7 @@ var ge = module.exports = function (id, client) {
     zones[1].panic_level = 5;
     zones[2].panic_level = 15;
     zones[3].panic_level = 30;
+    zones[5].panic_level = 30;
     zones[6].panic_level = 40;
     zones[11].panic_level = 50;
 
@@ -189,14 +193,52 @@ var ge = module.exports = function (id, client) {
 	*/
 	
     for(var i = 0; i < 8; i++){
-    	player = new ge.Player(i, "player" + i, i*2, player_colors[i], "ADSFADSFGaSDFG: " + i, 4);
+    	player = new ge.Player(i, "player" + i, i*2, player_colors[i], {}, 4);
     	player.info_cards.push(this.info_cards[0]);
     	player.info_cards.push(this.info_cards[0]);
-		
-		
     	this.players.push(player);
     }
-	
+    //add dummy roles
+    this.players[0].role = "Passer By";
+    this.players[1].role = "Crowd Manager";
+    this.players[2].role = "Driver";
+    this.players[3].role = "Operation Expert";
+    this.players[4].role = "Volunteer";
+    this.players[5].role = "Passer By";
+    this.players[6].role = "Coordinator";
+    this.players[7].role = "Crowd Manager";
+
+    //add some event(s)
+    this.events = [
+                   {   id:0,
+                	   name:"Fire in all industry zones!",
+                	   effects: [{
+                		   domain:'zone',
+                		   type:'panic',
+                		   panic:(20),
+                		   affects:[6, 7]
+                	   }]
+                   },
+                    {   id:1,
+                    	name:"Power outage in all residential zones!",
+                    	effects: [{
+                    		domain:'zone',
+                    		type:'panic',
+                    		panic:(5),
+                    		affects:[0, 1, 2, 3, 4, 8, 12, 13, 14, 15, 16]
+                    	}]
+                    },
+                     {   id:2,
+                    	 name:"Terrorist attack in all city zones!",
+                    	 effects: [{
+                    		 domain:'zone',
+                    		 type:'panic',
+                    		 panic:(35),
+                    		 affects:[9, 10, 11]
+                    	 }]
+                     }
+                     ];
+    
 }
 
 
@@ -336,6 +378,7 @@ ge.prototype.command = function(client, c){
             ap.actions_left = ap.role === 'activist' ?  5 : 4;
             
 			this.turn++;
+			this.turnsSinceEvent++;
 			this.active_player = this.active_player >= this.players.length-1 ?  0 : this.active_player+1;
 
             ap = players[this.active_player];
@@ -346,16 +389,26 @@ ge.prototype.command = function(client, c){
 				this.cards_left -= 1;
 			}
 			
+			//fire a random event every Xth turn
+			if (this.turnsSinceEvent===this.eventTurns){
+			var randomEvent=Math.floor(Math.random()*this.events.length);
+			changed = effect(this.events[randomEvent], this);
+			changed.event = this.events[randomEvent];
+			this.turnsSinceEvent=0;
+			}
+			
+			
 			changed.players = [ap];
 			changed.turn = this.turn;
 			changed.active_player = this.active_player;
+
 			break;
         
         console.log("No matching command types");
             
     }
     
-    if(changed.players || changed.nodes || changed.zones || changed.turn){
+    if(changed.players || changed.nodes || changed.zones || changed.turn || changed.event){
         changed.none = false;
     }
     
