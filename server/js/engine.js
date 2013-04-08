@@ -28,16 +28,34 @@ var ge = module.exports = function (id, client) {
 
     
 	this.info_cards = [
-                       {   id:0,
-                    	   name:"Decrease all red",
-                    	   effects: [{
-                    		   domain:'zone',
-                    		   type:'panic',
-                    		   panic:(-5),
-                    		   affects:[0,1,2,3,4,5,6,7,8,9]
-                    	   }]
-                       }
-                       ];
+       {
+    	   desc:"Calm financial districts",
+    	   effects: [{
+    		   domain:'zone',
+    		   type:'panic',
+    		   panic:(-5),
+    		   affects:'largecity'
+    	   }]
+       },
+       {
+    	   desc:"Calm industry districts",
+    	   effects: [{
+    		   domain:'zone',
+    		   type:'panic',
+    		   panic:(-5),
+    		   affects:'industry'
+    	   }]
+       },
+       {
+    	   desc:"Calm residential districts",
+    	   effects: [{
+    		   domain:'zone',
+    		   type:'panic',
+    		   panic:(-5),
+    		   affects:'residential'
+    	   }]
+       },
+   ];
     
 
     var conn = [
@@ -205,8 +223,8 @@ var ge = module.exports = function (id, client) {
 	
     for(var i = 0; i < 8; i++){
     	player = new ge.Player(i, "player" + i, i*2, player_colors[i], {}, 4);
-    	player.info_cards.push(this.info_cards[0]);
-    	player.info_cards.push(this.info_cards[0]);
+    	player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
+    	player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
     	this.players.push(player);
     }
     //add dummy roles
@@ -227,7 +245,7 @@ var ge = module.exports = function (id, client) {
                 		   domain:'zone',
                 		   type:'panic',
                 		   panic:(20),
-                		   affects:[6, 7]
+                		   affects:'industry'
                 	   }]
                    },
                     {   id:1,
@@ -236,7 +254,7 @@ var ge = module.exports = function (id, client) {
                     		domain:'zone',
                     		type:'panic',
                     		panic:(5),
-                    		affects:[0, 1, 2, 3, 4, 8, 12, 13, 14, 15, 16]
+                    		affects:'residential'
                     	}]
                     },
                      {   id:2,
@@ -387,9 +405,9 @@ ge.prototype.command = function(client, c){
 
 
 		case 'use_card':
-			var ic = players[c.player].info_cards.pop(c.info_card);
+			var ic = players[this.active_player].info_cards.splice(c.card,1)[0];
 			changed = effect(ic, this);
-            changed.players = changed.players ? changed.players.push(players[c.player]) :  [players[c.player]];
+            changed.players = changed.players ? changed.players.push(players[this.active_player]) :  [players[this.active_player]];
 			break;
 			
 			
@@ -421,7 +439,7 @@ ge.prototype.command = function(client, c){
             //TODO Add random info cards
 			client.emit('msg', this.cards_left);
 			if(this.cards_left > 0){
-				ap.info_cards.push(this.info_cards[0]);
+				ap.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
 				this.cards_left -= 1;
 			}
 			
@@ -508,6 +526,11 @@ function effect(card, g) {
      
     console.log("Executing card");
     console.log(card);
+    console.log("Desc:");
+    console.log(card.desc);
+    console.log("Effects:");
+    console.log(card.effects);
+
     for (i = 0; i<effects.length; i++){
         e = effects[i];
         console.log("Effect nr "+i);
@@ -515,6 +538,15 @@ function effect(card, g) {
         switch(e.domain){
             case 'zone':
                 changed.zones = [];
+                if(typeof e.affects === 'string'){
+                	var afflicted = e.affects;
+                	e.affects = [];
+                	for (z = 0; z<zones.length; z++){
+                		if (zones[z].type === afflicted){
+                			e.affects.push(z);
+                		}
+                	}
+                }
                 switch(e.type){
                     case 'panic':
                         for (z = 0; z<e.affects.length; z++){
@@ -951,14 +983,6 @@ ge.Map = function (nodes, zones) {
 ge.Settings = function (timer_interval) {
 	var timer = new timer(timer_interval);
 }
-
-
-
-
-
-
-
-
 
 
 

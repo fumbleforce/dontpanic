@@ -250,10 +250,10 @@ gco.update_cards = function() {
         $con.empty();
         if ((cards.length)*110+75 > (parseInt($con.parent().parent().css('width')))) {
             $con.parent().parent().css('width', ''+(parseInt($con.parent().parent().css('width'))+110)+'px');
-
         }
-        for (c = 0; c < cards.length; c++){
-            button = $("<button id='"+i+"-"+c+"' class='info-card' onclick='gco.info_card_click(this.id)'>"+cards[c].name+ "</button>");
+        
+        for (c = cards.length-1; c >= 0; c--){
+            button = $("<button id='"+i+"-"+c+"' class='info-card' onclick='gco.info_card_click("+i+","+c+")'>"+cards[c].desc+ "</button>");
             button.appendTo($con);
 			
         }
@@ -262,11 +262,11 @@ gco.update_cards = function() {
 }
 
 
-gco.info_card_click = function(id) {
-    var p = id.charAt(0),
-        c = id.charAt(2);
-    if(gco.active_player == p){
-		command('use_card', {player:p, card:c});
+gco.info_card_click = function(p, c) {
+	console.log(p);
+	console.log(c);
+    if(gco.active_player === p){
+		command('use_card', {card:c});
 	}
 }
 
