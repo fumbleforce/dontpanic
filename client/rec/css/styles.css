@@ -76,6 +76,11 @@ p
     font-size:35px;
     margin:15px;
 }
+.info-label-form
+{
+	color:black;
+	font-size:15px;
+}
 #turn-label
 {
 
@@ -98,7 +103,7 @@ p
     font-size:32px;
     padding:7px;
 }
-.btn-remove-road-block
+.btn
 {
     float:right;
     font-size:32px;
@@ -131,6 +136,16 @@ p
     background:white;
     width:98%;
     height:350px;
+    right:0px;
+    margin-bottom:30px;
+    padding:10px;
+    border-radius:30px;
+}
+.sidebar-textform
+{
+	background:grey;
+    width:50%;
+    height: 100px;
     right:0px;
     margin-bottom:30px;
     padding:10px;

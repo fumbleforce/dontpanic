@@ -13,31 +13,28 @@ var c_height = 1550,
     w_inc = 0;
 	//set images
 	var residential_img = new Image();
-	residential_img.src = "/img/residential.jpg";
+	residential_img.src = "client/rec/img/residential.jpg";
 	var park_img = new Image();
-	park_img.src = "/img/park.jpg";
+	park_img.src = "client/rec/img/park.jpg";
 	var industry_img = new Image();
-	industry_img.src = "/img/industry.jpg";
+	industry_img.src = "client/rec/img/industry.jpg";
 	var largecity_img = new Image();
-	largecity_img.src = "/img/largecity.jpg";
+	largecity_img.src = "client/rec/img/largecity.jpg";
 	
-	var coordinator_img = new Image();
-	coordinator_img.src = "/img/coordinator.png"
+	var cat_img = new Image();
+	cat_img.src = "client/rec/img/cat.png"
 	
-	var crowd_manager_img = new Image();
-	crowd_manager_img.src = "/img/crowd_manager.png"
+	var penguin_img = new Image();
+	penguin_img.src = "client/rec/img/cat.png"
 	
-	var driver_img = new Image();
-	driver_img.src = "/img/driver.png"
+	var tophat_img = new Image();
+	tophat_img.src = "client/rec/img/cat.png"
 	
-	var operation_expert_img = new Image();
-	operation_expert_img.src = "/img/operation_expert.png"
+	var lifejacket_img = new Image();
+	lifejacket_img.src = "client/rec/img/cat.png"
 	
-	var volunteer_img = new Image();
-	volunteer_img.src = "/img/volunteer.png"
-	
-	var passer_by_img = new Image();
-	passer_by_img.src = "/img/passer_by.png"
+	var book_img = new Image();
+	book_img.src = "client/rec/img/cat.png"
 	
 
 /* TEMPORARY ZONE IMAGES
@@ -86,7 +83,8 @@ var gco = {
     canvas : document.getElementById("viewport"),
     cst : {},
     turn : 0,
-    active_player : 0
+    active_player : 0,
+	next_node : 1
 }
 gco.ctx = gco.canvas.getContext("2d");
 
@@ -101,45 +99,20 @@ gco.ctx = gco.canvas.getContext("2d");
 */
 gco.init_game = function (d) {
     console.log("Game initiated");
-    gco.players = d.players;
-    gco.zones = d.zones;
-    gco.nodes = d.nodes;
-    gco.turn = d.turn;
-    gco.active_player = d.active_player;
+
+
+
     
     gco.setup_canvas();
     gco.set_canvas_listener();
-    gco.start_timer(d.timer);
+
     
     gco.draw();
-    gco.update_cards();
+
 
 }
 
 
-/* Start Timer
-    
-    Controls the timer label, and emits an event to server 
-    when the duration has been reached.
-    
-    Int dur         Duration of timer.
-*/
-gco.start_timer = function(dur){
-    console.log("Timer Started.");
-    var left = dur,
-        lab = document.getElementById("timer-label");
-    var int = setInterval(function(){
-        lab.innerHTML = "Panic Increase in: "+left;
-        gco.draw();
-        left--;
-        if (left === -1) {
-            command('inc_panic', {});
-            clearInterval(int);
-        }
-    }, 1000);
-    
-    
-}
 
 
 /*  Set up Canvas
@@ -161,39 +134,6 @@ gco.reset = function(){
     p.x = gco.nodes[p.node].x;
     p.y = gco.nodes[p.node].y;*/
     gco.update_players(gco.players);
-}
-
-gco.update_turn = function(turn, ap){
-    gco.turn = turn;
-    gco.active_player = ap;
-    gco.cst.selected_zone = null
-    gco.cst.selected_node = null
-}
-
-gco.update_options = function(o){
-	var $s = $('#selection'),
-		inner = '';
-	for (var i=0; i<o.length;i++){
-		switch(o[i]){
-			case 'block':
-				inner += "<button class='btn' onclick='command("+'"'+"create_road_block"+'"'+");'>Add road block</button>";
-				break;
-			case 'info':
-				inner += "<button class='btn' onclick='command("+'"'+"create_info_center"+'"'+");'>Add information center</button>";
-				break;
-			case 'panic':
-				inner += "<button class='btn' onclick='command("+'"'+"decrease_panic"+'"'+");'>Decrease panic</button>";
-				break;
-			case 'people':
-				inner += "<button class='btn' onclick='gco.move_people();'>Move people</button>";
-				break;
-			case 'rem_block':
-				inner += "<button class='btn' onclick='command("+'"'+"remove_road_block"+'"'+");'>Remove road block</button>";
-				break;
-
-		}
-	}
-	$s.html(inner);
 }
 
 
@@ -277,106 +217,40 @@ gco.info_card_click = function(id) {
 
 
 
-gco.move_people = function(){
-	if(gco.cst.selected_zone !== null){
-		gco.cst.moving_people = true;
-		gco.cst.moving_from = gco.cst.selected_zone;
-	}
-}
 
 
-/* deprecated - Update whole player instead
-gco.decrease_actions = function(){
-    if (gco.players[gco.active_player].actions_left > 0) {
-        gco.players[gco.active_player].actions_left--;
-    }
-    gco.draw();
-}
 
-gco.decrease_4_actions = function(){
-    if (gco.players[gco.active_player].actions_left > 0) {
-        gco.players[gco.active_player].actions_left -= 4;
-    }
-    gco.draw();
-}
-*/
-
-/* Update whole zone instead
-//decrease panic (server knows if player has special -10 panic role, if not decrease by 5)
-gco.decrease_panic = function(zone){
-	gco.zones[zone.id].panic_level = zone.panic_level;
-	gco.draw();
-}
-*/
 
 
 
 gco.player_draw = function(player, ctx){
-	ctx.fillStyle = "rgba(255,0,0,0)";
-	ctx.save();
-	
-	
-	if (player.x === undefined) player.x = gco.nodes[player.node].x;
+    if (player.x === undefined) player.x = gco.nodes[player.node].x;
     if (player.y === undefined) player.y = gco.nodes[player.node].y;
 	
-	//ctx.fillStyle = player.color;
+
 	
     ctx.beginPath();
-    ctx.arc(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size, 0, Math.PI*7, true); 
-
+    ctx.arc(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size, 0, Math.PI*2, true); 
+    ctx.closePath();
     //ctx.fill();
     //TODO draw circle to show active player when dragging/active?
     if (this.active_player===player.id){
-    	
-		ctx.fill();
-    	ctx.strokeStyle = 'red';
-    	ctx.lineWidth = 10;
-    	ctx.stroke();
-		}
-		/*var gradiant = ctx.createRadialGradient(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size-10, player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size);
-    	gradiant.addColorStop(0, 'red');
-    	gradiant.addColorStop(1, 'rgba(255,0,0,0)');
+    	var gradiant = ctx.createRadialGradient(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size-10, player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size);
+    	gradiant.addColorStop(0, player.color);
+    	gradiant.addColorStop(1, 'blue');
     	ctx.fillStyle=gradiant;
     	ctx.fill();
-    }*/
-    /*else{
-    	//ctx.fill();
+    }
+    else{
+    	ctx.fill();
     	ctx.strokeStyle = 'black';
     	ctx.lineWidth = 2;
     	ctx.stroke();
     }
-*/
-	//ctx.fillStyle = "Black";
+
+    ctx.fillStyle = "Black";
     ctx.font="bold 15px Arial",
     ctx.fillText(player.id, player.x+player_offsetX[player.id]-5, player.y+player_offsetY[player.id]+6);
-	
-;
-
-	
-			//draw the images
-	if (player.role==='coordinator'){
-		ctx.drawImage(coordinator_img, player.x + player_offsetX[player.id]-24, player.y+player_offsetY[player.id]-24);
-	}
-	else if (player.role==='crowd manager'){
-		ctx.drawImage(crowd_manager_img, player.x + player_offsetX[player.id]-24, player.y+player_offsetY[player.id]-24);
-	}
-	else if (player.role==='driver'){
-		ctx.drawImage(driver_img, player.x + player_offsetX[player.id]-35, player.y+player_offsetY[player.id]-35);
-	}
-	else if (player.role==='operation expert'){
-		ctx.drawImage(operation_expert_img, player.x + player_offsetX[player.id]-24, player.y+player_offsetY[player.id]-24);	
-	}	
-	else if (player.role==='volunteer'){
-		ctx.drawImage(volunteer_img, player.x + player_offsetX[player.id]-24, player.y+player_offsetY[player.id]-24);
-	}	
-	else if (player.role==='passer by'){
-		ctx.drawImage(passer_by_img, player.x + player_offsetX[player.id]-24, player.y+player_offsetY[player.id]-24);
-	}
-	ctx.closePath();
-	ctx.save();
-	ctx.clip()
-	ctx.fill();
-	ctx.restore();
 }
 
 gco.node_draw = function(node, ctx){
@@ -434,7 +308,7 @@ gco.roadblock_draw = function(node, ctx){
 }
 
 gco.background_draw = function(ctx){
-    ctx.fillStyle="black";
+    ctx.fillStyle="grey";
     ctx.fillRect(0,0, c_width, c_height);
 }
 
@@ -518,20 +392,7 @@ gco.zone_draw = function(zone, ctx){
 	ctx.font='27px Arial'
 	ctx.fillText(zone.panic_level, zone.centroid[0]-20, zone.centroid[1]+3);
 	
-	//TODO simple people info
-	ctx.fillStyle = 'black';
-	if (zone.people > 9 && zone.people < 100){
-		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]+28,40,30); 
-	}
-	else if(zone.people > 99){
-		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]+28,60,30); 
-	}
-	else{
-		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]+28,25,30); 
-	}
-	ctx.fillStyle = 'white';
-	ctx.font='27px Arial'
-	ctx.fillText(zone.people, zone.centroid[0]-20, zone.centroid[1]+54);
+
 	
 
     
@@ -554,16 +415,7 @@ gco.selection_draw = function(ctx){
         ctx.strokeStyle = "blue";
         ctx.lineWidth = 20;
         ctx.stroke();
-    }
-    if (cst.selected_node !== null){
-        var node = nodes[cst.selected_node];
-        ctx.beginPath();
-        ctx.beginPath();
-		ctx.arc(node.x, node.y, node_size, 15, Math.PI*2, true); 
-		ctx.closePath();
-        ctx.strokeStyle = "blue";
-        ctx.lineWidth = 20;
-        ctx.stroke();
+
     }
 }
 
@@ -659,21 +511,31 @@ gco.set_canvas_listener = function(){
         nodes = gco.nodes,
         players = gco.players,
         zones = gco.zones;
-    
-    cst.moving_people = false;
-    cst.moving_from = null;
-    
+        
     canvas.addEventListener('selectstart', function(e) { e.preventDefault(); return false; }, false);
 
     canvas.addEventListener('mousedown', function(e) {
+		console.log();
         
         var mx = e.offsetX,
             my = e.offsetY,
             selected;
 
+		console.log(mx + "   adfg" + my);
+        
         cst.selected_zone = null;
         cst.selected_node = null;
         
+		gco.nodes.push(newNode = {
+                id:gco.next_node,
+                x:mx,
+				y:my,
+                is_start_position:false,
+				connects_to:[]
+            });
+		gco.next_node++;
+		
+	    /*
         if (cst.selection) {
             console.log("clearing selection");
             cst.selection.x = nodes[cst.selection.node].x
@@ -703,40 +565,19 @@ gco.set_canvas_listener = function(){
         	}
         }
 
-		for (var i = 0; i < nodes.length; i++) {
-
-        	if (gco.node_contains(nodes[i], mx, my)) {
-        		console.log("Clicked on node "+i);
-        		cst.selected_node = i;
-				command('select_node', {node_id : cst.selected_node});
-        		gco.draw();
-        		return;
-           }
-        }
-		
         for (var i = 0; i < zones.length; i++) {
 
         	if (gco.zone_contains(zones[i], mx, my)) {
         		console.log("Clicked on zone "+i);
         		cst.selected_zone = i;
         		//TODO for testing, we add 'decrease_panic' when selecting zones
-        		if(cst.moving_people){
-        			command('move_people', {zone_from: cst.moving_from, zone_to:i});
-        			cst.moving_from = null;
-        			cst.moving_people = false;
-        		}
-        		else{
-        			command('select_zone', {zone_id : cst.selected_zone});
-        		}
+        		command('decrease_panic', {zone_id : cst.selected_zone});
         		gco.draw();
         		return;
            }
         }
-
-        
-        
+		*/
         gco.draw();
-        
         
     }, true);//end mousedown listener
   
