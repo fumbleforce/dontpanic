@@ -168,6 +168,9 @@ gco.update_options = function(o){
 			case 'people':
 				inner += "<button class='btn' onclick='gco.move_people();'>Move people</button>";
 				break;
+			case 'rem_block':
+				inner += "<button class='btn' onclick='command("+'"'+"remove_road_block"+'"'+");'>Remove road block</button>";
+				break;
 
 		}
 	}

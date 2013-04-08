@@ -226,7 +226,8 @@ ge.prototype.command = function(client, c){
         case 'move_player':
             if (c.player_id === this.active_player) {
                 var p = players[c.player_id];
-                if(p.move_player(nodes[p.node], nodes[c.node_id])) changed.players = [p];
+		    	if(p.move_player(nodes[p.node], nodes[c.node_id]))
+		    		{changed.players = [p];}
             }
             break;
             
@@ -234,23 +235,30 @@ ge.prototype.command = function(client, c){
   			var n = c.node_id,
   				options = [],
   				p = players[this.active_player];
-  				if(p.actions_left >=4 ) {
+  				if(nodes[n].can_add_information_center(p)) {
   					options.push('info');
+  				}
+  				if (nodes[n].can_add_road_block(p, players)) {
   					options.push('block');
+  				}
+  				if (nodes[n].can_remove_road_block(p, players)) {
+  					options.push('rem_block');
   				}
   			changed.options = options;
   			
   			break;
   			
   		case 'select_zone':
-  			var z = c.zone_id,
+  			var z = zones[c.zone_id],
   				options = [],
   				p = players[this.active_player];
   				
-  			if(p.actions_left >=1) {
-  					options.push('panic');
-  					options.push('people');
-  				}
+  			if(z.can_move_people_from(p, 5)) {
+				options.push('people');
+  			}
+  			if(z.can_dec_panic(p,nodes[p.node])){
+  				options.push('panic');
+  			}
   			changed.options = options;
   			break;
   
@@ -295,11 +303,14 @@ ge.prototype.command = function(client, c){
 		case 'create_info_center':
 
 			var p = players[this.active_player],
-				n = nodes[p.node];
+				n = nodes[c.selected_node];
 
 
-			if((this.information_centers < this.max_information_centers) && (n.add_information_center(p)) && n===c.selected_node){
-
+			if(
+				this.information_centers < this.max_information_centers
+				&& p.node === n.id 
+				&& n.add_information_center(p)){
+				
 				changed.nodes = [n];
 				changed.players = [p];
 				this.information_centers++;
@@ -534,18 +545,23 @@ ge.Player = function(id, user, node, color, role, actions_left) {
 }
 
 ge.Player.prototype.update_actions = function (actions) {
-	this.actions_left += actions;
-	if (this.actions_left === 0) {
-	    return true;
+	var able = this.can_update_actions(actions);
+	if (able) {
+	    this.actions_left += actions;
+	    console.log("Changed player actions by "+actions);
+	    return true
 	}
-	else if (this.actions_left < 0) {
-	    this.actions_left -= actions;
-	    console.log("Not enough actions");
+    return false;
+}
+ge.Player.prototype.can_update_actions = function (actions) {
+
+	var result_action = this.actions_left + actions;
+	if (result_action < 0) {
+		console.log("Not enough actions left");
 	    return false;
 	}
     return true;
 }
-
 
 ge.Player.prototype.remove_info_card = function(info_card) {
 	for (var i = 0; i < this.info_cards.length; i++) {
@@ -559,13 +575,23 @@ ge.Player.prototype.add_info_card = function(info_card) {
 }
 
 ge.Player.prototype.move_player = function (node_from, node_to) {
+	var able = this.can_move_player(node_from, node_to);
+	if (able) {
+	    this.update_actions(-1);
+	    this.node = node_to.id;
+	    return true;
+	}
+	return false;
+}
+ge.Player.prototype.can_move_player = function (node_from, node_to) {
+	console.log("Can move player?");
 	if (node_from === node_to) {
 	    console.log("node from and to are same");
 		return false;
 	} 
 	else if (node_from.connects_with(node_to)) {
-		if (this.update_actions(-1)){
-		    this.node = node_to.id;
+		if (this.can_update_actions(-1)){
+			console.log("True");
 		    return true;
 		}
 		return false;
@@ -605,16 +631,43 @@ ge.Node = function (id, x, y, is_start_position, connects_to) {
 
 }
 ge.Node.prototype.add_information_center = function (player) {
-	if (this.has_information_center) return false;
-	
-    if(player.update_actions(-4) ){
+	var able = this.can_add_information_center(player);
+	if (able){
 		this.has_information_center = true;
+		return true;
+	}
+	return false;
+}
+ge.Node.prototype.can_add_information_center = function (player) {
+	console.log("Can add info center?");
+	if (this.has_information_center) {
+		console.log("Already has information center");
+		return false;
+	}
+	if(this.id !== player.node){
+		console.log("Player is not on node");
+		return false;
+	}
+	
+    if(player.can_update_actions(-4) ){
+    	console.log("True");
 		return true;
     }
     return false;
 }
 
+
 ge.Node.prototype.add_road_block = function (player, players) {
+	var able = this.can_add_road_block(player, players);
+	if (able){
+		this.has_road_block = true;
+		return true;
+	}
+	return false;	
+
+}
+ge.Node.prototype.can_add_road_block = function (player, players) {
+	console.log("Can add road block?");
 	if (this.has_road_block) {
 		console.log('error', "Already has road block");
 	    return false;
@@ -631,8 +684,8 @@ ge.Node.prototype.add_road_block = function (player, players) {
 		return false
 	}
 	
-	if(player.update_actions(-1) ){
-		this.has_road_block = true;
+	if(player.can_update_actions(-1) ){
+		console.log("True");
 		return true;
 	}
 	
@@ -641,8 +694,17 @@ ge.Node.prototype.add_road_block = function (player, players) {
 }
 
 ge.Node.prototype.remove_road_block = function (player, players) {
+	var able = this.can_add_road_block(player, players);
+	if (able){
+		this.has_road_block = false;
+		return true;
+	}
+	return false;
+}
+ge.Node.prototype.can_remove_road_block = function (player, players) {
+	console.log("Can remove road block?");
 	if (!this.has_road_block) {
-		console.log('error', "No road block here!");
+		console.log("No road block at this node");
 	    return false;
 	}
 	
@@ -653,15 +715,13 @@ ge.Node.prototype.remove_road_block = function (player, players) {
 		}
 	}
 	if (!another_player){
-		console.log("Player "+player+" failed to remove road block, no other players on node!");
+		console.log("No other players on node");
 		return false
 	}
-	
-	if(player.update_actions(-1) ){
-		this.has_road_block = false;
+	if(player.can_update_actions(-1) ){
+		console.log("Can remove road block");
 		return true;
 	}
-	
 	return false;	
 }
 ge.Node.prototype.connects_with = function(n){
@@ -724,33 +784,57 @@ ge.Zone.prototype.is_panic_zero = function () {
 	return this.panic_level === 0 ?  true : false;
 }
 ge.Zone.prototype.dec_panic = function(player, node) {
-
+	var able = this.can_dec_panic(player, node);
+	if(able){
+		if(player.role === 'crowd controller'){
+			this.update_panic(player.role.panic)
+		}
+		else{
+			this.update_panic(-5);
+		}
+		return true;
+	}
+	return false;
+}
+ge.Zone.prototype.can_dec_panic = function(player, node) {
+	console.log("Can decrease panic?");
 	if (this.nodes.indexOf(node.id) >= 0) {
 		if(this.panic_level >= 5){
-			
-			if(player.update_actions(-1)){
-				
-				player.role === 'crowd controller' ? this.update_panic(player.role.panic) : this.update_panic(-5);
+			if(player.can_update_actions(-1)){
+				console.log("True");
 				return true;
 			}
+			
 		}
+		else{
+			console.log("Panic is too low");
+		}
+	}
+	else{
+		console.log("Not an adjacent node");
 	}
 	return false;
 }
 
 
-
 ge.Zone.prototype.move_people = function (p, to_zone, num) {
+	var able = this.can_move_people(p, to_zone, num);
+	if(able){
+		this.people -= num;
+		to_zone.people += num;
+		return true;
+	}
+	return false;
+}
+ge.Zone.prototype.can_move_people = function (p, to_zone, num) {
+	console.log("Can move people?");
 	if (this.people >= num){
 		if(this.adjacent_zones.indexOf(to_zone.id)>=0 ){
-			if(p.update_actions(-1)) {
-				this.people -= num;
-				to_zone.people += num;
+			if(p.can_update_actions(-1)) {
+				console.log("True");
 				return true;
 			}
-			else{
-				console.log("Not enough actions");
-			}
+			
 		}
 		else{
 			console.log("Not an adjacent zone");
@@ -760,8 +844,26 @@ ge.Zone.prototype.move_people = function (p, to_zone, num) {
 		//error 
 		console.log("There isnt that many people in this zone");
 	}
+	return false;
 }
-
+ge.Zone.prototype.can_move_people_from = function (p, num){
+	console.log("Can move from this zone?");
+	if (this.people >= num){
+		if(this.nodes.indexOf(p.node)>=0 ){
+			if(p.can_update_actions(-1)) {
+				console.log("True");
+				return true;
+			}
+		}
+		else{
+			console.log("Zone is not adjacent to player");
+		}
+	}
+	else{
+		console.log("Not enough people in zone");
+	}
+	return false;
+}
 
 
 
