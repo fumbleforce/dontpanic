@@ -66,13 +66,17 @@
 			
 			<input type="submit" value="submit">
 			</form>
-			<button class="button" onclick="gco.init_game();"></button>
-			<canvas id="viewport">
-                <p>Your browser is terrible</p>
-                <p>Get a good one here:</p>
-                <p><a href="http://www.mozilla.org/en-US/firefox/new/">Firefox</a></p>
-                <p><a href="https://www.google.com/intl/no/chrome/browser/">Chrome</a></p>
-            </canvas>
+			<button class="button" onclick="gco.init_game();">Start!/Clear</button>
+			<button class="button" onclick="gco.del_selected_node();">Delete selected</button>
+			<button class="button" onclick="gco.node_connection();">Start node connection</button>
+			<div class="content-row">
+				<canvas id="viewport">
+					<p>Your browser is terrible</p>
+					<p>Get a good one here:</p>
+					<p><a href="http://www.mozilla.org/en-US/firefox/new/">Firefox</a></p>
+					<p><a href="https://www.google.com/intl/no/chrome/browser/">Chrome</a></p>
+				</canvas>
+			</div>
 		</div>
 	</div>
 
