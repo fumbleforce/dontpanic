@@ -59,6 +59,9 @@ socket.on('change', function (data) {
     if (d.none) {
         gco.reset();
     }
+    if (d.event) {
+    	window.alert(d.event.name);
+    }
     gco.draw();
     
     /*
