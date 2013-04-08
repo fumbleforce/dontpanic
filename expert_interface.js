@@ -85,9 +85,12 @@ var gco = {
     turn : 0,
     active_player : 0,
 	next_node : 0,
+	next_zone : 0,
 	mode : "add node",
 	selected_node : -1,
-	connection : -1
+	connection : -1,
+	zone_container : [],
+	node_container : []
 }
 gco.ctx = gco.canvas.getContext("2d");
 
@@ -258,6 +261,11 @@ gco.player_draw = function(player, ctx){
 
 gco.node_draw = function(node, ctx){
     ctx.fillStyle = 'white';
+	if((gco.node_container.indexOf(node.id) > -1) || (gco.selected_node == node.id) || (gco.connection == node.id)){
+		ctx.fillStyle = 'red';
+
+	}
+	
     ctx.beginPath();
     ctx.arc(node.x, node.y, node_size, 0, Math.PI*2, true); 
     ctx.closePath();
@@ -265,6 +273,7 @@ gco.node_draw = function(node, ctx){
     
     ctx.fillStyle = "black";
     ctx.font="15px Arial";
+	
     if(node.id>9){
     	ctx.fillText(node.id, node.x-8, node.y-15);
     }
@@ -272,7 +281,8 @@ gco.node_draw = function(node, ctx){
     	ctx.fillText(node.id, node.x-4, node.y-15);
     }
     
-if (node.has_information_center){
+	
+	if (node.has_information_center){
 		
 		ctx.fillStyle = 'blue';
 		ctx.fill();
@@ -543,8 +553,24 @@ gco.create_connection = function(){
 gco.node_connection = function(){
 
 	gco.connection = gco.selected_node; 
+	gco.draw();
 	
-}	
+}
+gco.add_zone_nodes = function(){ // adds a node to a container so it later can be used to create a zone
+
+	
+	if(gco.selected_node > -1){
+		gco.node_container.push(gco.selected_node);
+		
+		
+	}
+	gco.draw();
+}
+gco.clear_zone_nodes = function() {
+	
+	gco.node_container = [];
+	gco.draw();
+}
 
 gco.del_selected_node = function(){ // deletes the selected node, if none is selected nothing will be removed
 	
