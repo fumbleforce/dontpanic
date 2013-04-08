@@ -21,20 +21,23 @@ var c_height = 1550,
 	var largecity_img = new Image();
 	largecity_img.src = "/img/largecity.jpg";
 	
-	var cat_img = new Image();
-	cat_img.src = "/img/cat.png"
+	var coordinator_img = new Image();
+	coordinator_img.src = "/img/coordinator.png"
 	
-	var penguin_img = new Image();
-	penguin_img.src = "/img/cat.png"
+	var crowd_manager_img = new Image();
+	crowd_manager_img.src = "/img/crowd_manager.png"
 	
-	var tophat_img = new Image();
-	tophat_img.src = "/img/cat.png"
+	var driver_img = new Image();
+	driver_img.src = "/img/driver.png"
 	
-	var lifejacket_img = new Image();
-	lifejacket_img.src = "/img/cat.png"
+	var operation_expert_img = new Image();
+	operation_expert_img.src = "/img/operation_expert.png"
 	
-	var book_img = new Image();
-	book_img.src = "/img/cat.png"
+	var volunteer_img = new Image();
+	volunteer_img.src = "/img/volunteer.png"
+	
+	var passer_by_img = new Image();
+	passer_by_img.src = "/img/passer_by.png"
 	
 
 /* TEMPORARY ZONE IMAGES
@@ -309,53 +312,71 @@ gco.decrease_panic = function(zone){
 
 
 gco.player_draw = function(player, ctx){
-    if (player.x === undefined) player.x = gco.nodes[player.node].x;
+	ctx.fillStyle = "rgba(255,0,0,0)";
+	ctx.save();
+	
+	
+	if (player.x === undefined) player.x = gco.nodes[player.node].x;
     if (player.y === undefined) player.y = gco.nodes[player.node].y;
 	
-	/*	//draw the images
-	if (player.type==='coordinator'){
-		ctx.drawImage(cat_img);
-	}
-	else if (player.type==='crowd manager'){
-		ctx.drawImage(tophat_img);
-	}
-	else if (player.type==='driver'){
-		ctx.drawImage(lifejacket_img);
-	}
-	else if (player.type==='operation expert'){
-		ctx.drawImage(book_img);	
-		
-	else if (player.type==='volunteer'){
-		ctx.drawImage(map_img);	
-		
-	else if (player.type==='passer by'){
-		ctx.drawImage(penguin_img);	
-	}*/
-	
-    //ctx.fillStyle = player.color;
+	//ctx.fillStyle = player.color;
 	
     ctx.beginPath();
-    ctx.arc(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size, 0, Math.PI*2, true); 
-    ctx.closePath();
+    ctx.arc(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size, 0, Math.PI*7, true); 
+
     //ctx.fill();
     //TODO draw circle to show active player when dragging/active?
     if (this.active_player===player.id){
-    	var gradiant = ctx.createRadialGradient(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size-10, player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size);
-    	gradiant.addColorStop(0, player.color);
-    	gradiant.addColorStop(1, 'blue');
+    	
+		ctx.fill();
+    	ctx.strokeStyle = 'red';
+    	ctx.lineWidth = 10;
+    	ctx.stroke();
+		}
+		/*var gradiant = ctx.createRadialGradient(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size-10, player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size);
+    	gradiant.addColorStop(0, 'red');
+    	gradiant.addColorStop(1, 'rgba(255,0,0,0)');
     	ctx.fillStyle=gradiant;
     	ctx.fill();
-    }
-    else{
-    	ctx.fill();
+    }*/
+    /*else{
+    	//ctx.fill();
     	ctx.strokeStyle = 'black';
     	ctx.lineWidth = 2;
     	ctx.stroke();
     }
-
-    ctx.fillStyle = "Black";
+*/
+	//ctx.fillStyle = "Black";
     ctx.font="bold 15px Arial",
     ctx.fillText(player.id, player.x+player_offsetX[player.id]-5, player.y+player_offsetY[player.id]+6);
+	
+;
+
+	
+			//draw the images
+	if (player.role==='coordinator'){
+		ctx.drawImage(coordinator_img, player.x + player_offsetX[player.id]-24, player.y+player_offsetY[player.id]-24);
+	}
+	else if (player.role==='crowd manager'){
+		ctx.drawImage(crowd_manager_img, player.x + player_offsetX[player.id]-24, player.y+player_offsetY[player.id]-24);
+	}
+	else if (player.role==='driver'){
+		ctx.drawImage(driver_img, player.x + player_offsetX[player.id]-35, player.y+player_offsetY[player.id]-35);
+	}
+	else if (player.role==='operation expert'){
+		ctx.drawImage(operation_expert_img, player.x + player_offsetX[player.id]-24, player.y+player_offsetY[player.id]-24);	
+	}	
+	else if (player.role==='volunteer'){
+		ctx.drawImage(volunteer_img, player.x + player_offsetX[player.id]-24, player.y+player_offsetY[player.id]-24);
+	}	
+	else if (player.role==='passer by'){
+		ctx.drawImage(passer_by_img, player.x + player_offsetX[player.id]-24, player.y+player_offsetY[player.id]-24);
+	}
+	ctx.closePath();
+	ctx.save();
+	ctx.clip()
+	ctx.fill();
+	ctx.restore();
 }
 
 gco.node_draw = function(node, ctx){

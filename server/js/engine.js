@@ -207,7 +207,7 @@ var ge = module.exports = function (id, client) {
     
     this.players = [];
     player_colors = ["red","orange","yellow","chartreuse ","green","aqua","blue","purple"];
-	
+	player_role = ["coordinator","passer by","crowd manager","driver","operation expert","volunteer"];
 	/*this.randomrole =  
 		[{title: "Constructor",
 		
@@ -222,9 +222,11 @@ var ge = module.exports = function (id, client) {
 	*/
 	
     for(var i = 0; i < 8; i++){
+
     	player = new ge.Player(i, "player" + i, i*2, player_colors[i], {}, 4);
     	player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
     	player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
+
     	this.players.push(player);
     }
     //add dummy roles
@@ -765,6 +767,10 @@ ge.Node.prototype.can_add_road_block = function (player, players) {
 	if (!another_player){
 		console.log("Player "+player+" failed to add road block, no other players on node!");
 		return false
+	}
+	
+	if(player.node !== this.id){
+		return false;
 	}
 	
 	if(player.can_update_actions(-1) ){
