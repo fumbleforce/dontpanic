@@ -24,6 +24,37 @@ var ge = module.exports = function (id, client) {
 	this.cards_left = 10;
 
     
+
+	this.info_cards = [
+       {
+    	   desc:"Calm financial districts",
+    	   effects: [{
+    		   domain:'zone',
+    		   type:'panic',
+    		   panic:(-5),
+    		   affects:'largecity'
+    	   }]
+       },
+       {
+    	   desc:"Calm industry districts",
+    	   effects: [{
+    		   domain:'zone',
+    		   type:'panic',
+    		   panic:(-5),
+    		   affects:'industry'
+    	   }]
+       },
+       {
+    	   desc:"Calm residential districts",
+    	   effects: [{
+    		   domain:'zone',
+    		   type:'panic',
+    		   panic:(-5),
+    		   affects:'residential'
+    	   }]
+       },
+   ];
+
     
     this.info_cards = [
         {   id:0,
@@ -189,14 +220,55 @@ var ge = module.exports = function (id, client) {
 	*/
 	
     for(var i = 0; i < 8; i++){
+
     	player = new ge.Player(i, "player" + i, i*2, player_colors[i], player_role[Math.floor(Math.random()*player_role.length)],4);
-    	player.info_cards.push(this.info_cards[0]);
-    	player.info_cards.push(this.info_cards[0]);
-		
-		
+    	player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
+    	player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
+
     	this.players.push(player);
     }
-	
+    //add dummy roles
+    this.players[0].role = "Passer By";
+    this.players[1].role = "Crowd Manager";
+    this.players[2].role = "Driver";
+    this.players[3].role = "Operation Expert";
+    this.players[4].role = "Volunteer";
+    this.players[5].role = "Passer By";
+    this.players[6].role = "Coordinator";
+    this.players[7].role = "Crowd Manager";
+
+    //add some event(s)
+    this.events = [
+                   {   id:0,
+                	   name:"Fire in all industry zones!",
+                	   effects: [{
+                		   domain:'zone',
+                		   type:'panic',
+                		   panic:(20),
+                		   affects:'industry'
+                	   }]
+                   },
+                    {   id:1,
+                    	name:"Power outage in all residential zones!",
+                    	effects: [{
+                    		domain:'zone',
+                    		type:'panic',
+                    		panic:(5),
+                    		affects:'residential'
+                    	}]
+                    },
+                     {   id:2,
+                    	 name:"Terrorist attack in all city zones!",
+                    	 effects: [{
+                    		 domain:'zone',
+                    		 type:'panic',
+                    		 panic:(35),
+                    		 affects:[9, 10, 11]
+                    	 }]
+                     }
+                     ];
+    
+
 }
 
 
@@ -309,9 +381,9 @@ ge.prototype.command = function(client, c){
 
 
 		case 'use_card':
-			var ic = players[c.player].info_cards.pop(c.info_card);
+			var ic = players[this.active_player].info_cards.splice(c.card,1)[0];
 			changed = effect(ic, this);
-            changed.players = changed.players ? changed.players.push(players[c.player]) :  [players[c.player]];
+            changed.players = changed.players ? changed.players.push(players[this.active_player]) :  [players[this.active_player]];
 			break;
 			
 			
@@ -342,7 +414,7 @@ ge.prototype.command = function(client, c){
             //TODO Add random info cards
 			client.emit('msg', this.cards_left);
 			if(this.cards_left > 0){
-				ap.info_cards.push(this.info_cards[0]);
+				ap.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
 				this.cards_left -= 1;
 			}
 			
@@ -418,6 +490,11 @@ function effect(card, g) {
      
     console.log("Executing card");
     console.log(card);
+    console.log("Desc:");
+    console.log(card.desc);
+    console.log("Effects:");
+    console.log(card.effects);
+
     for (i = 0; i<effects.length; i++){
         e = effects[i];
         console.log("Effect nr "+i);
@@ -425,6 +502,15 @@ function effect(card, g) {
         switch(e.domain){
             case 'zone':
                 changed.zones = [];
+                if(typeof e.affects === 'string'){
+                	var afflicted = e.affects;
+                	e.affects = [];
+                	for (z = 0; z<zones.length; z++){
+                		if (zones[z].type === afflicted){
+                			e.affects.push(z);
+                		}
+                	}
+                }
                 switch(e.type){
                     case 'panic':
                         for (z = 0; z<e.affects.length; z++){
@@ -603,8 +689,14 @@ ge.Node.prototype.add_road_block = function (player, players) {
 		return false
 	}
 	
-	if(player.update_actions(-1) ){
-		this.has_road_block = true;
+
+	if(player.node !== this.id){
+		return false;
+	}
+	
+	if(player.can_update_actions(-1) ){
+		console.log("True");
+
 		return true;
 	}
 	
@@ -788,14 +880,6 @@ ge.Map = function (nodes, zones) {
 ge.Settings = function (timer_interval) {
 	var timer = new timer(timer_interval);
 }
-
-
-
-
-
-
-
-
 
 
 
