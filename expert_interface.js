@@ -261,9 +261,12 @@ gco.player_draw = function(player, ctx){
 
 gco.node_draw = function(node, ctx){
     ctx.fillStyle = 'white';
-	if((gco.node_container.indexOf(node.id) > -1) || (gco.selected_node == node.id) || (gco.connection == node.id)){
+	if((gco.selected_node == node.id) || (gco.connection == node.id)){
 		ctx.fillStyle = 'red';
 
+	}
+	if(gco.node_container.indexOf(node) > -1){
+		ctx.fillStyle = 'blue';
 	}
 	
     ctx.beginPath();
@@ -351,22 +354,22 @@ gco.zone_draw = function(zone, ctx){
 	var miny = 2000;
 	
     for (var j = 0; j < zone.nodes.length; j++){
-       	if (gco.nodes[zone.nodes[j]].x < minx){
-		minx = gco.nodes[zone.nodes[j]].x;
+       	if (zone.nodes[j].x < minx){
+		minx = zone.nodes[j].x;
 		}
-		if (gco.nodes[zone.nodes[j]].y < miny){
-		miny = gco.nodes[zone.nodes[j]].y;
+		if (zone.nodes[j].y < miny){
+		miny = zone.nodes[j].y;
 		}
     }
 	    ctx.beginPath();
 
 	//var node = gco.nodes;
 	//var zones = 
-    ctx.moveTo(gco.nodes[zone.nodes[0]].x, gco.nodes[zone.nodes[0]].y);
+    ctx.moveTo(zone.nodes[0].x, zone.nodes[0].y);
     for (var j = 0; j < zone.nodes.length; j++){
-        ctx.lineTo(gco.nodes[zone.nodes[j]].x, gco.nodes[zone.nodes[j]].y);
+        ctx.lineTo(zone.nodes[j].x, zone.nodes[j].y);
     }
-    ctx.lineTo(gco.nodes[zone.nodes[0]].x, gco.nodes[zone.nodes[0]].y);
+    ctx.lineTo(zone.nodes[0].x, zone.nodes[0].y);
     
 	
 	
@@ -560,7 +563,7 @@ gco.add_zone_nodes = function(){ // adds a node to a container so it later can b
 
 	
 	if(gco.selected_node > -1){
-		gco.node_container.push(gco.selected_node);
+		gco.node_container.push(gco.nodes[gco.selected_node]);
 		
 		
 	}
@@ -571,6 +574,9 @@ gco.clear_zone_nodes = function() {
 	gco.node_container = [];
 	gco.draw();
 }
+gco.del_selected_zone = function(){
+
+}
 
 gco.del_selected_node = function(){ // deletes the selected node, if none is selected nothing will be removed
 	
@@ -578,6 +584,15 @@ gco.del_selected_node = function(){ // deletes the selected node, if none is sel
 		index = gco.selected_node;
 		node = gco.nodes[index];
 		
+		
+		
+		for (var z = 0; z < gco.zones.length ; z++){
+			if(gco.zones[z].nodes.indexOf(gco.nodes[gco.selected_node]) > -1 ){
+				console.log("failed delete test");
+				return;
+			}
+		}
+		console.log("passed delete test");
 		for (var i = 0; i < gco.nodes[index].connects_to.length; i++){
 			cnode = gco.nodes[index].connects_to[i];
 			index2 = cnode.connects_to.indexOf(node);
@@ -598,6 +613,51 @@ gco.re_id = function(){ // redo all id's of the nodes, to make it look better
 	for(gco.next_node = 0; gco.next_node < gco.nodes.length; gco.next_node++){
 		gco.nodes[gco.next_node].id = gco.next_node;
 	}
+}
+
+
+gco.create_zone = function(){
+	nodes = gco.node_container;
+	
+	// checking if possible to create zone: enough nodes
+	if(nodes.length < 2){
+		gco.clear_zone_nodes();
+		return;
+	}
+	console.log("checking");
+	// checking if possible to create zone: coupled together
+	
+	for (var i = 0 ; i+1 < nodes.length ; i++){
+		if(nodes[i].connects_to.indexOf(nodes[i+1]) < 0){
+			for (var z = 0 ; z < gco.nodes[nodes[i]].connects_to.length ; z++){
+				console.log(gco.nodes[nodes[i]].connects_to[z]);
+			}
+			console.log("failed: " + i + ": " + gco.nodes[nodes[i]].connects_to.indexOf(nodes[i+1]) );
+			gco.clear_zone_nodes();
+			
+			return;
+		}
+	}
+	if(nodes[0].connects_to.indexOf(nodes[nodes.length-1]) < 0){
+		gco.clear_zone_nodes();
+		console.log("failed");
+		return;
+	}
+	newZone = {
+			id : gco.next_zone,
+			people : 0,
+			panic_level : 0,
+			type : "residental",
+			centroid : [0,0],
+			nodes : gco.node_container,
+			zones : []
+		};
+	gco.zones.push(newZone);
+	gco.next_zone++;
+	
+	console.log("zone: " + newZone.id + " nodes " + newZone.nodes);
+	gco.clear_zone_nodes();
+	
 }
 
 gco.set_canvas_listener = function(){
