@@ -21,20 +21,23 @@ var c_height = 1550,
 	var largecity_img = new Image();
 	largecity_img.src = "/img/largecity.jpg";
 	
-	var cat_img = new Image();
-	cat_img.src = "/img/cat.png"
+	var coordinator_img = new Image();
+	coordinator_img.src = "/img/coordinator.png"
 	
-	var penguin_img = new Image();
-	penguin_img.src = "/img/cat.png"
+	var crowd_manager_img = new Image();
+	crowd_manager_img.src = "/img/crowd_manager.png"
 	
-	var tophat_img = new Image();
-	tophat_img.src = "/img/cat.png"
+	var driver_img = new Image();
+	driver_img.src = "/img/driver.png"
 	
-	var lifejacket_img = new Image();
-	lifejacket_img.src = "/img/cat.png"
+	var operation_expert_img = new Image();
+	operation_expert_img.src = "/img/operation_expert.png"
 	
-	var book_img = new Image();
-	book_img.src = "/img/cat.png"
+	var volunteer_img = new Image();
+	volunteer_img.src = "/img/volunteer.png"
+	
+	var passer_by_img = new Image();
+	passer_by_img.src = "/img/passer_by.png"
 	
 
 /* TEMPORARY ZONE IMAGES
@@ -167,6 +170,32 @@ gco.update_turn = function(turn, ap){
     gco.cst.selected_node = null
 }
 
+gco.update_options = function(o){
+	var $s = $('#selection'),
+		inner = '';
+	for (var i=0; i<o.length;i++){
+		switch(o[i]){
+			case 'block':
+				inner += "<button class='btn' onclick='command("+'"'+"create_road_block"+'"'+");'>Add road block</button>";
+				break;
+			case 'info':
+				inner += "<button class='btn' onclick='command("+'"'+"create_info_center"+'"'+");'>Add information center</button>";
+				break;
+			case 'panic':
+				inner += "<button class='btn' onclick='command("+'"'+"decrease_panic"+'"'+");'>Decrease panic</button>";
+				break;
+			case 'people':
+				inner += "<button class='btn' onclick='gco.move_people();'>Move people</button>";
+				break;
+			case 'rem_block':
+				inner += "<button class='btn' onclick='command("+'"'+"remove_road_block"+'"'+");'>Remove road block</button>";
+				break;
+
+		}
+	}
+	$s.html(inner);
+}
+
 
 /*  Update Player
     
@@ -224,10 +253,10 @@ gco.update_cards = function() {
         $con.empty();
         if ((cards.length)*110+75 > (parseInt($con.parent().parent().css('width')))) {
             $con.parent().parent().css('width', ''+(parseInt($con.parent().parent().css('width'))+110)+'px');
-
         }
-        for (c = 0; c < cards.length; c++){
-            button = $("<button id='"+i+"-"+c+"' class='info-card' onclick='gco.info_card_click(this.id)'>"+cards[c].name+ "</button>");
+        
+        for (c = cards.length-1; c >= 0; c--){
+            button = $("<button id='"+i+"-"+c+"' class='info-card' onclick='gco.info_card_click("+i+","+c+")'>"+cards[c].desc+ "</button>");
             button.appendTo($con);
 			
         }
@@ -236,11 +265,11 @@ gco.update_cards = function() {
 }
 
 
-gco.info_card_click = function(id) {
-    var p = id.charAt(0),
-        c = id.charAt(2);
-    if(gco.active_player == p){
-		command('use_card', {player:p, card:c});
+gco.info_card_click = function(p, c) {
+	console.log(p);
+	console.log(c);
+    if(gco.active_player === p){
+		command('use_card', {card:c});
 	}
 }
 
@@ -248,7 +277,12 @@ gco.info_card_click = function(id) {
 
 
 
-
+gco.move_people = function(){
+	if(gco.cst.selected_zone !== null){
+		gco.cst.moving_people = true;
+		gco.cst.moving_from = gco.cst.selected_zone;
+	}
+}
 
 
 /* deprecated - Update whole player instead
@@ -278,53 +312,71 @@ gco.decrease_panic = function(zone){
 
 
 gco.player_draw = function(player, ctx){
-    if (player.x === undefined) player.x = gco.nodes[player.node].x;
+	ctx.fillStyle = "rgba(255,0,0,0)";
+	ctx.save();
+	
+	
+	if (player.x === undefined) player.x = gco.nodes[player.node].x;
     if (player.y === undefined) player.y = gco.nodes[player.node].y;
 	
-	/*	//draw the images
-	if (player.type==='coordinator'){
-		ctx.drawImage(cat_img);
-	}
-	else if (player.type==='crowd manager'){
-		ctx.drawImage(tophat_img);
-	}
-	else if (player.type==='driver'){
-		ctx.drawImage(lifejacket_img);
-	}
-	else if (player.type==='operation expert'){
-		ctx.drawImage(book_img);	
-		
-	else if (player.type==='volunteer'){
-		ctx.drawImage(map_img);	
-		
-	else if (player.type==='passer by'){
-		ctx.drawImage(penguin_img);	
-	}*/
-	
-    //ctx.fillStyle = player.color;
+	//ctx.fillStyle = player.color;
 	
     ctx.beginPath();
-    ctx.arc(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size, 0, Math.PI*2, true); 
-    ctx.closePath();
+    ctx.arc(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size, 0, Math.PI*7, true); 
+
     //ctx.fill();
     //TODO draw circle to show active player when dragging/active?
     if (this.active_player===player.id){
-    	var gradiant = ctx.createRadialGradient(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size-10, player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size);
-    	gradiant.addColorStop(0, player.color);
-    	gradiant.addColorStop(1, 'blue');
+    	
+		ctx.fill();
+    	ctx.strokeStyle = 'red';
+    	ctx.lineWidth = 10;
+    	ctx.stroke();
+		}
+		/*var gradiant = ctx.createRadialGradient(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size-10, player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size);
+    	gradiant.addColorStop(0, 'red');
+    	gradiant.addColorStop(1, 'rgba(255,0,0,0)');
     	ctx.fillStyle=gradiant;
     	ctx.fill();
-    }
-    else{
-    	ctx.fill();
+    }*/
+    /*else{
+    	//ctx.fill();
     	ctx.strokeStyle = 'black';
     	ctx.lineWidth = 2;
     	ctx.stroke();
     }
-
-    ctx.fillStyle = "Black";
+*/
+	//ctx.fillStyle = "Black";
     ctx.font="bold 15px Arial",
     ctx.fillText(player.id, player.x+player_offsetX[player.id]-5, player.y+player_offsetY[player.id]+6);
+	
+;
+
+	
+			//draw the images
+	if (player.role==='coordinator'){
+		ctx.drawImage(coordinator_img, player.x + player_offsetX[player.id]-24, player.y+player_offsetY[player.id]-24);
+	}
+	else if (player.role==='crowd manager'){
+		ctx.drawImage(crowd_manager_img, player.x + player_offsetX[player.id]-24, player.y+player_offsetY[player.id]-24);
+	}
+	else if (player.role==='driver'){
+		ctx.drawImage(driver_img, player.x + player_offsetX[player.id]-35, player.y+player_offsetY[player.id]-35);
+	}
+	else if (player.role==='operation expert'){
+		ctx.drawImage(operation_expert_img, player.x + player_offsetX[player.id]-24, player.y+player_offsetY[player.id]-24);	
+	}	
+	else if (player.role==='volunteer'){
+		ctx.drawImage(volunteer_img, player.x + player_offsetX[player.id]-24, player.y+player_offsetY[player.id]-24);
+	}	
+	else if (player.role==='passer by'){
+		ctx.drawImage(passer_by_img, player.x + player_offsetX[player.id]-24, player.y+player_offsetY[player.id]-24);
+	}
+	ctx.closePath();
+	ctx.save();
+	ctx.clip()
+	ctx.fill();
+	ctx.restore();
 }
 
 gco.node_draw = function(node, ctx){
@@ -466,7 +518,20 @@ gco.zone_draw = function(zone, ctx){
 	ctx.font='27px Arial'
 	ctx.fillText(zone.panic_level, zone.centroid[0]-20, zone.centroid[1]+3);
 	
-
+	//TODO simple people info
+	ctx.fillStyle = 'black';
+	if (zone.people > 9 && zone.people < 100){
+		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]+28,40,30); 
+	}
+	else if(zone.people > 99){
+		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]+28,60,30); 
+	}
+	else{
+		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]+28,25,30); 
+	}
+	ctx.fillStyle = 'white';
+	ctx.font='27px Arial'
+	ctx.fillText(zone.people, zone.centroid[0]-20, zone.centroid[1]+54);
 	
 
     
@@ -489,7 +554,16 @@ gco.selection_draw = function(ctx){
         ctx.strokeStyle = "blue";
         ctx.lineWidth = 20;
         ctx.stroke();
-
+    }
+    if (cst.selected_node !== null){
+        var node = nodes[cst.selected_node];
+        ctx.beginPath();
+        ctx.beginPath();
+		ctx.arc(node.x, node.y, node_size, 15, Math.PI*2, true); 
+		ctx.closePath();
+        ctx.strokeStyle = "blue";
+        ctx.lineWidth = 20;
+        ctx.stroke();
     }
 }
 
@@ -585,7 +659,10 @@ gco.set_canvas_listener = function(){
         nodes = gco.nodes,
         players = gco.players,
         zones = gco.zones;
-        
+    
+    cst.moving_people = false;
+    cst.moving_from = null;
+    
     canvas.addEventListener('selectstart', function(e) { e.preventDefault(); return false; }, false);
 
     canvas.addEventListener('mousedown', function(e) {
@@ -626,18 +703,40 @@ gco.set_canvas_listener = function(){
         	}
         }
 
+		for (var i = 0; i < nodes.length; i++) {
+
+        	if (gco.node_contains(nodes[i], mx, my)) {
+        		console.log("Clicked on node "+i);
+        		cst.selected_node = i;
+				command('select_node', {node_id : cst.selected_node});
+        		gco.draw();
+        		return;
+           }
+        }
+		
         for (var i = 0; i < zones.length; i++) {
 
         	if (gco.zone_contains(zones[i], mx, my)) {
         		console.log("Clicked on zone "+i);
         		cst.selected_zone = i;
         		//TODO for testing, we add 'decrease_panic' when selecting zones
-        		command('decrease_panic', {zone_id : cst.selected_zone});
+        		if(cst.moving_people){
+        			command('move_people', {zone_from: cst.moving_from, zone_to:i});
+        			cst.moving_from = null;
+        			cst.moving_people = false;
+        		}
+        		else{
+        			command('select_zone', {zone_id : cst.selected_zone});
+        		}
         		gco.draw();
         		return;
            }
         }
+
+        
+        
         gco.draw();
+        
         
     }, true);//end mousedown listener
   

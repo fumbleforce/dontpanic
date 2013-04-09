@@ -53,6 +53,9 @@ socket.on('change', function (data) {
     if (d.turn) {
         gco.update_turn(d.turn, d.active_player);
     }
+    if (d.options) {
+    	gco.update_options(d.options);
+    }
     if (d.none) {
         gco.reset();
     }
@@ -120,9 +123,13 @@ socket.on('change', function (data) {
 });
 
 
+
+
 function command(type, o){
     var c = o || {}
     c.type = type;
+    if (gco.cst.selected_node !== null) c.selected_node = gco.cst.selected_node;
+    if (gco.cst.selected_zone !== null) c.selected_zone = gco.cst.selected_zone;
     var send = JSON.stringify(c);
     console.log('Sending '+ type +  ' "' + send + '" ');
     socket.emit('game_command', send);

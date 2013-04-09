@@ -22,24 +22,52 @@ var ge = module.exports = function (id, client) {
     this.max_information_centers = 5;
     this.max_road_blocks = 2;
 	this.cards_left = 10;
-	//how often events should fire
-	this.eventTurns = 3;
-	this.turnsSinceEvent = 0;
 
     
+
 	this.info_cards = [
-                       {   id:0,
-                    	   name:"Decrease all red",
-                    	   effects: [{
-                    		   domain:'zone',
-                    		   type:'panic',
-                    		   panic:(-5),
-                    		   affects:[0,1,2,3,4,5,6,7,8,9]
-                    	   }]
-                       }
-                       ];
-    
+       {
+    	   desc:"Calm financial districts",
+    	   effects: [{
+    		   domain:'zone',
+    		   type:'panic',
+    		   panic:(-5),
+    		   affects:'largecity'
+    	   }]
+       },
+       {
+    	   desc:"Calm industry districts",
+    	   effects: [{
+    		   domain:'zone',
+    		   type:'panic',
+    		   panic:(-5),
+    		   affects:'industry'
+    	   }]
+       },
+       {
+    	   desc:"Calm residential districts",
+    	   effects: [{
+    		   domain:'zone',
+    		   type:'panic',
+    		   panic:(-5),
+    		   affects:'residential'
+    	   }]
+       },
+   ];
 
+    
+    this.info_cards = [
+        {   id:0,
+            name:"Decrease all red",
+            effects: [{
+                domain:'zone',
+                type:'panic',
+                panic:(-5),
+                affects:[0,1,2,3,4,5,6,7,8,9]
+            }]
+        }
+    ];
+    
     var conn = [
         [1, 2, 3], // 0 
         [0, 4, 6],
@@ -158,7 +186,6 @@ var ge = module.exports = function (id, client) {
     zones[1].panic_level = 5;
     zones[2].panic_level = 15;
     zones[3].panic_level = 30;
-    zones[5].panic_level = 30;
     zones[6].panic_level = 40;
     zones[11].panic_level = 50;
 
@@ -178,7 +205,7 @@ var ge = module.exports = function (id, client) {
     
     this.players = [];
     player_colors = ["red","orange","yellow","chartreuse ","green","aqua","blue","purple"];
-	
+	player_role = ["coordinator","passer by","crowd manager","driver","operation expert","volunteer"];
 	/*this.randomrole =  
 		[{title: "Constructor",
 		
@@ -193,9 +220,11 @@ var ge = module.exports = function (id, client) {
 	*/
 	
     for(var i = 0; i < 8; i++){
-    	player = new ge.Player(i, "player" + i, i*2, player_colors[i], {}, 4);
-    	player.info_cards.push(this.info_cards[0]);
-    	player.info_cards.push(this.info_cards[0]);
+
+    	player = new ge.Player(i, "player" + i, i*2, player_colors[i], player_role[Math.floor(Math.random()*player_role.length)],4);
+    	player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
+    	player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
+
     	this.players.push(player);
     }
     //add dummy roles
@@ -216,7 +245,7 @@ var ge = module.exports = function (id, client) {
                 		   domain:'zone',
                 		   type:'panic',
                 		   panic:(20),
-                		   affects:[6, 7]
+                		   affects:'industry'
                 	   }]
                    },
                     {   id:1,
@@ -225,7 +254,7 @@ var ge = module.exports = function (id, client) {
                     		domain:'zone',
                     		type:'panic',
                     		panic:(5),
-                    		affects:[0, 1, 2, 3, 4, 8, 12, 13, 14, 15, 16]
+                    		affects:'residential'
                     	}]
                     },
                      {   id:2,
@@ -239,6 +268,7 @@ var ge = module.exports = function (id, client) {
                      }
                      ];
     
+
 }
 
 
@@ -351,9 +381,9 @@ ge.prototype.command = function(client, c){
 
 
 		case 'use_card':
-			var ic = players[c.player].info_cards.pop(c.info_card);
+			var ic = players[this.active_player].info_cards.splice(c.card,1)[0];
 			changed = effect(ic, this);
-            changed.players = changed.players ? changed.players.push(players[c.player]) :  [players[c.player]];
+            changed.players = changed.players ? changed.players.push(players[this.active_player]) :  [players[this.active_player]];
 			break;
 			
 			
@@ -378,37 +408,26 @@ ge.prototype.command = function(client, c){
             ap.actions_left = ap.role === 'activist' ?  5 : 4;
             
 			this.turn++;
-			this.turnsSinceEvent++;
 			this.active_player = this.active_player >= this.players.length-1 ?  0 : this.active_player+1;
 
             ap = players[this.active_player];
             //TODO Add random info cards
 			client.emit('msg', this.cards_left);
 			if(this.cards_left > 0){
-				ap.info_cards.push(this.info_cards[0]);
+				ap.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
 				this.cards_left -= 1;
 			}
-			
-			//fire a random event every Xth turn
-			if (this.turnsSinceEvent===this.eventTurns){
-			var randomEvent=Math.floor(Math.random()*this.events.length);
-			changed = effect(this.events[randomEvent], this);
-			changed.event = this.events[randomEvent];
-			this.turnsSinceEvent=0;
-			}
-			
 			
 			changed.players = [ap];
 			changed.turn = this.turn;
 			changed.active_player = this.active_player;
-
 			break;
         
         console.log("No matching command types");
             
     }
     
-    if(changed.players || changed.nodes || changed.zones || changed.turn || changed.event){
+    if(changed.players || changed.nodes || changed.zones || changed.turn){
         changed.none = false;
     }
     
@@ -471,6 +490,11 @@ function effect(card, g) {
      
     console.log("Executing card");
     console.log(card);
+    console.log("Desc:");
+    console.log(card.desc);
+    console.log("Effects:");
+    console.log(card.effects);
+
     for (i = 0; i<effects.length; i++){
         e = effects[i];
         console.log("Effect nr "+i);
@@ -478,6 +502,15 @@ function effect(card, g) {
         switch(e.domain){
             case 'zone':
                 changed.zones = [];
+                if(typeof e.affects === 'string'){
+                	var afflicted = e.affects;
+                	e.affects = [];
+                	for (z = 0; z<zones.length; z++){
+                		if (zones[z].type === afflicted){
+                			e.affects.push(z);
+                		}
+                	}
+                }
                 switch(e.type){
                     case 'panic':
                         for (z = 0; z<e.affects.length; z++){
@@ -656,8 +689,14 @@ ge.Node.prototype.add_road_block = function (player, players) {
 		return false
 	}
 	
-	if(player.update_actions(-1) ){
-		this.has_road_block = true;
+
+	if(player.node !== this.id){
+		return false;
+	}
+	
+	if(player.can_update_actions(-1) ){
+		console.log("True");
+
 		return true;
 	}
 	
@@ -841,14 +880,6 @@ ge.Map = function (nodes, zones) {
 ge.Settings = function (timer_interval) {
 	var timer = new timer(timer_interval);
 }
-
-
-
-
-
-
-
-
 
 
 
