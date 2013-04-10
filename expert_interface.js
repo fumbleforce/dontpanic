@@ -11,6 +11,7 @@ var c_height = 1550,
     offset_distance = node_size*1,
     panic_info_size = 40,
     w_inc = 0;
+	player_colors = ["red","orange","yellow","chartreuse ","green","aqua","blue","purple"];
 	//set images
 	var residential_img = new Image();
 	residential_img.src = "client/rec/img/residential.jpg";
@@ -22,19 +23,19 @@ var c_height = 1550,
 	largecity_img.src = "client/rec/img/largecity.jpg";
 	
 	var cat_img = new Image();
-	cat_img.src = "client/rec/img/cat.png"
+	cat_img.src = "client/rec/img/cat.jpg"
 	
 	var penguin_img = new Image();
-	penguin_img.src = "client/rec/img/cat.png"
+	penguin_img.src = "client/rec/img/cat.jpg"
 	
 	var tophat_img = new Image();
-	tophat_img.src = "client/rec/img/cat.png"
+	tophat_img.src = "client/rec/img/cat.jpg"
 	
 	var lifejacket_img = new Image();
-	lifejacket_img.src = "client/rec/img/cat.png"
+	lifejacket_img.src = "client/rec/img/cat.jpg"
 	
 	var book_img = new Image();
-	book_img.src = "client/rec/img/cat.png"
+	book_img.src = "client/rec/img/cat.jpg"
 	
 
 /* TEMPORARY ZONE IMAGES
@@ -86,7 +87,8 @@ var gco = {
     active_player : 0,
 	next_node : 0,
 	next_zone : 0,
-	mode : "add node",
+	next_player : 0,
+	mode : "add node", // not in use
 	selected_node : -1,
 	selected_zone : -1,
 	connection : -1,
@@ -231,8 +233,8 @@ gco.info_card_click = function(id) {
 
 
 gco.player_draw = function(player, ctx){
-    if (player.x === undefined) player.x = gco.nodes[player.node].x;
-    if (player.y === undefined) player.y = gco.nodes[player.node].y;
+    player.x = player.node.x;
+    player.y = player.node.y;
 	
 
 	
@@ -346,12 +348,12 @@ gco.draw_connections = function(ctx){
 		}
 	}	
 }
-gco.background_draw = function(ctx){
+gco.background_draw = function(ctx){ // draws the background
     ctx.fillStyle="grey";
     ctx.fillRect(0,0, c_width, c_height);
 }
 
-gco.zone_draw = function(zone, ctx){
+gco.zone_draw = function(zone, ctx){ // draws a zone with the provided context
 
 	ctx.save();
 	var minx = 2000;
@@ -564,19 +566,45 @@ gco.draw = function(){ //Draws everything
     for (var i = 0; i < players.length; i++) {
         pl = players[i];
         gco.player_draw(pl, ctx);
-        var id = "p"+i;
-        document.getElementById(id).style.background = "gray";
-        if (i === gco.active_player) document.getElementById(id).style.background = "lightgray";
+        //var id = "p"+i;
+        //document.getElementById(id).style.background = "gray";
+        //if (i === gco.active_player) document.getElementById(id).style.background = "lightgray";
     }
     
-    if(players.length > 1){
+    /*if(players.length > 1){
         document.getElementById("turn-label").innerHTML = "Turn: "+(gco.turn); 
         document.getElementById("player-turn-label").innerHTML = "Player "+(gco.active_player)+"'s turn";
         document.getElementById("action-label").innerHTML = "Actions left: "+(players[gco.active_player].actions_left); 
-    } 
+    } */
     
 }// end draw
 
+
+gco.add_player = function(){ // creates a player and adds it to the game.
+	
+	var player_role = document.getElementById("player_role").value;
+	document.getElementById("player_role").value = "";
+	
+	console.log("role" + player_role);
+	
+	var player_node = document.getElementById("player_node").value;
+	
+	console.log("Node: " + player_node);
+	
+	
+		
+	gco.players.push(player = {
+				id:gco.next_player,
+				user:"player",
+				node:gco.nodes[player_node],
+				color:"red",
+				role:player_role,
+				actions_left : 4
+			});
+	gco.next_player++;
+	gco.draw();
+
+}
 gco.create_connection = function(){ // creates a connection between the 2 selected nodes
 	if((gco.connection > -1) && (gco.selected_node > -1) && (gco.connection != gco.selected_node) && 
 			(gco.nodes[gco.connection].connects_to.indexOf(gco.nodes[gco.selected_node]) < 0)){
@@ -685,10 +713,13 @@ gco.re_id = function(){ // redo all id's of the nodes, to make it look better
 	for(gco.next_zone = 0; gco.next_zone < gco.zones.length; gco.next_zone++){
 		gco.zones[gco.next_zone].id = gco.next_zone;
 	}
+	for(gco.next_player = 0; gco.next_player < gco.players.length; gco.next_player++){
+		gco.players[gco.next_player].id = gco.next_player;
+	}
 }
 
 
-gco.create_zone = function(){
+gco.create_zone = function(){ // checks if it is possible to create a zone, and creates one if possible.
 	nodes = gco.node_container;
 	
 	// checking if possible to create zone: enough nodes
@@ -729,6 +760,26 @@ gco.create_zone = function(){
 	
 	console.log("zone: " + newZone.id + " nodes " + newZone.nodes[0]);
 	gco.clear_zone_nodes();
+	
+}
+
+gco.update_startnode_column = function() {
+
+	var ddbox = document.getElementById("player_node");
+	
+
+	if(gco.nodes.length == 0){
+		document.player_node.options.length=1;
+		ddbox.options[0] = new Option('-1','none exists');
+		return;
+	}
+	ddbox.options.length=gco.nodes.length;
+	for( var i = 0; i < gco.nodes.length; i++){
+		ddbox.options[i] = new Option(i ,i);
+		
+	
+	}
+	
 	
 }
 
@@ -833,9 +884,9 @@ gco.set_canvas_listener = function(){
 				connects_to:[]
 			});
 		gco.next_node++;
-		gco.selected_node = gco.next_node -1;
 		
-
+		gco.selected_node = gco.next_node -1;
+		gco.update_startnode_column();
         gco.draw();
         
     }, true);//end mousedown listener

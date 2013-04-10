@@ -31,27 +31,48 @@
 		
 		<div class="content-column">
 			
-			<form>
+			
 			
 			
 			<div class="sidebar-textform">
 				<div class="content-column">
 					<div class="content-row">
-						<div id="1_something" class="info-label-form"> Text for something 1</div>
+						<div id="1_player_info_label" class="info-label-form"> Create a new player:<br>if nothing typed it will be set to a default value</div>
 						
 					</div>
 				</div>
 				
 				<div class="content-column">
 					<div class="content-row">
-						<input type="text" name="something"><br>
+						
+						<div class="content-row">
+							<div class="content-column">
+								Role:
+							</div>
+							<div class="content-column">
+								<input id="player_role" type="text" name="something">
+							</div>
+						</div>
+							
+						
+						<div class="content-row">
+							<div class="content-column">
+								Startnode:
+							</div>
+							<div id="node_column" class="content-column">
+								<select id="player_node">
+									<option value="-1">none exists</option>
+									
+								</select>
+							</div>
+						</div>
+						
 					</div>
 					<div class="content-row">
-						<input type="text" name="something"><br>
+						<button class="button" onclick="gco.add_player();">Add Player</button>
+						<button class="button" onclick="gco.add_player();">Change selected player</button>
 					</div>
-					<div class="content-row">
-						<input type="text" name="something"><br>
-					</div>
+					
 				</div>
 			</div>
 			
@@ -64,8 +85,6 @@
 
 			
 			
-			<input type="submit" value="submit">
-			</form>
 			<button class="button" onclick="gco.init_game();">Start!</button>
 			<button class="button" onclick="gco.del_selected_node();">Delete node</button>
 			<button class="button" onclick="gco.node_connection();">Start node connection</button>
