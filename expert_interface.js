@@ -12,6 +12,7 @@ var c_height = 1550,
     panic_info_size = 40,
     w_inc = 0;
 	player_colors = ["red","orange","yellow","chartreuse ","green","aqua","blue","purple"];
+	max_players = 7;
 	//set images
 	var residential_img = new Image();
 	residential_img.src = "client/rec/img/residential.jpg";
@@ -243,21 +244,23 @@ gco.player_draw = function(player, ctx){
     ctx.closePath();
     //ctx.fill();
     //TODO draw circle to show active player when dragging/active?
-    if (this.active_player===player.id){
+    /*if (this.active_player===player.id){
     	var gradiant = ctx.createRadialGradient(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size-10, player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size);
     	gradiant.addColorStop(0, player.color);
     	gradiant.addColorStop(1, 'blue');
     	ctx.fillStyle=gradiant;
     	ctx.fill();
     }
-    else{
-    	ctx.fill();
-    	ctx.strokeStyle = 'black';
-    	ctx.lineWidth = 2;
-    	ctx.stroke();
-    }
-
-    ctx.fillStyle = "Black";
+    else{*/
+	
+	ctx.fillStyle = player.color;
+	ctx.fill();
+	ctx.strokeStyle = 'black';
+	ctx.lineWidth = 2;
+	ctx.stroke();
+    
+	ctx.fillStyle = 'black';
+    
     ctx.font="bold 15px Arial",
     ctx.fillText(player.id, player.x+player_offsetX[player.id]-5, player.y+player_offsetY[player.id]+6);
 }
@@ -583,7 +586,7 @@ gco.draw = function(){ //Draws everything
 gco.add_player = function(){ // creates a player and adds it to the game.
 	
 	var player_role = document.getElementById("player_role").value;
-	document.getElementById("player_role").value = "";
+	
 	
 	console.log("role" + player_role);
 	
@@ -591,13 +594,17 @@ gco.add_player = function(){ // creates a player and adds it to the game.
 	
 	console.log("Node: " + player_node);
 	
-	
+	if (gco.next_player > max_players) {
+		console.log("to many players");
+		return;
+	}
+	console.log("color: " + player_colors[gco.next_player]);
 		
 	gco.players.push(player = {
 				id:gco.next_player,
 				user:"player",
 				node:gco.nodes[player_node],
-				color:"red",
+				color:player_colors[gco.next_player],
 				role:player_role,
 				actions_left : 4
 			});
