@@ -207,7 +207,7 @@ var ge = module.exports = function (id, client) {
     
     this.players = [];
     player_colors = ["red","orange","yellow","chartreuse ","green","aqua","blue","purple"];
-	
+	player_role =["crowd manager", "driver", "volunteer", "operation expert", "coordinator","passer by"];
 	/*this.randomrole =  
 		[{title: "Constructor",
 		
@@ -222,7 +222,7 @@ var ge = module.exports = function (id, client) {
 	*/
 	
     for(var i = 0; i < 8; i++){
-    	player = new ge.Player(i, "player" + i, i*2, player_colors[i], {}, 4);
+		player = new ge.Player(i, "player" + i, i*2, player_colors[i], player_role[Math.floor(Math.random()*player_role.length)],4);
     	player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
     	player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
     	this.players.push(player);
@@ -869,7 +869,7 @@ ge.Zone.prototype.is_panic_zero = function () {
 ge.Zone.prototype.dec_panic = function(player, node) {
 	var able = this.can_dec_panic(player, node);
 	if(able){
-		if(player.role === 'crowd controller'){
+		if(player.role === 'crowd manager'){
 			this.update_panic(player.role.panic)
 		}
 		else{
