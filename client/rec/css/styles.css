@@ -56,6 +56,12 @@ p
     width:33%;
     vertical-align:top;
 }
+#selection
+{
+	height:70px;
+	width:100%;
+	background-color:white;
+}
 #viewport
 {
 
@@ -64,10 +70,23 @@ p
 {
     height:100px;
 }
+.margin-row
+{
+	height:20px;
+	width:100%;
+}
 .top-bar
 {
-    margin-bottom:20px;
-    background-color:lightgray;
+    height:220px;
+}
+.top-bar-info
+{
+	height:72px;
+    background-color:white;
+}
+.top-bar-row
+{
+    margin-bottom:40px;
 }
 .info-label
 {
@@ -105,9 +124,11 @@ p
 }
 .btn
 {
-    float:right;
-    font-size:32px;
+    float:left;
+    font-size:35px;
     padding:7px;
+    background-color:black;
+    color:white;
 }
 .btn-create-info-center
 {
@@ -139,7 +160,7 @@ p
     right:0px;
     margin-bottom:30px;
     padding:10px;
-    border-radius:30px;
+    border-radius:0;
 }
 .sidebar-textform
 {
@@ -177,7 +198,9 @@ p
     height:100px;
     padding:5px;
     width:110px;
-    color:black;
+
+    background-color:black;
+    color:white;
     float:left;
     margin-right:7px;
     margin-right:7px;
@@ -188,6 +211,10 @@ p
 
     width:95%;
     height:160px;
+}
+.role-info-label
+{
+	margin-top:20px;
 }
 
 
