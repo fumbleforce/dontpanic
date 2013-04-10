@@ -3,7 +3,7 @@
     This module will be a game "Class".
 */
 
-var ge = module.exports = function (id, client) {
+var ge = module.exports = function (id, client, template) {
 
 	this.id = id || 0;
 	this.map = {};
@@ -239,34 +239,34 @@ var ge = module.exports = function (id, client) {
 
     //add some event(s)
     this.events = [
-                   {   id:0,
-                	   name:"Fire in all industry zones!",
-                	   effects: [{
-                		   domain:'zone',
-                		   type:'panic',
-                		   panic:(20),
-                		   affects:'industry'
-                	   }]
-                   },
-                    {   id:1,
-                    	name:"Power outage in all residential zones!",
-                    	effects: [{
-                    		domain:'zone',
-                    		type:'panic',
-                    		panic:(5),
-                    		affects:'residential'
-                    	}]
-                    },
-                     {   id:2,
-                    	 name:"Terrorist attack in all city zones!",
-                    	 effects: [{
-                    		 domain:'zone',
-                    		 type:'panic',
-                    		 panic:(35),
-                    		 affects:[9, 10, 11]
-                    	 }]
-                     }
-                     ];
+       {   id:0,
+    	   name:"Fire in all industry zones!",
+    	   effects: [{
+    		   domain:'zone',
+    		   type:'panic',
+    		   panic:(20),
+    		   affects:'industry'
+    	   }]
+		},
+		{	id:1,
+			name:"Power outage in all residential zones!",
+        	effects: [{
+        		domain:'zone',
+        		type:'panic',
+        		panic:(5),
+        		affects:'residential'
+        	}]
+        },
+		{	id:2,
+        	name:"Terrorist attack in all city zones!",
+        	effects: [{
+        		domain:'zone',
+        		type:'panic',
+        		panic:(35),
+        		affects:[9, 10, 11]
+        	}]
+        }
+	];
     
 }
 
