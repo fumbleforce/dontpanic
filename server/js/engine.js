@@ -875,6 +875,7 @@ ge.Zone.prototype.dec_panic = function(player, node) {
 		else{
 			this.update_panic(-5);
 		}
+		player.update_actions(-1);
 		return true;
 	}
 	return false;
