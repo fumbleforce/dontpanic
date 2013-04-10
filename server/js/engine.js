@@ -22,9 +22,11 @@ var ge = module.exports = function (id, client) {
     this.max_information_centers = 5;
     this.max_road_blocks = 2;
 	this.cards_left = 10;
+	//how often events should fire
+	this.eventTurns = 3;
+	this.turnsSinceEvent = 0;
 
     
-
 	this.info_cards = [
        {
     	   desc:"Calm financial districts",
@@ -54,20 +56,8 @@ var ge = module.exports = function (id, client) {
     	   }]
        },
    ];
+    
 
-    
-    this.info_cards = [
-        {   id:0,
-            name:"Decrease all red",
-            effects: [{
-                domain:'zone',
-                type:'panic',
-                panic:(-5),
-                affects:[0,1,2,3,4,5,6,7,8,9]
-            }]
-        }
-    ];
-    
     var conn = [
         [1, 2, 3], // 0 
         [0, 4, 6],
@@ -186,8 +176,20 @@ var ge = module.exports = function (id, client) {
     zones[1].panic_level = 5;
     zones[2].panic_level = 15;
     zones[3].panic_level = 30;
+    zones[5].panic_level = 30;
     zones[6].panic_level = 40;
     zones[11].panic_level = 50;
+	
+	zones[0].people = 20;
+	zones[1].people = 25;
+	zones[3].people = 80;
+	zones[5].people = 5;
+	zones[7].people = 35;
+	zones[9].people = 50;
+	zones[11].people = 15;
+	zones[8].people = 125;
+	zones[4].people = 10;
+	
 
     //set centroidX and centroidY for test zone
     //TODO THIS IS ACTUALLY CENTER, NOT CENTROID. For better result, 
@@ -205,7 +207,7 @@ var ge = module.exports = function (id, client) {
     
     this.players = [];
     player_colors = ["red","orange","yellow","chartreuse ","green","aqua","blue","purple"];
-	player_role = ["coordinator","passer by","crowd manager","driver","operation expert","volunteer"];
+	
 	/*this.randomrole =  
 		[{title: "Constructor",
 		
@@ -220,11 +222,9 @@ var ge = module.exports = function (id, client) {
 	*/
 	
     for(var i = 0; i < 8; i++){
-
-    	player = new ge.Player(i, "player" + i, i*2, player_colors[i], player_role[Math.floor(Math.random()*player_role.length)],4);
+    	player = new ge.Player(i, "player" + i, i*2, player_colors[i], {}, 4);
     	player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
     	player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
-
     	this.players.push(player);
     }
   /*  //add dummy roles
@@ -268,7 +268,6 @@ var ge = module.exports = function (id, client) {
                      }
                      ];
     
-
 }
 
 
@@ -287,15 +286,47 @@ ge.prototype.command = function(client, c){
         case 'move_player':
             if (c.player_id === this.active_player) {
                 var p = players[c.player_id];
-                if(p.move_player(nodes[p.node], nodes[c.node_id])) changed.players = [p];
+		    	if(p.move_player(nodes[p.node], nodes[c.node_id]))
+		    		{changed.players = [p];}
             }
             break;
             
+  		case 'select_node':
+  			var n = c.node_id,
+  				options = [],
+  				p = players[this.active_player];
+  				if(nodes[n].can_add_information_center(p)) {
+  					options.push('info');
+  				}
+  				if (nodes[n].can_add_road_block(p, players)) {
+  					options.push('block');
+  				}
+  				if (nodes[n].can_remove_road_block(p, players)) {
+  					options.push('rem_block');
+  				}
+  			changed.options = options;
+  			
+  			break;
+  			
+  		case 'select_zone':
+  			var z = zones[c.zone_id],
+  				options = [],
+  				p = players[this.active_player];
+  				
+  			if(z.can_move_people_from(p, 5)) {
+				options.push('people');
+  			}
+  			if(z.can_dec_panic(p,nodes[p.node])){
+  				options.push('panic');
+  			}
+  			changed.options = options;
+  			break;
+  
   
 		case 'decrease_panic':
 			console.log("Trying to decrease panic in zone: " + c.zone_id);
             
-            var z = zones[c.zone_id],
+            var z = zones[c.selected_zone],
                 p = players[this.active_player]
             
             if (z.dec_panic(p, nodes[p.node])){
@@ -314,26 +345,16 @@ ge.prototype.command = function(client, c){
 			
 		case 'move_people':
 			// TODO: find out how many people we can move
-			console.log("Trying to move people from zone: " + c.from_zone_id +
-				"to zone: " + c.to_zone_id);
-			var dec_action = false;
+			console.log("Trying to move people from zone: " + c.zone_from+
+				"to zone: " + c.zone_to);
+
 			
-			if (!this.map.zones[c.from_zone_id]
-				.move_people(players[this.active_player], 
-				this.zones[c.to_zone_id])) {
-				
-				client.emit('error', 'Failed moving people');
-				break;
+			if (zones[c.zone_from].move_people(players[this.active_player], zones[c.zone_to], 5)) {
+				changed.zones=[zones[c.zone_to], zones[c.zone_from]];
+				changed.players = [players[this.active_player]];
 			}
-			else{
-			    dec_action = true;
-			}
-			changed = {
-				type:'moved_people',
-				dec_action:dec_action,
-				from_zone:this.zones[c.from_zone_id],
-				to_zone:this.zones[c.to_zone_id]
-			};
+			
+
 
 			break;
 			
@@ -342,11 +363,14 @@ ge.prototype.command = function(client, c){
 		case 'create_info_center':
 
 			var p = players[this.active_player],
-				n = nodes[p.node];
+				n = nodes[c.selected_node];
 
 
-			if((this.information_centers < this.max_information_centers) && (n.add_information_center(p))){
-
+			if(
+				this.information_centers < this.max_information_centers
+				&& p.node === n.id 
+				&& n.add_information_center(p)){
+				
 				changed.nodes = [n];
 				changed.players = [p];
 				this.information_centers++;
@@ -408,6 +432,7 @@ ge.prototype.command = function(client, c){
             ap.actions_left = ap.role === 'activist' ?  5 : 4;
             
 			this.turn++;
+			this.turnsSinceEvent++;
 			this.active_player = this.active_player >= this.players.length-1 ?  0 : this.active_player+1;
 
             ap = players[this.active_player];
@@ -418,16 +443,27 @@ ge.prototype.command = function(client, c){
 				this.cards_left -= 1;
 			}
 			
+
+			//fire a random event every Xth turn
+			if (this.turnsSinceEvent===this.eventTurns){
+			var randomEvent=Math.floor(Math.random()*this.events.length);
+			changed = effect(this.events[randomEvent], this);
+			changed.event = this.events[randomEvent];
+			this.turnsSinceEvent=0;
+			}
+			
+			
 			changed.players = [ap];
 			changed.turn = this.turn;
 			changed.active_player = this.active_player;
+
 			break;
         
         console.log("No matching command types");
             
     }
     
-    if(changed.players || changed.nodes || changed.zones || changed.turn){
+    if(changed.players || changed.nodes || changed.zones || changed.turn || changed.event){
         changed.none = false;
     }
     
@@ -592,18 +628,23 @@ ge.Player = function(id, user, node, color, role, actions_left) {
 }
 
 ge.Player.prototype.update_actions = function (actions) {
-	this.actions_left += actions;
-	if (this.actions_left === 0) {
-	    return true;
+	var able = this.can_update_actions(actions);
+	if (able) {
+	    this.actions_left += actions;
+	    console.log("Changed player actions by "+actions);
+	    return true
 	}
-	else if (this.actions_left < 0) {
-	    this.actions_left -= actions;
-	    console.log("Not enough actions");
+    return false;
+}
+ge.Player.prototype.can_update_actions = function (actions) {
+
+	var result_action = this.actions_left + actions;
+	if (result_action < 0) {
+		console.log("Not enough actions left");
 	    return false;
 	}
     return true;
 }
-
 
 ge.Player.prototype.remove_info_card = function(info_card) {
 	for (var i = 0; i < this.info_cards.length; i++) {
@@ -617,13 +658,23 @@ ge.Player.prototype.add_info_card = function(info_card) {
 }
 
 ge.Player.prototype.move_player = function (node_from, node_to) {
+	var able = this.can_move_player(node_from, node_to);
+	if (able) {
+	    this.update_actions(-1);
+	    this.node = node_to.id;
+	    return true;
+	}
+	return false;
+}
+ge.Player.prototype.can_move_player = function (node_from, node_to) {
+	console.log("Can move player?");
 	if (node_from === node_to) {
 	    console.log("node from and to are same");
 		return false;
 	} 
 	else if (node_from.connects_with(node_to)) {
-		if (this.update_actions(-1)){
-		    this.node = node_to.id;
+		if (this.can_update_actions(-1)){
+			console.log("True");
 		    return true;
 		}
 		return false;
@@ -663,16 +714,43 @@ ge.Node = function (id, x, y, is_start_position, connects_to) {
 
 }
 ge.Node.prototype.add_information_center = function (player) {
-	if (this.has_information_center) return false;
-	
-    if(player.update_actions(-4) ){
+	var able = this.can_add_information_center(player);
+	if (able){
 		this.has_information_center = true;
+		return true;
+	}
+	return false;
+}
+ge.Node.prototype.can_add_information_center = function (player) {
+	console.log("Can add info center?");
+	if (this.has_information_center) {
+		console.log("Already has information center");
+		return false;
+	}
+	if(this.id !== player.node){
+		console.log("Player is not on node");
+		return false;
+	}
+	
+    if(player.can_update_actions(-4) ){
+    	console.log("True");
 		return true;
     }
     return false;
 }
 
+
 ge.Node.prototype.add_road_block = function (player, players) {
+	var able = this.can_add_road_block(player, players);
+	if (able){
+		this.has_road_block = true;
+		return true;
+	}
+	return false;	
+
+}
+ge.Node.prototype.can_add_road_block = function (player, players) {
+	console.log("Can add road block?");
 	if (this.has_road_block) {
 		console.log('error', "Already has road block");
 	    return false;
@@ -689,14 +767,8 @@ ge.Node.prototype.add_road_block = function (player, players) {
 		return false
 	}
 	
-
-	if(player.node !== this.id){
-		return false;
-	}
-	
 	if(player.can_update_actions(-1) ){
 		console.log("True");
-
 		return true;
 	}
 	
@@ -705,8 +777,17 @@ ge.Node.prototype.add_road_block = function (player, players) {
 }
 
 ge.Node.prototype.remove_road_block = function (player, players) {
+	var able = this.can_add_road_block(player, players);
+	if (able){
+		this.has_road_block = false;
+		return true;
+	}
+	return false;
+}
+ge.Node.prototype.can_remove_road_block = function (player, players) {
+	console.log("Can remove road block?");
 	if (!this.has_road_block) {
-		console.log('error', "No road block here!");
+		console.log("No road block at this node");
 	    return false;
 	}
 	
@@ -717,15 +798,13 @@ ge.Node.prototype.remove_road_block = function (player, players) {
 		}
 	}
 	if (!another_player){
-		console.log("Player "+player+" failed to remove road block, no other players on node!");
+		console.log("No other players on node");
 		return false
 	}
-	
-	if(player.update_actions(-1) ){
-		this.has_road_block = false;
+	if(player.can_update_actions(-1) ){
+		console.log("Can remove road block");
 		return true;
 	}
-	
 	return false;	
 }
 ge.Node.prototype.connects_with = function(n){
@@ -768,7 +847,7 @@ ge.Event = function (text, effect) {
 ge.Zone = function (id, nodes, zones) {
 	this.id = id;
 	this.type = "residential";
-	this.people = 50;
+	this.people = 0;
 	this.nodes = nodes;
 	this.adjacent_zones = zones;
 	this.panic_level = 0;//settes til 0 i starten??
@@ -788,62 +867,87 @@ ge.Zone.prototype.is_panic_zero = function () {
 	return this.panic_level === 0 ?  true : false;
 }
 ge.Zone.prototype.dec_panic = function(player, node) {
-
+	var able = this.can_dec_panic(player, node);
+	if(able){
+		if(player.role === 'crowd controller'){
+			this.update_panic(player.role.panic)
+		}
+		else{
+			this.update_panic(-5);
+		}
+		return true;
+	}
+	return false;
+}
+ge.Zone.prototype.can_dec_panic = function(player, node) {
+	console.log("Can decrease panic?");
 	if (this.nodes.indexOf(node.id) >= 0) {
 		if(this.panic_level >= 5){
-			
-			if(player.update_actions(-1)){
-				
-				player.role === 'crowd manager' ? this.update_panic(player.role.panic) : this.update_panic(-5);
+
+			if(player.can_update_actions(-1)){
+				console.log("True");
 				return true;
 			}
+			
+		}
+		else{
+			console.log("Panic is too low");
 		}
 	}
-	return false;
-}
-
-// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
-// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
-// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
-// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
-
- // should this method be different because of panic ?? 
-ge.Zone.prototype.move_people = function(player, to_zone) {
-	if (player.node.adjacent_zones.indexOf(this) >= 0 &&
-		this.adjacent_zones.indexOf(to_zone) >= 0) {
-		if(player.update_actions(-1)){
-			this.people -= 5; //TODO: add roles-difference
-			to_zone.people += 5;
-			return true;
-		}
+	else{
+		console.log("Not an adjacent node");
 	}
 	return false;
 }
 
 
-ge.Zone.prototype.move_people = function (people, to_zone) {
-	if (this.people >= people) {
-		for (var i = 0; i < this.adjacent_zones.length; i++) {
-			//hvis zonen er nabo kan du flytte
-			if (this.adjacent_zones[i] === to_zone) {
-				this.people -= people;
-				to_zone.people += people;
-				return 1;
+ge.Zone.prototype.move_people = function (p, to_zone, num) {
+	var able = this.can_move_people(p, to_zone, num);
+	if(able){
+		this.people -= num;
+		to_zone.people += num;
+		return true;
+	}
+	return false;
+}
+ge.Zone.prototype.can_move_people = function (p, to_zone, num) {
+	console.log("Can move people?");
+	if (this.people >= num){
+		if(this.adjacent_zones.indexOf(to_zone.id)>=0 ){
+			if(p.can_update_actions(-1)) {
+				console.log("True");
+				return true;
 			}
+			
 		}
-		//error message to gui
-		console.log("The zone is not adjacent");
-		return 0;
+		else{
+			console.log("Not an adjacent zone");
+		}
 	}
 	else {
 		//error 
-		console.log("There isnt that many people in this zone!!");
+		console.log("There isnt that many people in this zone");
 	}
+	return false;
 }
-// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
-// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
-// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
-// TODO TODO TODO TODO TODO You can NOT have two functions with the same name in Javascript. FIX
+ge.Zone.prototype.can_move_people_from = function (p, num){
+	console.log("Can move from this zone?");
+	if (this.people >= num){
+		if(this.nodes.indexOf(p.node)>=0 ){
+			if(p.can_update_actions(-1)) {
+				console.log("True");
+				return true;
+			}
+		}
+		else{
+			console.log("Zone is not adjacent to player");
+		}
+	}
+	else{
+		console.log("Not enough people in zone");
+	}
+	return false;
+}
 
 
 
