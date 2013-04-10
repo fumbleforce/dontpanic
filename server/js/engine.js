@@ -3,7 +3,7 @@
     This module will be a game "Class".
 */
 
-var ge = module.exports = function (id, client) {
+var ge = module.exports = function (id, client, template) {
 
 	this.id = id || 0;
 	this.map = {};
@@ -172,14 +172,14 @@ var ge = module.exports = function (id, client) {
     this.map.zones = zones;
     
     //TEST add panic on a few random zones
-    /*zones[0].panic_level = 0;
+    zones[0].panic_level = 0;
     zones[1].panic_level = 5;
     zones[2].panic_level = 15;
     zones[3].panic_level = 30;
     zones[5].panic_level = 30;
     zones[6].panic_level = 40;
     zones[11].panic_level = 50;
-	*/
+	
 	zones[0].people = 20;
 	zones[1].people = 25;
 	zones[3].people = 80;
@@ -238,38 +238,39 @@ var ge = module.exports = function (id, client) {
     this.players[7].role = "Crowd Manager";
 */
     //add some event(s)
-    this.events = [
-                   {   id:0,
-                	   name:"Fire in all industry zones!",
-                	   effects: [{
-                		   domain:'zone',
-                		   type:'event',
-                		   panic:(20),
-                		   affects:'industry'
-                	   }]
-                   },
-                    {   id:1,
-                    	name:"Power outage in all residential zones!",
-                    	effects: [{
-                    		domain:'zone',
-                    		type:'event',
-                    		panic:(5),
-                    		affects:'residential'
-                    	}]
-                    },
-                     {   id:2,
-                    	 name:"Terrorist attack in all city zones!",
-                    	 effects: [{
-                    		 domain:'zone',
-                    		 type:'event',
-                    		 panic:(35),
-                    		 affects:[9, 10, 11]
-                    	 }]
-                     }
-                     ];
-    
-}
 
+    this.events = [
+                   { id:0,
+                 name:"Fire in all industry zones!",
+                 effects: [{
+                 domain:'zone',
+                 type:'panic',
+                 panic:(20),
+                 affects:'industry'
+                 }]
+            },
+            {	id:1,
+            name:"Power outage in all residential zones!",
+                     effects: [{
+                     domain:'zone',
+                     type:'panic',
+                     panic:(5),
+                     affects:'residential'
+                     }]
+                    },
+            {	id:2,
+                     name:"Terrorist attack in all city zones!",
+                     effects: [{
+                     domain:'zone',
+                     type:'panic',
+                     panic:(35),
+                     affects:[9, 10, 11]
+                     }]
+                    }
+            ];
+                
+            }
+    
 //round panic by nearest five
 function round5(x)
 {
@@ -906,6 +907,7 @@ ge.Zone.prototype.dec_panic = function(player, node) {
 		else{
 			this.update_panic(-5);
 		}
+		player.update_actions(-1);
 		return true;
 	}
 	return false;

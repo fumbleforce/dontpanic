@@ -106,13 +106,14 @@ gco.init_game = function (d) {
     gco.nodes = d.nodes;
     gco.turn = d.turn;
     gco.active_player = d.active_player;
-    
+    gco.construct_player_divs(gco.players);
     gco.setup_canvas();
     gco.set_canvas_listener();
     gco.start_timer(d.timer);
     
     gco.draw();
     gco.update_cards();
+    gco.update_options([]);
 
 }
 
@@ -155,6 +156,31 @@ gco.setup_canvas = function(){
     gco.cst.selected_node = null;
 }
 
+gco.construct_player_divs = function(players){
+	var $l = $('#left-sidebar'),
+		$r = $('#right-sidebar'),
+		inner = '',
+		i,
+		lim1 = 0,
+		lim2 = 0;
+	if(players.length >4){
+		lim1 = 4;
+		lim2 = players.length;
+	}
+	else{
+		lim1 = players.length;
+		lim2 = 0;
+	}
+	for(i = 0; i<lim1; i++){
+		inner += "<div id='p"+i+"' class='sidebar-player'><h2>Player "+i+"</h2><br><div class='player-info'><p>This is a player information sidebar row</p><div id='"+i+"_text' class='role-info-label'>More info here.</div></div><div id='"+i+"_cards' class='card-container'></div></div>";
+	}
+	$l.html(inner);
+	inner = '';
+	for(i=lim1; i<lim2; i++){
+		inner += "<div id='p"+i+"' class='sidebar-player'><h2>Player "+i+"</h2><br><div class='player-info'><p>This is a player information sidebar row</p><div id='"+i+"_text' class='role-info-label'>More info here.</div></div><div id='"+i+"_cards' class='card-container'></div></div>";
+	}
+	$r.html(inner);
+}
 
 gco.reset = function(){
     /*var p = gco.players[gco.active_player];
@@ -173,6 +199,9 @@ gco.update_turn = function(turn, ap){
 gco.update_options = function(o){
 	var $s = $('#selection'),
 		inner = '';
+		
+	inner += "<button class='btn' onclick='command("+'"'+"end_turn"+'"'+");'>Next Turn</button>";
+	
 	for (var i=0; i<o.length;i++){
 		switch(o[i]){
 			case 'block':
@@ -638,7 +667,7 @@ gco.draw = function(){
         gco.player_draw(pl, ctx);
         var id = "p"+i;
         document.getElementById(id).style.background = "gray";
-        if (i === gco.active_player) document.getElementById(id).style.background = "lightgray";
+        if (i === gco.active_player) document.getElementById(id).style.background = "white";
     }
     
     if(players.length > 1){
