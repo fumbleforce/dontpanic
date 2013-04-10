@@ -260,7 +260,7 @@ gco.player_draw = function(player, ctx){
     ctx.fillText(player.id, player.x+player_offsetX[player.id]-5, player.y+player_offsetY[player.id]+6);
 }
 
-gco.node_draw = function(node, ctx){
+gco.node_draw = function(node, ctx){ //draws a node with the provided context
     ctx.fillStyle = 'white';
 	if((gco.selected_node == node.id) || (gco.connection == node.id)){
 		ctx.fillStyle = 'red';
@@ -268,6 +268,9 @@ gco.node_draw = function(node, ctx){
 	}
 	if(gco.node_container.indexOf(node) > -1){
 		ctx.fillStyle = 'blue';
+	}
+	if(gco.connection == node.id){
+		ctx.fillStyle = 'yellow';
 	}
 	
     ctx.beginPath();
@@ -420,17 +423,44 @@ gco.zone_draw = function(zone, ctx){
 	
    
     //TODO TEMPORARY show simple panic info
+	
+	
+	for (var zon=0; zon<gco.zones.length; zon++){
+    	var xx=0, yy=0;
+	    for (var i=0; i<gco.zones[zon].nodes.length; i++){
+	    	xx+=gco.nodes[gco.zones[zon].nodes[i].id].x;
+	    	yy+=gco.nodes[gco.zones[zon].nodes[i].id].y;
+	    }
+    gco.zones[zon].centroid=[xx/gco.zones[zon].nodes.length, yy/gco.zones[zon].nodes.length];
+    }
+	
+	
     ctx.fillStyle = 'black';
 	if (zone.panic_level > 9){
 		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]-22,40,30); 
 	}
 	else{
+		console.log("checking zone draw panic");
 		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]-22,25,30); 
 	}
 	ctx.fillStyle = 'white';
 	ctx.font='27px Arial'
 	ctx.fillText(zone.panic_level, zone.centroid[0]-20, zone.centroid[1]+3);
 	
+	// people info
+	ctx.fillStyle = 'black';
+	if (zone.people > 9 && zone.people < 100){
+		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]+28,40,30); 
+	}
+	else if(zone.people > 99){
+		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]+28,60,30); 
+	}
+	else{
+		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]+28,25,30); 
+	}
+	ctx.fillStyle = 'white';
+	ctx.font='27px Arial'
+	ctx.fillText(zone.people, zone.centroid[0]-20, zone.centroid[1]+54);
 
 	
 
@@ -473,7 +503,7 @@ gco.node_contains = function(node, mx, my) {
         (my>=(node.y-node_size));
 }
 
-gco.zone_contains = function(z, mx, my){ // checks if the selected area 
+gco.zone_contains = function(z, mx, my){ // checks if the clicked area contains a zone
     var n = z.nodes;
     var nodes = gco.nodes;
     var r = false;
@@ -548,15 +578,21 @@ gco.draw = function(){ //Draws everything
 }// end draw
 
 gco.create_connection = function(){ // creates a connection between the 2 selected nodes
-	if((gco.connection > -1) && (gco.selected_node > -1) && (gco.connection != gco.selected_node)){
+	if((gco.connection > -1) && (gco.selected_node > -1) && (gco.connection != gco.selected_node) && 
+			(gco.nodes[gco.connection].connects_to.indexOf(gco.nodes[gco.selected_node]) < 0)){
+			
+	
 		gco.nodes[gco.connection].connects_to.push(gco.nodes[gco.selected_node]);
 		gco.nodes[gco.selected_node].connects_to.push(gco.nodes[gco.connection]);
 		
 		console.log("connection between " + gco.selected_node + " and " + gco.connection);
 		
 		gco.connection = -1;
-		
+		return;
 	}
+	console.log("failed create connection test");
+	gco.connection = -1;
+	gco.draw();
 		
 	
 }
@@ -571,8 +607,15 @@ gco.add_zone_nodes = function(){ // adds a node to a container so it later can b
 	
 	if((gco.selected_node > -1) && (gco.node_container.indexOf(gco.nodes[gco.selected_node]) < 0) ){
 		
-		
-		gco.node_container.push(gco.nodes[gco.selected_node]);
+		if(gco.node_container.length == 0){
+			gco.node_container.push(gco.nodes[gco.selected_node]);
+			gco.draw();
+			return 
+		}
+		if((gco.node_container[gco.node_container.length-1].connects_to.indexOf(gco.nodes[gco.selected_node]) > -1 )){
+			gco.node_container.push(gco.nodes[gco.selected_node]);
+			
+		}
 		
 		
 	}
@@ -594,6 +637,8 @@ gco.del_selected_zone = function(){ // delete the selected zone, if none is sele
 		
 		gco.selected_zone = -1;
 		gco.re_id();
+		gco.connection = -1;
+		gco.clear_zone_nodes();
 		gco.draw();
 		
 	}
@@ -627,6 +672,8 @@ gco.del_selected_node = function(){ // deletes the selected node, if none is sel
 		
 		gco.selected_node = -1;
 		gco.re_id();
+		gco.clear_zone_nodes();
+		gco.connection = -1;
 		gco.draw();
 	}
 }
@@ -645,7 +692,7 @@ gco.create_zone = function(){
 	nodes = gco.node_container;
 	
 	// checking if possible to create zone: enough nodes
-	if(nodes.length < 2){
+	if(nodes.length < 3){
 		gco.clear_zone_nodes();
 		return;
 	}
@@ -786,6 +833,7 @@ gco.set_canvas_listener = function(){
 				connects_to:[]
 			});
 		gco.next_node++;
+		gco.selected_node = gco.next_node -1;
 		
 
         gco.draw();
