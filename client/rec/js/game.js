@@ -22,22 +22,22 @@ var c_height = 1550,
 	largecity_img.src = "/img/largecity.jpg";
 	
 	var coordinator_img = new Image();
-	coordinator_img.src = "/img/coordinator.png"
+	coordinator_img.src = "/img/coordinator.png";
 	
 	var crowd_manager_img = new Image();
-	crowd_manager_img.src = "/img/crowd_manager.png"
+	crowd_manager_img.src = "/img/crowd_manager.png";
 	
 	var driver_img = new Image();
-	driver_img.src = "/img/driver.png"
+	driver_img.src = "/img/driver.png";
 	
 	var operation_expert_img = new Image();
-	operation_expert_img.src = "/img/operation_expert.png"
+	operation_expert_img.src = "/img/operation_expert.png";
 	
 	var volunteer_img = new Image();
-	volunteer_img.src = "/img/volunteer.png"
+	volunteer_img.src = "/img/volunteer.png";
 	
 	var passer_by_img = new Image();
-	passer_by_img.src = "/img/passer_by.png"
+	passer_by_img.src = "/img/passer_by.png";
 	
 
 /* TEMPORARY ZONE IMAGES
