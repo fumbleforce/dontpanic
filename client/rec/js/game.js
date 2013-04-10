@@ -378,8 +378,6 @@ gco.player_draw = function(player, ctx){
 	//ctx.fillStyle = "Black";
     ctx.font="bold 15px Arial",
     ctx.fillText(player.id, player.x+player_offsetX[player.id]-5, player.y+player_offsetY[player.id]+6);
-	
-;
 
 	
 			//draw the images

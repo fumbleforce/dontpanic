@@ -207,7 +207,7 @@ var ge = module.exports = function (id, client, template) {
     
     this.players = [];
     player_colors = ["red","orange","yellow","chartreuse ","green","aqua","blue","purple"];
-	
+	player_role =["crowd manager", "driver", "volunteer", "operation expert", "coordinator","passer by"];
 	/*this.randomrole =  
 		[{title: "Constructor",
 		
@@ -222,12 +222,12 @@ var ge = module.exports = function (id, client, template) {
 	*/
 	
     for(var i = 0; i < 8; i++){
-    	player = new ge.Player(i, "player" + i, i*2, player_colors[i], {}, 4);
+		player = new ge.Player(i, "player" + i, i*2, player_colors[i], player_role[Math.floor(Math.random()*player_role.length)],4);
     	player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
     	player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
     	this.players.push(player);
     }
-    //add dummy roles
+  /*  //add dummy roles
     this.players[0].role = "Passer By";
     this.players[1].role = "Crowd Manager";
     this.players[2].role = "Driver";
@@ -236,7 +236,7 @@ var ge = module.exports = function (id, client, template) {
     this.players[5].role = "Passer By";
     this.players[6].role = "Coordinator";
     this.players[7].role = "Crowd Manager";
-
+*/
     //add some event(s)
     this.events = [
        {   id:0,
@@ -869,7 +869,7 @@ ge.Zone.prototype.is_panic_zero = function () {
 ge.Zone.prototype.dec_panic = function(player, node) {
 	var able = this.can_dec_panic(player, node);
 	if(able){
-		if(player.role === 'crowd controller'){
+		if(player.role === 'crowd manager'){
 			this.update_panic(player.role.panic)
 		}
 		else{
@@ -884,6 +884,7 @@ ge.Zone.prototype.can_dec_panic = function(player, node) {
 	console.log("Can decrease panic?");
 	if (this.nodes.indexOf(node.id) >= 0) {
 		if(this.panic_level >= 5){
+
 			if(player.can_update_actions(-1)){
 				console.log("True");
 				return true;
