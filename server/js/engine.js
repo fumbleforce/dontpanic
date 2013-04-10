@@ -177,7 +177,7 @@ var ge = module.exports = function (id, client, template) {
     zones[2].panic_level = 15;
     zones[3].panic_level = 30;
     zones[5].panic_level = 30;
-    zones[6].panic_level = 40;
+    //zones[6].panic_level = 40;
     zones[11].panic_level = 50;
 	
 	zones[0].people = 20;
@@ -244,7 +244,7 @@ var ge = module.exports = function (id, client, template) {
                  name:"Fire in all industry zones!",
                  effects: [{
                  domain:'zone',
-                 type:'panic',
+                 type:'event',
                  panic:(20),
                  affects:'industry'
                  }]
@@ -253,7 +253,7 @@ var ge = module.exports = function (id, client, template) {
             name:"Power outage in all residential zones!",
                      effects: [{
                      domain:'zone',
-                     type:'panic',
+                     type:'event',
                      panic:(5),
                      affects:'residential'
                      }]
@@ -262,7 +262,7 @@ var ge = module.exports = function (id, client, template) {
                      name:"Terrorist attack in all city zones!",
                      effects: [{
                      domain:'zone',
-                     type:'panic',
+                     type:'event',
                      panic:(35),
                      affects:[9, 10, 11]
                      }]
