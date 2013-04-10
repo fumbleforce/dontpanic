@@ -172,14 +172,14 @@ var ge = module.exports = function (id, client) {
     this.map.zones = zones;
     
     //TEST add panic on a few random zones
-    zones[0].panic_level = 0;
+    /*zones[0].panic_level = 0;
     zones[1].panic_level = 5;
     zones[2].panic_level = 15;
     zones[3].panic_level = 30;
     zones[5].panic_level = 30;
     zones[6].panic_level = 40;
     zones[11].panic_level = 50;
-	
+	*/
 	zones[0].people = 20;
 	zones[1].people = 25;
 	zones[3].people = 80;
@@ -243,7 +243,7 @@ var ge = module.exports = function (id, client) {
                 	   name:"Fire in all industry zones!",
                 	   effects: [{
                 		   domain:'zone',
-                		   type:'panic',
+                		   type:'event',
                 		   panic:(20),
                 		   affects:'industry'
                 	   }]
@@ -252,7 +252,7 @@ var ge = module.exports = function (id, client) {
                     	name:"Power outage in all residential zones!",
                     	effects: [{
                     		domain:'zone',
-                    		type:'panic',
+                    		type:'event',
                     		panic:(5),
                     		affects:'residential'
                     	}]
@@ -261,13 +261,19 @@ var ge = module.exports = function (id, client) {
                     	 name:"Terrorist attack in all city zones!",
                     	 effects: [{
                     		 domain:'zone',
-                    		 type:'panic',
+                    		 type:'event',
                     		 panic:(35),
                     		 affects:[9, 10, 11]
                     	 }]
                      }
                      ];
     
+}
+
+//round panic by nearest five
+function round5(x)
+{
+    return (x % 5) >= 2.5 ? parseInt(x / 5) * 5 + 5 : parseInt(x / 5) * 5;
 }
 
 
@@ -552,6 +558,31 @@ function effect(card, g) {
                         for (z = 0; z<e.affects.length; z++){
                             zones[e.affects[z]].update_panic(e.panic);
                             changed.zones.push(zones[e.affects[z]]);
+                        }
+                        break;
+                        
+                    case 'event':
+                    	var infoCenter=false;
+                    	for (z = 0; z<e.affects.length; z++){
+                    		for (var n=0; n<zones[e.affects[z]].nodes.length; n++){
+                    			var checkZone = zones[e.affects[z]];
+                    			var checkNode = nodes[checkZone.nodes[n]];
+                    			if (checkNode.has_information_center){
+                    				
+                    				infoCenter=true;
+                    			}
+                    		}
+                    		if (infoCenter){
+                    			console.log("LOL INFO");
+                    			zones[e.affects[z]].update_panic(round5((e.panic)/2));
+                    			changed.zones.push(zones[e.affects[z]]);
+                    		}
+                    		else{
+                    			console.log("LOL NOINFO");
+                    			zones[e.affects[z]].update_panic(e.panic);
+                    			changed.zones.push(zones[e.affects[z]]);
+                    		}
+                    		infoCenter=false;
                         }
                         break;
                         
