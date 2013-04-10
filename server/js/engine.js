@@ -227,7 +227,7 @@ var ge = module.exports = function (id, client) {
 
     	this.players.push(player);
     }
-    //add dummy roles
+  /*  //add dummy roles
     this.players[0].role = "Passer By";
     this.players[1].role = "Crowd Manager";
     this.players[2].role = "Driver";
@@ -236,7 +236,7 @@ var ge = module.exports = function (id, client) {
     this.players[5].role = "Passer By";
     this.players[6].role = "Coordinator";
     this.players[7].role = "Crowd Manager";
-
+*/
     //add some event(s)
     this.events = [
                    {   id:0,
@@ -794,7 +794,7 @@ ge.Zone.prototype.dec_panic = function(player, node) {
 			
 			if(player.update_actions(-1)){
 				
-				player.role === 'crowd controller' ? this.update_panic(player.role.panic) : this.update_panic(-5);
+				player.role === 'crowd manager' ? this.update_panic(player.role.panic) : this.update_panic(-5);
 				return true;
 			}
 		}
