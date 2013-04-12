@@ -177,7 +177,7 @@ var ge = module.exports = function (id, client, template) {
     zones[2].panic_level = 15;
     zones[3].panic_level = 30;
     zones[5].panic_level = 30;
-    zones[6].panic_level = 40;
+    //zones[6].panic_level = 40;
     zones[11].panic_level = 50;
 	
 	zones[0].people = 20;
@@ -238,36 +238,43 @@ var ge = module.exports = function (id, client, template) {
     this.players[7].role = "Crowd Manager";
 */
     //add some event(s)
+
     this.events = [
-       {   id:0,
-    	   name:"Fire in all industry zones!",
-    	   effects: [{
-    		   domain:'zone',
-    		   type:'panic',
-    		   panic:(20),
-    		   affects:'industry'
-    	   }]
-		},
-		{	id:1,
-			name:"Power outage in all residential zones!",
-        	effects: [{
-        		domain:'zone',
-        		type:'panic',
-        		panic:(5),
-        		affects:'residential'
-        	}]
-        },
-		{	id:2,
-        	name:"Terrorist attack in all city zones!",
-        	effects: [{
-        		domain:'zone',
-        		type:'panic',
-        		panic:(35),
-        		affects:[9, 10, 11]
-        	}]
-        }
-	];
+                   { id:0,
+                 name:"Fire in all industry zones!",
+                 effects: [{
+                 domain:'zone',
+                 type:'event',
+                 panic:(20),
+                 affects:'industry'
+                 }]
+            },
+            {	id:1,
+            name:"Power outage in all residential zones!",
+                     effects: [{
+                     domain:'zone',
+                     type:'event',
+                     panic:(5),
+                     affects:'residential'
+                     }]
+                    },
+            {	id:2,
+                     name:"Terrorist attack in all city zones!",
+                     effects: [{
+                     domain:'zone',
+                     type:'event',
+                     panic:(35),
+                     affects:[9, 10, 11]
+                     }]
+                    }
+            ];
+                
+            }
     
+//round panic by nearest five
+function round5(x)
+{
+    return (x % 5) >= 2.5 ? parseInt(x / 5) * 5 + 5 : parseInt(x / 5) * 5;
 }
 
 
@@ -552,6 +559,31 @@ function effect(card, g) {
                         for (z = 0; z<e.affects.length; z++){
                             zones[e.affects[z]].update_panic(e.panic);
                             changed.zones.push(zones[e.affects[z]]);
+                        }
+                        break;
+                        
+                    case 'event':
+                    	var infoCenter=false;
+                    	for (z = 0; z<e.affects.length; z++){
+                    		for (var n=0; n<zones[e.affects[z]].nodes.length; n++){
+                    			var checkZone = zones[e.affects[z]];
+                    			var checkNode = nodes[checkZone.nodes[n]];
+                    			if (checkNode.has_information_center){
+                    				
+                    				infoCenter=true;
+                    			}
+                    		}
+                    		if (infoCenter){
+                    			console.log("LOL INFO");
+                    			zones[e.affects[z]].update_panic(round5((e.panic)/2));
+                    			changed.zones.push(zones[e.affects[z]]);
+                    		}
+                    		else{
+                    			console.log("LOL NOINFO");
+                    			zones[e.affects[z]].update_panic(e.panic);
+                    			changed.zones.push(zones[e.affects[z]]);
+                    		}
+                    		infoCenter=false;
                         }
                         break;
                         
