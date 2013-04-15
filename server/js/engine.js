@@ -3,7 +3,7 @@
     This module will be a game "Class".
 */
 
-var ge = module.exports = function (id, client) {
+var ge = module.exports = function (id, client, template) {
 
 	this.id = id || 0;
 	this.map = {};
@@ -177,7 +177,7 @@ var ge = module.exports = function (id, client) {
     zones[2].panic_level = 15;
     zones[3].panic_level = 30;
     zones[5].panic_level = 30;
-    zones[6].panic_level = 40;
+    //zones[6].panic_level = 40;
     zones[11].panic_level = 50;
 	
 	zones[0].people = 20;
@@ -238,6 +238,7 @@ var ge = module.exports = function (id, client) {
     this.players[7].role = "Crowd Manager";
 */
     //add some event(s)
+
     this.events = [
                    {   id:0,
                 	   name:"Fire engulfs industrial complex! Workers in all districts gives into panic.\nPanic increased by 20 in all industrial districts",
@@ -258,7 +259,7 @@ var ge = module.exports = function (id, client) {
                     	}]
                     },
                      {   id:2,
-                    	 name:"Terrorist attack in all city districts!\nPanic increased by 10 in all financial districts",
+                    	 name:"Terrorist attack in all finacial districts!\nPanic increased by 10 in all financial districts",
                     	 effects: [{
                     		 domain:'zone',
                     		 type:'event',
@@ -282,7 +283,7 @@ var ge = module.exports = function (id, client) {
                     		domain:'zone',
                     		type:'event',
                     		panic:(10),
-                    		affects:zones
+                    		affects:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
                     	}]
                     } ,
                     {   id:5,
@@ -331,7 +332,7 @@ var ge = module.exports = function (id, client) {
                     	}]
                     },
                     {   id:10,
-                    	name:"Large occurenses of MRSA Staph Bacteria Infections have been reported!\nPanic increased by 10 in all residential zones",
+                    	name:"Large occurenses of MRSA Staph Bacteria Infections have been reported!\nPanic increased by 10 in all residential districts",
                     	effects: [{
                     		domain:'zone',
                     		type:'event',
@@ -340,7 +341,7 @@ var ge = module.exports = function (id, client) {
                     	}]
                     },
                     {   id:11,
-                    	name:"Gunshots can be heard through a school cooridor!\nPanic increased by 10 in all residential zones",
+                    	name:"Gunshots can be heard through a school cooridor!\nPanic increased by 10 in all residential districts",
                     	effects: [{
                     		domain:'zone',
                     		type:'event',
@@ -349,7 +350,13 @@ var ge = module.exports = function (id, client) {
                     	}]
                     }
                      ];
+					}
+
     
+//round panic by nearest five
+function round5(x)
+{
+    return (x % 5) >= 2.5 ? parseInt(x / 5) * 5 + 5 : parseInt(x / 5) * 5;
 }
 
 
@@ -634,6 +641,31 @@ function effect(card, g) {
                         for (z = 0; z<e.affects.length; z++){
                             zones[e.affects[z]].update_panic(e.panic);
                             changed.zones.push(zones[e.affects[z]]);
+                        }
+                        break;
+                        
+                    case 'event':
+                    	var infoCenter=false;
+                    	for (z = 0; z<e.affects.length; z++){
+                    		for (var n=0; n<zones[e.affects[z]].nodes.length; n++){
+                    			var checkZone = zones[e.affects[z]];
+                    			var checkNode = nodes[checkZone.nodes[n]];
+                    			if (checkNode.has_information_center){
+                    				
+                    				infoCenter=true;
+                    			}
+                    		}
+                    		if (infoCenter){
+                    			console.log("LOL INFO");
+                    			zones[e.affects[z]].update_panic(round5((e.panic)/2));
+                    			changed.zones.push(zones[e.affects[z]]);
+                    		}
+                    		else{
+                    			console.log("LOL NOINFO");
+                    			zones[e.affects[z]].update_panic(e.panic);
+                    			changed.zones.push(zones[e.affects[z]]);
+                    		}
+                    		infoCenter=false;
                         }
                         break;
                         
@@ -957,6 +989,7 @@ ge.Zone.prototype.dec_panic = function(player, node) {
 		else{
 			this.update_panic(-5);
 		}
+		player.update_actions(-1);
 		return true;
 	}
 	return false;

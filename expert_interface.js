@@ -11,6 +11,8 @@ var c_height = 1550,
     offset_distance = node_size*1,
     panic_info_size = 40,
     w_inc = 0;
+	player_colors = ["red","orange","yellow","chartreuse ","green","aqua","blue","purple"];
+	max_players = 7;
 	//set images
 	var residential_img = new Image();
 	residential_img.src = "client/rec/img/residential.jpg";
@@ -22,19 +24,19 @@ var c_height = 1550,
 	largecity_img.src = "client/rec/img/largecity.jpg";
 	
 	var cat_img = new Image();
-	cat_img.src = "client/rec/img/cat.png"
+	cat_img.src = "client/rec/img/cat.jpg"
 	
 	var penguin_img = new Image();
-	penguin_img.src = "client/rec/img/cat.png"
+	penguin_img.src = "client/rec/img/cat.jpg"
 	
 	var tophat_img = new Image();
-	tophat_img.src = "client/rec/img/cat.png"
+	tophat_img.src = "client/rec/img/cat.jpg"
 	
 	var lifejacket_img = new Image();
-	lifejacket_img.src = "client/rec/img/cat.png"
+	lifejacket_img.src = "client/rec/img/cat.jpg"
 	
 	var book_img = new Image();
-	book_img.src = "client/rec/img/cat.png"
+	book_img.src = "client/rec/img/cat.jpg"
 	
 
 /* TEMPORARY ZONE IMAGES
@@ -86,8 +88,10 @@ var gco = {
     active_player : 0,
 	next_node : 0,
 	next_zone : 0,
-	mode : "add node",
+	next_player : 0,
+	mode : "add node", // not in use
 	selected_node : -1,
+	selected_zone : -1,
 	connection : -1,
 	zone_container : [],
 	node_container : []
@@ -230,8 +234,8 @@ gco.info_card_click = function(id) {
 
 
 gco.player_draw = function(player, ctx){
-    if (player.x === undefined) player.x = gco.nodes[player.node].x;
-    if (player.y === undefined) player.y = gco.nodes[player.node].y;
+    player.x = player.node.x;
+    player.y = player.node.y;
 	
 
 	
@@ -240,26 +244,28 @@ gco.player_draw = function(player, ctx){
     ctx.closePath();
     //ctx.fill();
     //TODO draw circle to show active player when dragging/active?
-    if (this.active_player===player.id){
+    /*if (this.active_player===player.id){
     	var gradiant = ctx.createRadialGradient(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size-10, player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size);
     	gradiant.addColorStop(0, player.color);
     	gradiant.addColorStop(1, 'blue');
     	ctx.fillStyle=gradiant;
     	ctx.fill();
     }
-    else{
-    	ctx.fill();
-    	ctx.strokeStyle = 'black';
-    	ctx.lineWidth = 2;
-    	ctx.stroke();
-    }
-
-    ctx.fillStyle = "Black";
+    else{*/
+	
+	ctx.fillStyle = player.color;
+	ctx.fill();
+	ctx.strokeStyle = 'black';
+	ctx.lineWidth = 2;
+	ctx.stroke();
+    
+	ctx.fillStyle = 'black';
+    
     ctx.font="bold 15px Arial",
     ctx.fillText(player.id, player.x+player_offsetX[player.id]-5, player.y+player_offsetY[player.id]+6);
 }
 
-gco.node_draw = function(node, ctx){
+gco.node_draw = function(node, ctx){ //draws a node with the provided context
     ctx.fillStyle = 'white';
 	if((gco.selected_node == node.id) || (gco.connection == node.id)){
 		ctx.fillStyle = 'red';
@@ -267,6 +273,9 @@ gco.node_draw = function(node, ctx){
 	}
 	if(gco.node_container.indexOf(node) > -1){
 		ctx.fillStyle = 'blue';
+	}
+	if(gco.connection == node.id){
+		ctx.fillStyle = 'yellow';
 	}
 	
     ctx.beginPath();
@@ -342,12 +351,12 @@ gco.draw_connections = function(ctx){
 		}
 	}	
 }
-gco.background_draw = function(ctx){
+gco.background_draw = function(ctx){ // draws the background
     ctx.fillStyle="grey";
     ctx.fillRect(0,0, c_width, c_height);
 }
 
-gco.zone_draw = function(zone, ctx){
+gco.zone_draw = function(zone, ctx){ // draws a zone with the provided context
 
 	ctx.save();
 	var minx = 2000;
@@ -405,6 +414,9 @@ gco.zone_draw = function(zone, ctx){
 	ctx.restore();
 	//Draw outline of zones
     ctx.strokeStyle = "white";
+	if(zone.id==gco.selected_zone){
+		ctx.strokeStyle = "blue";
+	}
     ctx.lineWidth = 15;
 	ctx.stroke(); // Now draw our path
 	ctx.restore(); // Put the canvas back how it was before we started
@@ -416,17 +428,44 @@ gco.zone_draw = function(zone, ctx){
 	
    
     //TODO TEMPORARY show simple panic info
+	
+	
+	for (var zon=0; zon<gco.zones.length; zon++){
+    	var xx=0, yy=0;
+	    for (var i=0; i<gco.zones[zon].nodes.length; i++){
+	    	xx+=gco.nodes[gco.zones[zon].nodes[i].id].x;
+	    	yy+=gco.nodes[gco.zones[zon].nodes[i].id].y;
+	    }
+    gco.zones[zon].centroid=[xx/gco.zones[zon].nodes.length, yy/gco.zones[zon].nodes.length];
+    }
+	
+	
     ctx.fillStyle = 'black';
 	if (zone.panic_level > 9){
 		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]-22,40,30); 
 	}
 	else{
+		console.log("checking zone draw panic");
 		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]-22,25,30); 
 	}
 	ctx.fillStyle = 'white';
 	ctx.font='27px Arial'
 	ctx.fillText(zone.panic_level, zone.centroid[0]-20, zone.centroid[1]+3);
 	
+	// people info
+	ctx.fillStyle = 'black';
+	if (zone.people > 9 && zone.people < 100){
+		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]+28,40,30); 
+	}
+	else if(zone.people > 99){
+		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]+28,60,30); 
+	}
+	else{
+		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]+28,25,30); 
+	}
+	ctx.fillStyle = 'white';
+	ctx.font='27px Arial'
+	ctx.fillText(zone.people, zone.centroid[0]-20, zone.centroid[1]+54);
 
 	
 
@@ -469,16 +508,16 @@ gco.node_contains = function(node, mx, my) {
         (my>=(node.y-node_size));
 }
 
-gco.zone_contains = function(z, mx, my){
-    var n = z.nodes,
-        nodes = gco.nodes;
+gco.zone_contains = function(z, mx, my){ // checks if the clicked area contains a zone
+    var n = z.nodes;
+    var nodes = gco.nodes;
     var r = false;
     var j = n.length - 1;
 
     for (var i=0; i <n.length; i++) {
-        if (nodes[n[i]].y < my && nodes[n[j]].y >= my ||  nodes[n[j]].y < my && nodes[n[i]].y >= my) {
+        if (nodes[n[i].id].y < my && nodes[n[j].id].y >= my ||  nodes[n[j].id].y < my && nodes[n[i].id].y >= my) {
      
-            if (nodes[n[i]].x + (my - nodes[n[i]].y) / (nodes[n[j]].y - nodes[n[i]].y) * (nodes[n[j]].x - nodes[n[i]].x) < mx) {
+            if (nodes[n[i].id].x + (my - nodes[n[i].id].y) / (nodes[n[j].id].y - nodes[n[i].id].y) * (nodes[n[j].id].x - nodes[n[i].id].x) < mx) {
                 r = !r;
             }
         }
@@ -487,7 +526,7 @@ gco.zone_contains = function(z, mx, my){
     return r;
 }
 
-gco.draw = function(){
+gco.draw = function(){ //Draws everything
     var to_node = {},
         node = {},
         zone = {},
@@ -505,6 +544,9 @@ gco.draw = function(){
         zone = zones[i];
         gco.zone_draw(zone,ctx);
     }
+	if(gco.selected_zone > -1){
+		gco.zone_draw(zones[gco.selected_zone], ctx);
+	}
     
     
     
@@ -527,33 +569,69 @@ gco.draw = function(){
     for (var i = 0; i < players.length; i++) {
         pl = players[i];
         gco.player_draw(pl, ctx);
-        var id = "p"+i;
-        document.getElementById(id).style.background = "gray";
-        if (i === gco.active_player) document.getElementById(id).style.background = "lightgray";
+        //var id = "p"+i;
+        //document.getElementById(id).style.background = "gray";
+        //if (i === gco.active_player) document.getElementById(id).style.background = "lightgray";
     }
     
-    if(players.length > 1){
+    /*if(players.length > 1){
         document.getElementById("turn-label").innerHTML = "Turn: "+(gco.turn); 
         document.getElementById("player-turn-label").innerHTML = "Player "+(gco.active_player)+"'s turn";
         document.getElementById("action-label").innerHTML = "Actions left: "+(players[gco.active_player].actions_left); 
-    } 
+    } */
     
 }// end draw
 
-gco.create_connection = function(){
-	if((gco.connection > -1) && (gco.selected_node > -1) && (gco.connection != gco.selected_node)){
+
+gco.add_player = function(){ // creates a player and adds it to the game.
+	
+	var player_role = document.getElementById("player_role").value;
+	
+	
+	console.log("role" + player_role);
+	
+	var player_node = document.getElementById("player_node").value;
+	
+	console.log("Node: " + player_node);
+	
+	if (gco.next_player > max_players) {
+		console.log("to many players");
+		return;
+	}
+	console.log("color: " + player_colors[gco.next_player]);
+		
+	gco.players.push(player = {
+				id:gco.next_player,
+				user:"player",
+				node:gco.nodes[player_node],
+				color:player_colors[gco.next_player],
+				role:player_role,
+				actions_left : 4
+			});
+	gco.next_player++;
+	gco.draw();
+
+}
+gco.create_connection = function(){ // creates a connection between the 2 selected nodes
+	if((gco.connection > -1) && (gco.selected_node > -1) && (gco.connection != gco.selected_node) && 
+			(gco.nodes[gco.connection].connects_to.indexOf(gco.nodes[gco.selected_node]) < 0)){
+			
+	
 		gco.nodes[gco.connection].connects_to.push(gco.nodes[gco.selected_node]);
 		gco.nodes[gco.selected_node].connects_to.push(gco.nodes[gco.connection]);
 		
 		console.log("connection between " + gco.selected_node + " and " + gco.connection);
 		
 		gco.connection = -1;
-		
+		return;
 	}
+	console.log("failed create connection test");
+	gco.connection = -1;
+	gco.draw();
 		
 	
 }
-gco.node_connection = function(){
+gco.node_connection = function(){ // saves the selected node fot connection purposes
 
 	gco.connection = gco.selected_node; 
 	gco.draw();
@@ -562,23 +640,47 @@ gco.node_connection = function(){
 gco.add_zone_nodes = function(){ // adds a node to a container so it later can be used to create a zone
 
 	
-	if(gco.selected_node > -1){
-		gco.node_container.push(gco.nodes[gco.selected_node]);
+	if((gco.selected_node > -1) && (gco.node_container.indexOf(gco.nodes[gco.selected_node]) < 0) ){
+		
+		if(gco.node_container.length == 0){
+			gco.node_container.push(gco.nodes[gco.selected_node]);
+			gco.draw();
+			return 
+		}
+		if((gco.node_container[gco.node_container.length-1].connects_to.indexOf(gco.nodes[gco.selected_node]) > -1 )){
+			gco.node_container.push(gco.nodes[gco.selected_node]);
+			
+		}
 		
 		
 	}
 	gco.draw();
 }
-gco.clear_zone_nodes = function() {
+gco.clear_zone_nodes = function() { // clears the selected nodes for science!
 	
 	gco.node_container = [];
 	gco.draw();
 }
-gco.del_selected_zone = function(){
+gco.del_selected_zone = function(){ // delete the selected zone, if none is selected nothing will be removed
 
+	if(gco.selected_zone > -1){
+		index = gco.selected_zone;
+		zone = gco.zones[index];
+		
+		
+		gco.zones.splice(index, 1);
+		
+		gco.selected_zone = -1;
+		gco.re_id();
+		gco.connection = -1;
+		gco.clear_zone_nodes();
+		gco.draw();
+		
+	}
 }
 
 gco.del_selected_node = function(){ // deletes the selected node, if none is selected nothing will be removed
+									// will not delete if node is a part of a zone
 	
 	if(gco.selected_node > -1){
 		index = gco.selected_node;
@@ -605,6 +707,8 @@ gco.del_selected_node = function(){ // deletes the selected node, if none is sel
 		
 		gco.selected_node = -1;
 		gco.re_id();
+		gco.clear_zone_nodes();
+		gco.connection = -1;
 		gco.draw();
 	}
 }
@@ -613,14 +717,20 @@ gco.re_id = function(){ // redo all id's of the nodes, to make it look better
 	for(gco.next_node = 0; gco.next_node < gco.nodes.length; gco.next_node++){
 		gco.nodes[gco.next_node].id = gco.next_node;
 	}
+	for(gco.next_zone = 0; gco.next_zone < gco.zones.length; gco.next_zone++){
+		gco.zones[gco.next_zone].id = gco.next_zone;
+	}
+	for(gco.next_player = 0; gco.next_player < gco.players.length; gco.next_player++){
+		gco.players[gco.next_player].id = gco.next_player;
+	}
 }
 
 
-gco.create_zone = function(){
+gco.create_zone = function(){ // checks if it is possible to create a zone, and creates one if possible.
 	nodes = gco.node_container;
 	
 	// checking if possible to create zone: enough nodes
-	if(nodes.length < 2){
+	if(nodes.length < 3){
 		gco.clear_zone_nodes();
 		return;
 	}
@@ -647,7 +757,7 @@ gco.create_zone = function(){
 			id : gco.next_zone,
 			people : 0,
 			panic_level : 0,
-			type : "residental",
+			type : 'residential',
 			centroid : [0,0],
 			nodes : gco.node_container,
 			zones : []
@@ -655,8 +765,28 @@ gco.create_zone = function(){
 	gco.zones.push(newZone);
 	gco.next_zone++;
 	
-	console.log("zone: " + newZone.id + " nodes " + newZone.nodes);
+	console.log("zone: " + newZone.id + " nodes " + newZone.nodes[0]);
 	gco.clear_zone_nodes();
+	
+}
+
+gco.update_startnode_column = function() {
+
+	var ddbox = document.getElementById("player_node");
+	
+
+	if(gco.nodes.length == 0){
+		document.player_node.options.length=1;
+		ddbox.options[0] = new Option('-1','none exists');
+		return;
+	}
+	ddbox.options.length=gco.nodes.length;
+	for( var i = 0; i < gco.nodes.length; i++){
+		ddbox.options[i] = new Option(i ,i);
+		
+	
+	}
+	
 	
 }
 
@@ -678,7 +808,8 @@ gco.set_canvas_listener = function(){
             selected;
 
 		
-        
+        gco.selected_zone = -1;
+		gco.selected_node = -1;
         cst.selected_zone = null;
         cst.selected_node = null;
        
@@ -712,6 +843,8 @@ gco.set_canvas_listener = function(){
         	}
         }
 		*/
+		
+	
 		for (var i = 0; i < gco.nodes.length; i++) {
 
         	if (gco.node_contains(nodes[i], mx, my)) {
@@ -738,7 +871,17 @@ gco.set_canvas_listener = function(){
            }
         }
 		
-		
+		for (var z = 0; z < gco.zones.length; z++) {
+			if(gco.zone_contains(zones[z], mx, my)){
+				console.log("Clicked on zone " + z);
+				gco.selected_zone = z;
+				
+				gco.draw();
+				return;
+					
+				
+			}	
+		}
 		
 		gco.nodes.push(newNode = {
 				id:gco.next_node,
@@ -749,7 +892,8 @@ gco.set_canvas_listener = function(){
 			});
 		gco.next_node++;
 		
-
+		gco.selected_node = gco.next_node -1;
+		gco.update_startnode_column();
         gco.draw();
         
     }, true);//end mousedown listener

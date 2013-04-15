@@ -11,39 +11,34 @@
     <div class="title-row content-row">
         <div class="content-column"></div>
         <div class="content-column title-text">
-            DON'T PANIC
+            DON'T PANIC EXPERT INTERFACE
         </div>
         <div class="content-column"></div>
     </div>
     
-    <div class="content-row top-bar-row" style="height:100px;">
+    <div class="content-row">
         <div class="content-column"></div>
         <div class="content-column top-bar clearfix">
-        	<div class="top-bar-info">
-		        
-		        <div id="player-turn-label" class="info-label">Player 0's turn</div>
-		        <div id="turn-label" class="info-label">Turn: 0</div>
-		        <div id="action-label" class="info-label">Action points left: 4</div>
-		        <div id="timer-label" class="info-label">Panic Increase in: 00</div>
-            </div>
-            <div class="margin-row">
-            	
-            </div>
-            <div id="selection">
-            	<button class="btn-end-turn" onclick="command('end_turn');">Next Turn</button>
-            </div>
+            <button class="btn-end-turn" onclick="command('end_turn');">Next Turn</button>
+            <button class="btn-remove-road-block" onclick="command('remove_road_block');">Rem RB</button>
+            <button class="btn-create-road-block" onclick="command('create_road_block');">Add RB</button>
+            <button class="btn-create-info-center" onclick="command('create_info_center');">Add IC</button>
+            <div id="player-turn-label" class="info-label">Player 0's turn</div>
+            <div id="turn-label" class="info-label">Turn: 0</div>
+            <div id="action-label" class="info-label">Action points left: 4</div>
+            <div id="timer-label" class="info-label">Panic Increase in: 00</div>
         </div>
         <div class="content-column"></div>
     </div>
 
     <div class="content-row">
         <div class="content-column">
-            <div id="left-sidebar" class="sidebar-left">
-                <!--<div id="p0" class="sidebar-player">
+            <div class="sidebar-left">
+                <div id="p0" class="sidebar-player">
                     <h2>Player 0</h2><br>
                     <div class="player-info">
                     <p>This is a player information sidebar row</p>
-                    <div id="0_text" class="role-info-label">More info here.</div>
+                    <p>More info here.</p>
                     </div>
                     <div id="0_cards" class="card-container"></div>
                 </div>
@@ -51,7 +46,7 @@
                     <h2>Player 1</h2><br>
                     <div class="player-info">
                     <p>This is a player information sidebar row</p>
-                    <div id="1_text" class="role-info-label">More info here.</div>
+                    <p>More info here.</p>
                     </div>
                     <div id="1_cards" class="card-container"></div>
                 </div>
@@ -59,7 +54,7 @@
                     <h2>Player 2</h2><br>
                     <div class="player-info">
                     <p>This is a player information sidebar row</p>
-                    <div id="2_text" class="role-info-label">More info here.</div>
+                    <p>More info here.</p>
                     </div>
                     <div id="2_cards" class="card-container"></div>
                 </div>
@@ -67,10 +62,11 @@
                     <h2>Player 3</h2><br>
                     <div class="player-info">
                     <p>This is a player information sidebar row</p>
-                    <div id="3_text" class="role-info-label">More info here.</div>
+                    <p>More info here.</p>
                     </div>
                     <div id="3_cards" class="card-container"></div>
-                </div>-->
+                </div>
+
             </div>
         </div>
         
@@ -85,13 +81,13 @@
             </div>
         </div>
         <div class="content-column">
-            <div id="right-sidebar" class="sidebar-right">
+            <div class="sidebar-right">
 
-                <!--<div id="p4" class="sidebar-player">
+                <div id="p4" class="sidebar-player">
                     <h2>Player 4</h2><br>
                     <div class="player-info">
                     <p>This is a player information sidebar row</p>
-                    <div id="4_text" class="role-info-label">More info here.</div>
+                    <p>More info here.</p>
                     </div>
                     <div id="4_cards" class="card-container"></div>
                 </div>
@@ -99,7 +95,7 @@
                     <h2>Player 5</h2><br>
                     <div class="player-info">
                     <p>This is a player information sidebar row</p>
-                    <div id="5_text" class="role-info-label">More info here.</div>
+                    <p>More info here.</p>
                     </div>
                     <div id="5_cards" class="card-container"></div>
                 </div>
@@ -107,7 +103,7 @@
                     <h2>Player 6</h2><br>
                     <div class="player-info">
                     <p>This is a player information sidebar row</p>
-                    <div id="6_text" class="role-info-label">More info here.</div>
+                    <p>More info here.</p>
                     </div>
                     <div id="6_cards" class="card-container"></div>
                 </div>
@@ -115,10 +111,10 @@
                     <h2>Player 7</h2><br>
                     <div class="player-info">
                     <p>This is a player information sidebar row</p>
-                    <div id="7_text" class="role-info-label">More info here.</div>
+                    <p>More info here.</p>
                     </div>
                     <div id="7_cards" class="card-container"></div>
-                </div>-->
+                </div>
             </div>
         </div>
     </div>
