@@ -5,6 +5,7 @@
 
 var ge = module.exports = function (id, client, template) {
 
+
 	this.id = id || 0;
 	this.map = {};
 	this.settings = {};
