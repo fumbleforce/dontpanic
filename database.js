@@ -136,6 +136,19 @@ db.set_template_string = function (gametemplate_id, json_string) {
 	});
 }
 
+
+db.get_all_templates = function (next) {
+	connection.query('SELECT * FROM gametemplate', function (err, rows, fields) {
+		if (err) throw err;
+		return next(rows);
+	});
+	
+}
+//kallet til get all templates
+/*db.get_all_templates(function(result) {
+	//console.log(result);
+});*/
+
 db.get_template = function(gametemplate_id, next) {
 	var nodes = 0;
 	var zones = 0;
