@@ -12,6 +12,7 @@ function play(){
         timeout: 5000,
         success: function(data) {
             console.log("Received data: "+data);
+            console.log(data);
         },
         error: function(jqXHR, textStatus, errorThrown) {
             alert('error ' + textStatus + " " + errorThrown);
@@ -25,15 +26,17 @@ function templates(d){
 		t;
 	console.log(d);
 	
-	if (d.templates){
-		for (var i = 0; i < d.templates.length; i++){
-			t = d.templates[i];
-			console.log(t);
-			cont += "<a href='http://127.0.0.1:8008/game/ onclick='selected_template("+t.id+")'><div class='template-entry clearfix'>"+ 
-					"<div class='template-info'>"+ t.id + "</div>"+ 
-					"<div class='template-info'>"+ t.desc + "</div>"+ 
-					"<div class='template-info'>"+ t.author + "</div>"+ 
-					"</div></a>";
+	if (d){
+		for (var i = 0; i < d.length; i++){
+			t = d[i];
+
+			cont += "<a href='http://127.0.0.1:8008/game/ onclick='selected_template("+t.id+")'><div class='template-entry clearfix'>";
+			
+			for (thing in t){ 
+				console.log(thing);
+				cont += "<div class='template-info'>"+ thing + "</div>";	
+			}
+			cont += "</div></a>";
 		}
 		$("#maindiv").html(cont);
 	}

@@ -67,7 +67,7 @@ http.createServer(function (req, res) {
     res.writeHead(200, {'Content-Type': 'text/plain'});
     
 
-    db.get_all_template_string(function(result) {
+    db.get_all_templates(function(result) {
 		console.log(result);
 		var	gametemplates = [];
 		for (var i = 0; i < result.length;i++){
