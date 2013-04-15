@@ -240,32 +240,114 @@ var ge = module.exports = function (id, client) {
     //add some event(s)
     this.events = [
                    {   id:0,
-                	   name:"Fire in all industry zones!",
+                	   name:"Fire engulfs industrial complex! Workers in all districts gives into panic.\nPanic increased by 20 in all industrial districts",
                 	   effects: [{
                 		   domain:'zone',
-                		   type:'panic',
+                		   type:'event',
                 		   panic:(20),
                 		   affects:'industry'
                 	   }]
                    },
                     {   id:1,
-                    	name:"Power outage in all residential zones!",
+                    	name:"Power outage in all residential districts!\nPanic increased by 5 in all residential districts",
                     	effects: [{
                     		domain:'zone',
-                    		type:'panic',
+                    		type:'event',
                     		panic:(5),
                     		affects:'residential'
                     	}]
                     },
                      {   id:2,
-                    	 name:"Terrorist attack in all city zones!",
+                    	 name:"Terrorist attack in all city districts!\nPanic increased by 10 in all financial districts",
                     	 effects: [{
                     		 domain:'zone',
-                    		 type:'panic',
+                    		 type:'event',
                     		 panic:(35),
                     		 affects:[9, 10, 11]
                     	 }]
                      }
+					 ,
+                    {   id:3,
+                    	name:"Power outage in all residential districts\nPanic increased by 10 in all residential districts!",
+                    	effects: [{
+                    		domain:'zone',
+                    		type:'event',
+                    		panic:(5),
+                    		affects:'residential'
+                    	}]
+                    } ,
+                    {   id:4,
+                    	name:"Whispering about an epedemic can be heard.\nPanic increased by 10 in all districts",
+                    	effects: [{
+                    		domain:'zone',
+                    		type:'event',
+                    		panic:(10),
+                    		affects:zones
+                    	}]
+                    } ,
+                    {   id:5,
+                    	name:"An explosion has occured!\nPanic increased by 10 in all industry districts",
+                    	effects: [{
+                    		domain:'zone',
+                    		type:'event',
+                    		panic:(10),
+                    		affects:'industry'
+                    	}]
+                    } ,
+                    {   id:6,
+                    	name:"Rabid dogs roam the park!\nPanic increased by 10 in all parks",
+                    	effects: [{
+                    		domain:'zone',
+                    		type:'event',
+                    		panic:(10),
+                    		affects:'park'
+                    	}]
+                    } ,
+                    {   id:7,
+                    	name:"Viable pipe bomb has been found near a school!\nPanic increased by 10 in all residential districts",
+                    	effects: [{
+                    		domain:'zone',
+                    		type:'event',
+                    		panic:(10),
+                    		affects:'residential'
+                    	}]
+                    } ,
+                    {   id:8,
+                    	name:"Gunshots can be heard through a school cooridor!\nPanic increased by 10 in all residential districts",
+                    	effects: [{
+                    		domain:'zone',
+                    		type:'event',
+                    		panic:(10),
+                    		affects:'residential'
+                    	}]
+                    },
+                    {   id:9,
+                    	name:"Antrax has been spread on an undergroud!\nPanic increased by 10 in all financial districts",
+                    	effects: [{
+                    		domain:'zone',
+                    		type:'event',
+                    		panic:(10),
+                    		affects:'largecity'
+                    	}]
+                    },
+                    {   id:10,
+                    	name:"Large occurenses of MRSA Staph Bacteria Infections have been reported!\nPanic increased by 10 in all residential zones",
+                    	effects: [{
+                    		domain:'zone',
+                    		type:'event',
+                    		panic:(10),
+                    		affects:'residential'
+                    	}]
+                    },
+                    {   id:11,
+                    	name:"Gunshots can be heard through a school cooridor!\nPanic increased by 10 in all residential zones",
+                    	effects: [{
+                    		domain:'zone',
+                    		type:'event',
+                    		panic:(10),
+                    		affects:'residential'
+                    	}]
+                    }
                      ];
     
 }
