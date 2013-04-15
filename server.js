@@ -10,7 +10,9 @@ var http		= require('http'),
     engine      = require('./server/js/engine.js'),
     ioserver    = require('http').createServer(server),
     games       = {},
-    uuid        = require('node-uuid');
+    uuid        = require('node-uuid'),
+    db			= require('./database.js');
+    
 
 
 
@@ -64,33 +66,18 @@ http.createServer(function (req, res) {
     console.log('Data request received');
     res.writeHead(200, {'Content-Type': 'text/plain'});
     
-    //TODO GET list of template IDs, description, author
-    
-    
-    //dummy
-    var t = {
-    	templates : [
-    		{ 	id : 1,
-    			desc : "This is a terrible template",
-    			author : "Mons"
-    		},
-    		{ 	id : 2,
-    			desc : "This is a terrific template",
-    			author : "Knut"
-    		},
-    		{ 	id : 3,
-    			desc : "This is a bad template",
-    			author : "Ulf"
-    		},
-    		{ 	id : 4,
-    			desc : "This is a good template",
-    			author : "Bjarne"
-    		},
-    	]
-    }
-    var stringed = JSON.stringify(t);
-    console.log("Sending list of templates");
-    res.end('templates('+stringed+')');
+
+    db.get_all_template_string(function(result) {
+		console.log(result);
+		var	gametemplates = [];
+		for (var i = 0; i < result.length;i++){
+			gametemplates.push(result[i].json_string);
+		}
+		
+    	console.log("Sending list of templates");
+    	res.end('templates('+gametemplates+')');
+
+	});  
 }).listen(8124);
 console.log('Data server running at http://127.0.0.1:8124/');
 
@@ -156,15 +143,23 @@ socket_listener.sockets.on('connection', function (client) {
         console.log('**SOCKET_LISTENER** received command ' + c);
         engine.end_game(client, c);
     });
-    
+	
     client.on('create_game', function(c) {
-        console.log('**SOCKET_LISTENER** received create command ' + c);
-        // db.get_template(c.template_id)
-        var g = new engine(client.userid, client);
-        games[g.id] = g;
-        client.game_id = g.id;
-        g.start(client);
-    });
+
+    	//henter ut gametemplate med gitt template id
+    	db.get_template_string(c.template_id, function(result) {
+			console.log(result);
+			var	gametemplate = JSON.parse(result[0].json_string);
+			
+			console.log('**SOCKET_LISTENER** received create command ' + c);
+        	var g = new engine(client.userid, client, gametemplate);
+        	games[g.id] = g;
+        	client.game_id = g.id;
+        	g.start(client);
+
+		});
+    })
+
     
     client.on('join_game', function(c) {
         console.log('**SOCKET_LISTENER** received join command ' + c);
