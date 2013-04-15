@@ -4,7 +4,8 @@
     Imports the game engine that handles all game logic.
     Imports http and makes a server that socket.io can listen to.
 */
-var express     = require('express'),
+var http		= require('http'),
+	express     = require('express'),
     server      = module.exports = express(),
     engine      = require('./server/js/engine.js'),
     ioserver    = require('http').createServer(server),
@@ -27,7 +28,7 @@ server.use('/img', (__dirname + '/client/rec/img'));
 server.set('view engine', 'html');
 server.set('port', process.env.PORT || 8008);
 
-console.log('Server running at http://127.0.0.1:8008/');
+console.log('View server running at http://127.0.0.1:8008/');
 
 /*  Handle http requests:
     
@@ -35,21 +36,63 @@ console.log('Server running at http://127.0.0.1:8008/');
     index.html page that contains the canvas.
 */
 server.get('/', function(request, response){
-    response.render('game');
-})
+    response.render('index');
+});
 
-server.get('/create', function(request, response){
-    response.render('create');
-})
+server.get('/expert', function(request, response){
+    response.render('expert_form');
+});
 
 server.get('/login', function(request, response){
     console.log("Request for '/login'");
     response.render('login');
-})
+});
 
-server.get('/game', function(request, response){
+server.get('/game/:id', function(request, response){
+	var id = request.params.id;
+	console.log("Chose game template "+id);
     response.render('game');
-})
+});
+
+
+
+/*	Data server
+*/
+
+
+http.createServer(function (req, res) {
+    console.log('Data request received');
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    
+    //TODO GET list of template IDs, description, author
+    
+    
+    //dummy
+    var t = {
+    	templates : [
+    		{ 	id : 1,
+    			desc : "This is a terrible template",
+    			author : "Mons"
+    		},
+    		{ 	id : 2,
+    			desc : "This is a terrific template",
+    			author : "Knut"
+    		},
+    		{ 	id : 3,
+    			desc : "This is a bad template",
+    			author : "Ulf"
+    		},
+    		{ 	id : 4,
+    			desc : "This is a good template",
+    			author : "Bjarne"
+    		},
+    	]
+    }
+    var stringed = JSON.stringify(t);
+    console.log("Sending list of templates");
+    res.end('templates('+stringed+')');
+}).listen(8124);
+console.log('Data server running at http://127.0.0.1:8124/');
 
 
 /* Configure Socket.IO:
@@ -143,7 +186,8 @@ socket_listener.sockets.on('connection', function (client) {
 
     client.on('disconnect', function () {
         console.log('**SOCKET_LISTENER** client ' + client.userid + ' disconnected.');
-        //engine.endGame(client.game.id, client.userid);
+       	//TODO Save to DB
+        games[client.userid] = {};
     });
       
 });// end onConnection

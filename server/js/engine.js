@@ -510,6 +510,7 @@ ge.prototype.delete_game = function(client, c) {
 
 
 
+
 ge.prototype.next_player = function(game) {
 	game.active_player.set_actions_left(4);
 	game.active_player = ge.players[(game.turn-1) % game.players-length];
