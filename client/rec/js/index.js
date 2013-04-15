@@ -29,7 +29,7 @@ function templates(d){
 		for (var i = 0; i < d.templates.length; i++){
 			t = d.templates[i];
 			console.log(t);
-			cont += "<a href='http://127.0.0.1:8008/game/"+t.id+"'><div class='template-entry clearfix'>"+ 
+			cont += "<a href='http://127.0.0.1:8008/game/ onclick='selected_template("+t.id+")'><div class='template-entry clearfix'>"+ 
 					"<div class='template-info'>"+ t.id + "</div>"+ 
 					"<div class='template-info'>"+ t.desc + "</div>"+ 
 					"<div class='template-info'>"+ t.author + "</div>"+ 
@@ -42,7 +42,9 @@ function templates(d){
 	}
 }
 
-
+function selected_template(id){
+	create_cookie("template_id", id, 1);
+}
 
 
 

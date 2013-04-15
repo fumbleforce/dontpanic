@@ -159,6 +159,7 @@ socket_listener.sockets.on('connection', function (client) {
     
     client.on('create_game', function(c) {
         console.log('**SOCKET_LISTENER** received create command ' + c);
+        // db.get_template(c.template_id)
         var g = new engine(client.userid, client);
         games[g.id] = g;
         client.game_id = g.id;
