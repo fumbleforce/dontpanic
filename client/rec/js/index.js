@@ -26,7 +26,7 @@ function templates(d){
 		t;
 	console.log(d);
 	
-	if (d){
+	if (typeof d === 'list'){
 		for (var i = 0; i < d.length; i++){
 			t = d[i];
 
@@ -39,6 +39,18 @@ function templates(d){
 			cont += "</div></a>";
 		}
 		$("#maindiv").html(cont);
+	}
+	else if (typeof d === 'object'){
+		cont += "<a href='http://127.0.0.1:8008/game/ onclick='selected_template("+d.id+")'><div class='template-entry clearfix'>";
+			
+		for (thing in d){ 
+			console.log(thing);
+			cont += "<div class='template-info'>"+ d[thing] + "</div>";	
+		}
+		cont += "</div></a>";
+		
+		$("#maindiv").html(cont);
+	
 	}
 	else{
 		alert("No templates are available!");
