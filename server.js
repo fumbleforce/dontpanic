@@ -11,11 +11,7 @@ var http		= require('http'),
     ioserver    = require('http').createServer(server),
     games       = {},
     uuid        = require('node-uuid'),
-    db			= require('./database.js');
-    
-
-
-
+    db			= require('./database.js'),
 /*  Configuration of express server:
     
     Makes the ejs module handle all html files.
@@ -150,7 +146,6 @@ socket_listener.sockets.on('connection', function (client) {
     	db.get_template_string(c.template_id, function(result) {
 			console.log(result);
 			var	gametemplate = JSON.parse(result[0].json_string);
-			
 			console.log('**SOCKET_LISTENER** received create command ' + c);
         	var g = new engine(client.userid, client, gametemplate);
         	games[g.id] = g;
@@ -176,10 +171,19 @@ socket_listener.sockets.on('connection', function (client) {
         console.log('');
         console.log('**SOCKET_LISTENER** Received:');
         var parsed = JSON.parse(c);
-        console.log(parsed);
+        replay_string += c;
+        replay_string2 += c;
+        console.log("*******REPLAY STRING:::****: " + replay_string2);
         if(games[client.userid]) games[client.game_id].command(client, parsed);
     });
 
+	client.on('show_replay', function(c) {
+		db.get_replay_string(1, function(result) {
+			
+		});
+		if(games[client.userid]) games[client.game_id].command(client, parsed);
+	})
+	
     client.on('disconnect', function () {
         console.log('**SOCKET_LISTENER** client ' + client.userid + ' disconnected.');
        	//TODO Save to DB

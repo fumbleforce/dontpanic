@@ -213,11 +213,11 @@ db.set_replay_state = function (game_id, turn_id, replay_string)  {
 	Gets the replay state of the given game and turn id. 
 */
 
-db.get_replay_state = function (game_id, turn_id) {
-	connection.query('SELECT State_array AS solution FROM Replay WHERE Game_ID = ' + 
-	game_id, 'AND Turn_ID = ' + turn_id, function (err, rows, fields) {
+db.get_replay_state = function (replay_id, command_id, next) {
+	connection.query('SELECT command AS solution FROM Replay WHERE replay_id = ' + 
+	replay_id, 'AND command_id = ' + command_id, function (err, rows, fields) {
 		if (err) throw err;
-		return rows[0].solution;
+		return next(rows[0].solution);
 	});
 }
 
