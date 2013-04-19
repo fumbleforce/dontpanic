@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="/css/styles.css" >
+</head>
+
+<body style="background-color:white;">
+<div class="content-table">
+	
+	<div class="content-row">
+		<div class="content-column"></div>
+		<div class="content-column top-bar clearfix">
+			<div id="top_text_expert" class="info-label">
+				Expert interface form
+			</div>
+		</div>
+		<div class="content-column"></div>
+	</div>
+	
+	<div class="content-row">
+
+		<div class="content-column"></div>
+		<div class="content-column clearfix">
+			<div class="sidebar-textform">
+				<div class="content-column">
+					<div class="content-row">
+						<div id="1_player_info_label" class="info-label-form"> 
+							Create a new effect:
+							<br>
+							if a field is empty then nothing will be created
+						</div>
+						
+					</div>
+				</div>
+				
+				<div class="content-column">
+					<div class="content-row">
+						
+						<div class="content-row">
+							<div class="content-column">
+								Role:
+							</div>
+							<div class="content-column">
+								<input id="player_role" type="text" name="something">
+							</div>
+						</div>
+							
+						
+						<div class="content-row">
+							<div class="content-column">
+								Startnode:
+							</div>
+							<div id="node_column" class="content-column">
+								<select id="player_node">
+									<option value="-1">none exists</option>
+									
+								</select>
+							</div>
+						</div>
+						
+					</div>
+					<div class="content-row">
+						<button class="button" onclick="gco.add_player();">Add Player</button>
+						<button class="button" onclick="gco.change_player();">Change selected player</button>
+					</div>
+					
+				</div>
+			</div>
+			<div class="sidebar-textform">
+				<div class="content-column">
+					<div class="content-row">
+						<div id="1_player_info_label" class="info-label-form">
+							Create a new Role:
+							<br>
+							if a field is empty, nothing will be created
+						</div>
+						
+					</div>
+				</div>
+				
+				<div class="content-column">
+					<div class="content-row">
+						
+						<div class="content-row">
+							<div class="content-column">
+								Title:
+							</div>
+							<div class="content-column">
+								<input id="role_title" type="text" name="something">
+							</div>
+						</div>
+							
+						<div class="content-row">
+							<div class="content-column">
+								Info:
+							</div>
+							<div class="content-column">
+								<input id="role_info" type="text" name="something">
+							</div>
+						</div>
+						
+						<div class="content-row">
+							<div class="content-column">
+								Startnode:
+							</div>
+							<div id="node_column" class="content-column">
+								<select id="role_effect">
+									<option value="-1">none exists</option>
+									
+								</select>
+							</div>
+						</div>
+						
+					</div>
+					<div class="content-row">
+						<button class="button" onclick="gco.add_player();">Create Role</button>
+						<button class="button" onclick="gco.change_player();">Delete Role</button>
+					</div>
+					
+				</div>
+			</div>
+			
+			<div class="sidebar-textform">
+				<div class="content-column">
+					<div class="content-row">
+						<div id="1_player_info_label" class="info-label-form"> Create a new player:<br>if nothing typed it will be set to a default value</div>
+						
+					</div>
+				</div>
+				
+				<div class="content-column">
+					<div class="content-row">
+						
+						<div class="content-row">
+							<div class="content-column">
+								Role:
+							</div>
+							<div class="content-column">
+								<input id="player_role" type="text" name="something">
+							</div>
+						</div>
+							
+						
+						<div class="content-row">
+							<div class="content-column">
+								Startnode:
+							</div>
+							<div id="node_column" class="content-column">
+								<select id="player_node">
+									<option value="-1">none exists</option>
+									
+								</select>
+							</div>
+						</div>
+						
+					</div>
+					<div class="content-row">
+						<button class="button" onclick="gco.add_player();">Add Player</button>
+						<button class="button" onclick="gco.change_player();">Change selected player</button>
+					</div>
+					
+				</div>
+			</div>
+			
+			<input type="text" name="something"><br>
+
+			
+			<input type="checkbox" name="check-this"><br>
+
+			<input type="radio" name="radio-this"><br>
+
+			<div class="content-row">
+				<button class="button" onclick="gco.export_to_database();">Export To Database</button>
+			</div>
+			<div class="content-row">
+				<button class="button" onclick="gco.init_game();">Start!</button>
+				<button class="button" onclick="gco.del_selected_node();">Delete node</button>
+				<button class="button" onclick="gco.node_connection();">Start node connection</button>
+				<button class="button" onclick="gco.add_zone_nodes();">Add zone node</button>
+				<button class="button" onclick="gco.clear_zone_nodes();">Clear zone nodes</button>
+				<button class="button" onclick="gco.create_zone();">Create zone</button>
+				<button class="button" onclick="gco.del_selected_zone();">Delete zone</button>
+			</div>
+			<div class="content-row">
+				<canvas id="viewport">
+					<p>Your browser is terrible</p>
+					<p>Get a good one here:</p>
+					<p><a href="http://www.mozilla.org/en-US/firefox/new/">Firefox</a></p>
+					<p><a href="https://www.google.com/intl/no/chrome/browser/">Chrome</a></p>
+				</canvas>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<script src="/js/expert_interface.js"></script>
+
+
+</body>
+</html>
