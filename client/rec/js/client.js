@@ -21,7 +21,9 @@ socket.on('msg', function (msg) {
 
 socket.on('not_in_game', function(o){
     console.log("Client is not associated with a game");
-    socket.emit('create_game', {template_id : read_cookie("template_id")});
+    var tid = read_cookie("template_id");
+    console.log("Creating game with template_id : "+tid+" from cookie");
+    socket.emit('create_game', {template_id : tid});
 });
 
 socket.on('error', function (e) {
@@ -29,7 +31,9 @@ socket.on('error', function (e) {
 });
 
 socket.on('start_game', function (data) {
+	console.log("Recieved starting state, initializing.");
     var d = JSON.parse(data);
+    console.log(d);
     create_cookie('dp_user_id', data.userid, 1);
     gco.init_game(d);
 });
