@@ -50,7 +50,7 @@ server.get('/login', function(request, response){
     response.render('login');
 });
 
-server.get('/game/:id', function(request, response){
+server.get('/game/', function(request, response){
 	var id = request.params.id;
 	console.log("Chose game template "+id);
     response.render('game');
@@ -70,8 +70,10 @@ http.createServer(function (req, res) {
     db.get_all_templates(function(result) {
 		console.log(result);
 		var	gametemplates = [];
+		var temp;
 		for (var i = 0; i < result.length;i++){
-			gametemplates.push(result[i].json_string);
+			temp = result[i];
+			gametemplates.push(JSON.stringify(temp));
 		}
 		
     	console.log("Sending list of templates");
@@ -145,17 +147,24 @@ socket_listener.sockets.on('connection', function (client) {
     });
 	
     client.on('create_game', function(c) {
-
+		console.log('**SOCKET_LISTENER** received create command ' + c);
     	//henter ut gametemplate med gitt template id
     	db.get_template_string(c.template_id, function(result) {
-			console.log(result);
-			var	gametemplate = JSON.parse(result[0].json_string);
 			
-			console.log('**SOCKET_LISTENER** received create command ' + c);
-        	var g = new engine(client.userid, client, gametemplate);
-        	games[g.id] = g;
-        	client.game_id = g.id;
-        	g.start(client);
+			console.log(result);
+			try {
+				console.log(result);
+				var	gametemplate = JSON.parse(result[0].json_string);
+				var g = new engine(client.userid, client, gametemplate);
+		    	games[g.id] = g;
+		    	client.game_id = g.id;
+		    	g.start(client);
+			}
+			catch(e){
+				console.log("Cannot find template JSON string!");
+			}
+			
+        	
 
 		});
     })

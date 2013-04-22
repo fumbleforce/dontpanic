@@ -2,8 +2,6 @@ function play(){
 	var $md = $("#maindiv");
 	$md.html("");
 
-	
-	
     $.ajax({
         url: 'http://127.0.0.1:8124/',
         dataType: "jsonp",
@@ -25,32 +23,28 @@ function templates(d){
 	var cont = "",
 		t;
 	console.log(d);
-	
+	console.log("Type: " + typeof d);
+	var info;
 	if (typeof d === 'list'){
 		for (var i = 0; i < d.length; i++){
 			t = d[i];
-
-			cont += "<a href='http://127.0.0.1:8008/game/ onclick='selected_template("+t.id+")'><div class='template-entry clearfix'>";
-			
-			for (thing in t){ 
-				console.log(thing);
-				cont += "<div class='template-info'>"+ thing + "</div>";	
-			}
+			info = JSON.parse(t.json_string);
+			cont += "<a href='http://127.0.0.1:8008/game/' onclick='selected_template("+t.id+")'><div class='template-entry clearfix'>";
+			cont += "<div class='template-info'>"+ t.id + "</div>";	
+			cont += "<div class='template-info'>"+ info.desc + "</div>";	
+			cont += "<div class='template-info'>"+ info.author + "</div>";	
 			cont += "</div></a>";
 		}
 		$("#maindiv").html(cont);
 	}
 	else if (typeof d === 'object'){
-		cont += "<a href='http://127.0.0.1:8008/game/ onclick='selected_template("+d.id+")'><div class='template-entry clearfix'>";
-			
-		for (thing in d){ 
-			console.log(thing);
-			cont += "<div class='template-info'>"+ d[thing] + "</div>";	
-		}
+		info = JSON.parse(d.json_string);
+		cont += "<a href='http://127.0.0.1:8008/game/' onclick='selected_template("+d.id+")'><div class='template-entry clearfix'>";
+		cont += "<div class='template-info'>"+ d.id + "</div>";	
+		cont += "<div class='template-info'>"+ info.desc + "</div>";
+		cont += "<div class='template-info'>"+ info.author + "</div>";	
 		cont += "</div></a>";
-		
 		$("#maindiv").html(cont);
-	
 	}
 	else{
 		alert("No templates are available!");
