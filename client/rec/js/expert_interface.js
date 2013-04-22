@@ -92,7 +92,9 @@ var gco = {
 	mode : "add node", // not in use
 	selected_node : -1,
 	selected_zone : -1,
+
 	selected_player : -1,
+
 	connection : -1,
 	zone_container : [],
 	node_container : []
@@ -332,9 +334,11 @@ gco.player_draw = function(player, ctx){
     else{*/
 	
 	ctx.fillStyle = player.color;
+
 	if(gco.selected_player == player.id){
 		ctx.fillStyle = 'brown';
 	}
+
 	ctx.fill();
 	ctx.strokeStyle = 'black';
 	ctx.lineWidth = 2;
@@ -694,6 +698,7 @@ gco.add_player = function(){ // creates a player and adds it to the game.
 
 }
 
+
 gco.change_player = function()
 {
 	if(gco.selected_player == -1){
@@ -721,6 +726,7 @@ gco.change_player = function()
 	gco.draw();
 	
 }
+
 gco.create_connection = function(){ // creates a connection between the 2 selected nodes
 	if((gco.connection > -1) && (gco.selected_node > -1) && (gco.connection != gco.selected_node) && 
 			(gco.nodes[gco.connection].connects_to.indexOf(gco.nodes[gco.selected_node]) < 0)){
@@ -949,6 +955,26 @@ gco.update_startnode_column = function() {
 	
 }
 
+gco.update_startnode_column = function() {
+
+	var ddbox = document.getElementById("player_node");
+	
+
+	if(gco.nodes.length == 0){
+		document.player_node.options.length=1;
+		ddbox.options[0] = new Option('-1','none exists');
+		return;
+	}
+	ddbox.options.length=gco.nodes.length;
+	for( var i = 0; i < gco.nodes.length; i++){
+		ddbox.options[i] = new Option(i ,i);
+		
+	
+	}
+	
+	
+}
+
 gco.set_canvas_listener = function(){
     var canvas = gco.canvas,
         cst = gco.cst,
@@ -1015,6 +1041,7 @@ gco.set_canvas_listener = function(){
 				return;
 			}
 		}
+
 	
 		for (var i = 0; i < gco.nodes.length; i++) {
 

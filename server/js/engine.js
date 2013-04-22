@@ -5,6 +5,7 @@
 
 var ge = module.exports = function (id, client, template) {
 
+
 	console.log("Base template:");
 	console.log(template);
 	
@@ -34,7 +35,7 @@ var ge = module.exports = function (id, client, template) {
 	
 	
 	//Players
-	
+
 	this.players = [];
 	var player_colors = ["red","orange","yellow","chartreuse ","green","aqua","blue","purple"];
 	var player_role =["crowd manager", "driver", "volunteer", "operation expert", "coordinator","passer by"];
@@ -94,33 +95,117 @@ var ge = module.exports = function (id, client, template) {
 
 	/*
     this.events = [
-			{ id:0,
-                 name:"Fire in all industry zones!",
-                 effects: [{
-                 domain:'zone',
-                 type:'event',
-                 panic:(20),
-                 affects:'industry'
-                 }]
-            },
-            {	id:1,
-            name:"Power outage in all residential zones!",
-                     effects: [{
-                     domain:'zone',
-                     type:'event',
-                     panic:(5),
-                     affects:'residential'
-                     }]
+                   {   id:0,
+                	   name:"Fire engulfs industrial complex! Workers in all districts gives into panic.\nPanic increased by 20 in all industrial districts",
+                	   effects: [{
+                		   domain:'zone',
+                		   type:'event',
+                		   panic:(20),
+                		   affects:'industry'
+                	   }]
+                   },
+                    {   id:1,
+                    	name:"Power outage in all residential districts!\nPanic increased by 5 in all residential districts",
+                    	effects: [{
+                    		domain:'zone',
+                    		type:'event',
+                    		panic:(5),
+                    		affects:'residential'
+                    	}]
                     },
-            {	id:2,
-                     name:"Terrorist attack in all city zones!",
-                     effects: [{
-                     domain:'zone',
-                     type:'event',
-                     panic:(35),
-                     affects:[9, 10, 11]
-                     }]
+                     {   id:2,
+                    	 name:"Terrorist attack in all finacial districts!\nPanic increased by 10 in all financial districts",
+                    	 effects: [{
+                    		 domain:'zone',
+                    		 type:'event',
+                    		 panic:(35),
+                    		 affects:[9, 10, 11]
+                    	 }]
+                     }
+					 ,
+                    {   id:3,
+                    	name:"Power outage in all residential districts\nPanic increased by 10 in all residential districts!",
+                    	effects: [{
+                    		domain:'zone',
+                    		type:'event',
+                    		panic:(5),
+                    		affects:'residential'
+                    	}]
+                    } ,
+                    {   id:4,
+                    	name:"Shouting about an epedemic can be heard.\nPanic increased by 10 in all districts",
+                    	effects: [{
+                    		domain:'zone',
+                    		type:'event',
+                    		panic:(10),
+                    		affects:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
+                    	}]
+                    } ,
+                    {   id:5,
+                    	name:"An explosion has occured!\nPanic increased by 10 in all industry districts",
+                    	effects: [{
+                    		domain:'zone',
+                    		type:'event',
+                    		panic:(10),
+                    		affects:'industry'
+                    	}]
+                    } ,
+                    {   id:6,
+                    	name:"Rabid dogs roam the park!\nPanic increased by 10 in all parks",
+                    	effects: [{
+                    		domain:'zone',
+                    		type:'event',
+                    		panic:(10),
+                    		affects:'park'
+                    	}]
+                    } ,
+                    {   id:7,
+                    	name:"Viable pipe bomb has been found near a school!\nPanic increased by 10 in all residential districts",
+                    	effects: [{
+                    		domain:'zone',
+                    		type:'event',
+                    		panic:(10),
+                    		affects:'residential'
+                    	}]
+                    } ,
+                    {   id:8,
+                    	name:"Gunshots can be heard through a school cooridor!\nPanic increased by 10 in all residential districts",
+                    	effects: [{
+                    		domain:'zone',
+                    		type:'event',
+                    		panic:(10),
+                    		affects:'residential'
+                    	}]
+                    },
+                    {   id:9,
+                    	name:"Antrax has been spread on an undergroud!\nPanic increased by 10 in all financial districts",
+                    	effects: [{
+                    		domain:'zone',
+                    		type:'event',
+                    		panic:(10),
+                    		affects:'largecity'
+                    	}]
+>>>>>>> 969a9dea3b0efb02d46fd08edcfc5cd0fe2054e7
+                    },
+                    {   id:10,
+                    	name:"Large occurenses of MRSA Staph Bacteria Infections have been reported!\nPanic increased by 10 in all residential districts",
+                    	effects: [{
+                    		domain:'zone',
+                    		type:'event',
+                    		panic:(10),
+                    		affects:'residential'
+                    	}]
+                    },
+                    {   id:11,
+                    	name:"Gunshots can be heard through a school cooridor!\nPanic increased by 10 in all residential districts",
+                    	effects: [{
+                    		domain:'zone',
+                    		type:'event',
+                    		panic:(10),
+                    		affects:'residential'
+                    	}]
                     }
+
             ];*/
                 
                 
@@ -128,6 +213,7 @@ var ge = module.exports = function (id, client, template) {
 }//END Engine init
     
     
+
 //round panic by nearest five
 function round5(x)
 {
@@ -208,7 +294,7 @@ ge.prototype.command = function(client, c){
 			
 			
 		case 'move_people':
-			// TODO: find out how many people we can move
+			// TODO: find out how many people we can move, driver can move 10, regulars can only move 5
 			console.log("Trying to move people from zone: " + c.zone_from+
 				"to zone: " + c.zone_to);
 
