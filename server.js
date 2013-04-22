@@ -143,7 +143,7 @@ socket_listener.sockets.on('connection', function (client) {
     });
 	
     client.on('create_game', function(c) {
-
+		
 		console.log('**SOCKET_LISTENER** received create command ');
     	//henter ut gametemplate med gitt template id
     	console.log('Retrieving template with id: '+c.template_id);
@@ -155,9 +155,7 @@ socket_listener.sockets.on('connection', function (client) {
 			console.log("Created.");
 	    	games[g.id] = g;
 	    	client.game_id = g.id;
-	    	g.start(client);
-
-
+	    	g.start(client);		
 		});
     })
 

@@ -93,7 +93,7 @@ var ge = module.exports = function (id, client, template) {
     
     
 
-	/*
+	
     this.events = [
                    {   id:0,
                 	   name:"Fire engulfs industrial complex! Workers in all districts gives into panic.\nPanic increased by 20 in all industrial districts",
@@ -185,7 +185,7 @@ var ge = module.exports = function (id, client, template) {
                     		panic:(10),
                     		affects:'largecity'
                     	}]
->>>>>>> 969a9dea3b0efb02d46fd08edcfc5cd0fe2054e7
+
                     },
                     {   id:10,
                     	name:"Large occurenses of MRSA Staph Bacteria Infections have been reported!\nPanic increased by 10 in all residential districts",
@@ -206,7 +206,7 @@ var ge = module.exports = function (id, client, template) {
                     	}]
                     }
 
-            ];*/
+            ];
                 
                 
 	console.log("Finished populating engine object.");
