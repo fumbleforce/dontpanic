@@ -25,10 +25,12 @@ function templates(d){
 	console.log(d);
 	console.log("Type: " + typeof d);
 	var info;
-	if (typeof d === 'list'){
+	if (d.length){
 		for (var i = 0; i < d.length; i++){
-			t = d[i];
+			t = JSON.parse(d[i]);
 			info = JSON.parse(t.json_string);
+			console.log("Template parsed:");
+			console.log(info);
 			cont += "<a href='http://127.0.0.1:8008/game/' onclick='selected_template("+t.id+")'><div class='template-entry clearfix'>";
 			cont += "<div class='template-info'>"+ t.id + "</div>";	
 			cont += "<div class='template-info'>"+ info.desc + "</div>";	
@@ -52,6 +54,7 @@ function templates(d){
 }
 
 function selected_template(id){
+	console.log("Creating cookie for chosen template: "+id);
 	create_cookie("template_id", id, 1);
 }
 

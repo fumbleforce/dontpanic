@@ -68,7 +68,7 @@ http.createServer(function (req, res) {
     
 
     db.get_all_templates(function(result) {
-		console.log(result);
+
 		var	gametemplates = [];
 		var temp;
 		for (var i = 0; i < result.length;i++){
@@ -77,9 +77,10 @@ http.createServer(function (req, res) {
 		}
 		
     	console.log("Sending list of templates");
-    	res.end('templates('+gametemplates+')');
 
-	});  
+    	res.end('templates('+JSON.stringify(gametemplates)+')');
+
+	});
 }).listen(8124);
 console.log('Data server running at http://127.0.0.1:8124/');
 
@@ -104,7 +105,6 @@ var socket_listener = require('socket.io').listen(ioserver, {log:false});
 /*  Handle client interaction through socket.io:
     
     TODO Clients are given a custom ID .
-    Tells the client that it has connected.
     TODO Starts a game session with the client.
     Listens for commands and sends them to the game engine.
     TODO Listens for disconnects and ends the game associated with the disconnected player.
@@ -147,24 +147,18 @@ socket_listener.sockets.on('connection', function (client) {
     });
 	
     client.on('create_game', function(c) {
-		console.log('**SOCKET_LISTENER** received create command ' + c);
+		console.log('**SOCKET_LISTENER** received create command ');
     	//henter ut gametemplate med gitt template id
+    	console.log('Retrieving template with id: '+c.template_id);
     	db.get_template_string(c.template_id, function(result) {
+			var	gametemplate = JSON.parse(result[0].json_string);
 			
-			console.log(result);
-			try {
-				console.log(result);
-				var	gametemplate = JSON.parse(result[0].json_string);
-				var g = new engine(client.userid, client, gametemplate);
-		    	games[g.id] = g;
-		    	client.game_id = g.id;
-		    	g.start(client);
-			}
-			catch(e){
-				console.log("Cannot find template JSON string!");
-			}
-			
-        	
+			console.log("Creating game object based on template..");
+			var g = new engine(client.userid, client, gametemplate);
+			console.log("Created.");
+	    	games[g.id] = g;
+	    	client.game_id = g.id;
+	    	g.start(client);
 
 		});
     })

@@ -100,7 +100,7 @@ gco.ctx = gco.canvas.getContext("2d");
     Object map      The map object containing list of Zones and Nodes
 */
 gco.init_game = function (d) {
-    console.log("Game initiated");
+    console.log("Game initiated.");
     gco.players = d.players;
     gco.zones = d.zones;
     gco.nodes = d.nodes;
@@ -129,13 +129,13 @@ gco.start_timer = function(dur){
     console.log("Timer Started.");
     var left = dur,
         lab = document.getElementById("timer-label");
-    var int = setInterval(function(){
+    var inter = setInterval(function(){
         lab.innerHTML = "Panic Increase in: "+left;
-        gco.draw();
+        
         left--;
         if (left === -1) {
             command('inc_panic', {});
-            clearInterval(int);
+            clearInterval(inter);
         }
     }, 1000);
     
@@ -343,10 +343,9 @@ gco.decrease_panic = function(zone){
 gco.player_draw = function(player, ctx){
 	ctx.fillStyle = "rgba(255,0,0,0)";
 	ctx.save();
-	
-	
-	if (player.x === undefined) player.x = gco.nodes[player.node].x;
-    if (player.y === undefined) player.y = gco.nodes[player.node].y;
+
+	if (!player.x) player.x = gco.nodes[player.node].x;
+    if (!player.y) player.y = gco.nodes[player.node].y;
 	
 	//ctx.fillStyle = player.color;
 	

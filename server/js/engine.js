@@ -5,243 +5,96 @@
 
 var ge = module.exports = function (id, client, template) {
 
+	console.log("Base template:");
+	console.log(template);
+	
+	console.log("Populating....");
 
-	this.id = id || 0;
-	this.map = {};
-	this.settings = {};
+	//Game related
+	this.info_cards = template.info_cards || [];
+	this.events = template.events || [];
+	this.settings = template.settings || {};
+	
+	//Map
+	this.map = {nodes : [], zones : []};
+	
+	if(!template.map.nodes) console.log("No nodes in template!");
+	if(!template.map.zones) console.log("No zones in template!");
+	if(!template.players) console.log("No nodes in template!");
+	
+	for(var i = 0;i<template.map.nodes.length; i++){
+		this.map.nodes.push(new ge.Node(template.map.nodes[i]));
+	}
+	for(var i = 0;i<template.map.zones.length; i++){
+		this.map.zones.push(new ge.Zone(template.map.zones[i]));
+	}
+	console.log("Map:");
+	console.log(this.map);
+	
+	
+	
+	//Players
+	
 	this.players = [];
-	this.client = client;
-	this.active_player = 0;
-	this.turn = 0;
-	var SCALE= 90;
-	var PADD = 50;
-    this.map.nodes = [];
-    this.map.zones = [];
-    this.timer = 20;
-    this.information_centers = 0;
-    this.road_blocks = 0;
-    this.max_information_centers = 5;
-    this.max_road_blocks = 2;
-	this.cards_left = 10;
-	//how often events should fire
-	this.eventTurns = 3;
-	this.turnsSinceEvent = 0;
-
-    
-	this.info_cards = [
-       {
-    	   desc:"Calm financial districts",
-    	   effects: [{
-    		   domain:'zone',
-    		   type:'panic',
-    		   panic:(-5),
-    		   affects:'largecity'
-    	   }]
-       },
-       {
-    	   desc:"Calm industry districts",
-    	   effects: [{
-    		   domain:'zone',
-    		   type:'panic',
-    		   panic:(-5),
-    		   affects:'industry'
-    	   }]
-       },
-       {
-    	   desc:"Calm residential districts",
-    	   effects: [{
-    		   domain:'zone',
-    		   type:'panic',
-    		   panic:(-5),
-    		   affects:'residential'
-    	   }]
-       },
-   ];
-    
-
-    var conn = [
-        [1, 2, 3], // 0 
-        [0, 4, 6],
-        [0, 5, 7],
-        [0, 4, 5, 8],
-        [1, 3, 9],
-        [2, 3, 7, 8], // 5
-        [1, 9, 11],
-        [2, 5, 10],
-        [3, 5, 9, 13, 16],
-        [4, 6, 8, 14, 16],
-        [7, 12, 13], //10
-        [6, 14, 17],
-        [10, 15],
-        [8, 10, 15, 16],
-        [9, 11, 17, 19],
-        [12, 13, 16, 18],//15
-        [8, 9, 13, 15, 18, 19],
-        [11, 14, 20],
-        [15, 16, 19],
-        [14, 16, 18, 20],
-        [17, 19] // 20
-           ],
-    posx = [
-        1*SCALE, 1*SCALE, 3*SCALE, 3*SCALE, 3*SCALE,
-        5*SCALE, 5*SCALE, 7*SCALE, 7*SCALE, 7*SCALE,
-        9*SCALE, 9*SCALE, 11*SCALE, 10*SCALE, 11*SCALE,
-        14*SCALE, 11*SCALE, 13*SCALE, 15*SCALE, 15*SCALE,
-        15*SCALE
-    ],
-    posy = [
-        5*SCALE, 13*SCALE, 3*SCALE, 7*SCALE, 11*SCALE,
-        5*SCALE, 15*SCALE, 3*SCALE, 7*SCALE, 11*SCALE,
-        3*SCALE, 15*SCALE, 1*SCALE, 5*SCALE, 11*SCALE,
-        3*SCALE, 8*SCALE, 15*SCALE, 7*SCALE, 11*SCALE,
-        15*SCALE
-    ];
-
-    for (var i = 0; i < conn.length; i++){
-        posy[i] = posy[i]+PADD;
-        posx[i] = posx[i]+PADD;
-    }
-
-    for(var i = 0; i < 21; i++){
-		    node = new ge.Node(i, posx[i], posy[i], true, conn[i]);
-		    this.map.nodes.push(node);
-    }
-    
-    //TEST add some road blocks
-//    this.map.nodes[0].has_road_block = true;
-//    this.map.nodes[2].has_road_block = true;
-//    this.map.nodes[3].has_road_block = true;
-//    this.map.nodes[5].has_road_block = true;
-//    this.map.nodes[8].has_road_block = true;
-//    this.map.nodes[13].has_road_block = true;
-//    this.map.nodes[16].has_road_block = true;
-    
-    //add road blocks on all nodes for testing node/node connections
-//    for (var i=0; i<this.map.nodes.length; i++){
-//    	this.map.nodes[i].has_road_block = true;
-//    }
+	var player_colors = ["red","orange","yellow","chartreuse ","green","aqua","blue","purple"];
+	var player_role =["crowd manager", "driver", "volunteer", "operation expert", "coordinator","passer by"];
 	
-
-
-    var zones = [];
-    //Zones are 'residential' by default
-    zones[0] = new ge.Zone(0, [0, 1, 4, 3], [1, 2, 5]);
-    zones[1] = new ge.Zone(1, [0, 2, 5, 3], [0, 3, 4]);
-    zones[2] = new ge.Zone(2, [1, 4, 9, 6], [0, 5, 7]);
-    zones[3] = new ge.Zone(3, [2, 5, 7], [1, 4, 6]);
-    zones[4] = new ge.Zone(4, [3, 5, 8], [1, 5, 6]);
-    zones[5] = new ge.Zone(5, [3, 4, 9, 8], [0, 2, 4, 10]);
-    zones[6] = new ge.Zone(6, [5, 7, 10, 13, 8], [3, 4, 8, 9]);
-    zones[7] = new ge.Zone(7, [6, 9, 14, 11], [2, 11, 12]);
-    zones[8] = new ge.Zone(8, [10, 12, 15, 13], [6, 13]);
-    zones[9] = new ge.Zone(9, [8, 13, 16], [6, 10, 13]);
-    zones[10] = new ge.Zone(10, [8, 9, 16], [5, 9, 11]);
-    zones[11] = new ge.Zone(11, [9, 14, 19, 16], [7, 10, 15, 16]);
-    zones[12] = new ge.Zone(12, [11, 14, 17], [7, 11, 16]);
-    zones[13] = new ge.Zone(13, [13, 15, 16], [8, 9, 14]);
-    zones[14] = new ge.Zone(14, [15, 16, 18], [13, 15]);
-    zones[15] = new ge.Zone(15, [16, 18, 19], [11, 14]);
-    zones[16] = new ge.Zone(16, [14, 17, 20, 19], [11, 12]);
-
-    //change some zones from residential
-    zones[5].type="park";
-    zones[16].type="park";
-    zones[6].type="industry";
-    zones[7].type="industry";
-    zones[11].type="largecity";
-    zones[10].type="largecity";
-    zones[9].type="largecity";
-    
-    zones[0].color = "aqua";
-    zones[1].color = "steelblue";
-    zones[2].color = "brown";
-    zones[3].color = "darkblue";
-    zones[4].color = "darkgreen";
-    zones[5].color = "indigo";
-    zones[6].color = "gold";
-    zones[7].color = "orange";
-    zones[8].color = "grey";
-    zones[9].color = "peru";
-    zones[10].color = "silver";
-    zones[11].color = "teal";
-    zones[12].color = "yellow";
-    zones[13].color = "yellowgreen";
-    zones[14].color = "tomato";
-    zones[15].color = "seashell";
-    zones[16].color = "lightgoldenrodyellow";
-    
-    this.map.zones = zones;
-    
-    //TEST add panic on a few random zones
-    zones[0].panic_level = 0;
-    zones[1].panic_level = 5;
-    zones[2].panic_level = 15;
-    zones[3].panic_level = 30;
-    zones[5].panic_level = 30;
-    //zones[6].panic_level = 40;
-    zones[11].panic_level = 50;
-	
-	zones[0].people = 20;
-	zones[1].people = 25;
-	zones[3].people = 80;
-	zones[5].people = 5;
-	zones[7].people = 35;
-	zones[9].people = 50;
-	zones[11].people = 15;
-	zones[8].people = 125;
-	zones[4].people = 10;
-	
-
-    //set centroidX and centroidY for test zone
-    //TODO THIS IS ACTUALLY CENTER, NOT CENTROID. For better result, 
-    // centroid has to be calculated (might not be of use to us since
-    // polygons aren't that extreme)
-    for (var zon=0; zon<zones.length; zon++){
-    	var xx=0, yy=0;
-	    for (var i=0; i<zones[zon].nodes.length; i++){
-	    	xx+=this.map.nodes[zones[zon].nodes[i]].x;
-	    	yy+=this.map.nodes[zones[zon].nodes[i]].y;
-	    }
-    zones[zon].centroid=[xx/zones[zon].nodes.length, yy/zones[zon].nodes.length];
-    }
-    
-    
-    this.players = [];
-    player_colors = ["red","orange","yellow","chartreuse ","green","aqua","blue","purple"];
-	player_role =["crowd manager", "driver", "volunteer", "operation expert", "coordinator","passer by"];
-	/*this.randomrole =  
-		[{title: "Constructor",
-		
-        info:"Can create roadblocs alone",
-		effects: [{
-            domain:'zone',
-			type:'panic',
-			panic:(-5),
-			affects:[0,1,2,3,4,5,6,7,8,9]
-		}]
-		}];
-	*/
-	
-    for(var i = 0; i < 8; i++){
+	var player;
+	var len = template.players.length || 8;
+    for(var i = 0; i < len; i++){
 		player = new ge.Player(i, "player" + i, i*2, player_colors[i], player_role[Math.floor(Math.random()*player_role.length)],4);
     	player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
     	player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
     	this.players.push(player);
     }
-  /*  //add dummy roles
-    this.players[0].role = "Passer By";
-    this.players[1].role = "Crowd Manager";
-    this.players[2].role = "Driver";
-    this.players[3].role = "Operation Expert";
-    this.players[4].role = "Volunteer";
-    this.players[5].role = "Passer By";
-    this.players[6].role = "Coordinator";
-    this.players[7].role = "Crowd Manager";
-*/
-    //add some event(s)
+	/*for(var i = 0;i<template.players.length; i++){
+		this.players.push(new ge.Player(template.players[i]));
+	}
+	console.log("Players:");
+	console.log(this.players);*/
+	
+	
+	
+	
+	
+	
+	//Server related
+	this.client = client || null;
+	this.id = id || 0;
+	
+	//Local game related
+	this.active_player = 0;
+	this.turn = 0;
+	this.timer = 20;
+    this.information_centers = 0;
+    this.road_blocks = 0;
+    this.max_information_centers = 5;
+    this.max_road_blocks = 2;
+	this.cards_left = 10;
+	this.eventTurns = 3;
+	this.turnsSinceEvent = 0;
+	
+	//Local
+	var SCALE= 90;
+	var PADD = 50;
 
+   /*
+    //set centroidX and centroidY for zones
+    for (var zon=0; zon<this.map.zones.length; zon++){
+    	var xx=0, yy=0;
+	    for (var i=0; i<this.map.zones[zon].nodes.length; i++){
+	    	xx+=this.map.nodes[zones[zon].nodes[i]].x;
+	    	yy+=this.map.nodes[zones[zon].nodes[i]].y;
+	    }
+    	this.map.zones[zon].centroid=[xx/zones[zon].nodes.length, yy/zones[zon].nodes.length];
+    }
+    */
+    
+    
+
+	/*
     this.events = [
-                   { id:0,
+			{ id:0,
                  name:"Fire in all industry zones!",
                  effects: [{
                  domain:'zone',
@@ -268,9 +121,12 @@ var ge = module.exports = function (id, client, template) {
                      affects:[9, 10, 11]
                      }]
                     }
-            ];
+            ];*/
                 
-            }
+                
+	console.log("Finished populating engine object.");
+}//END Engine init
+    
     
 //round panic by nearest five
 function round5(x)
@@ -492,6 +348,7 @@ ge.prototype.command = function(client, c){
 
 ge.prototype.start = function(){
     var g = state(this);
+    console.log("Sending start state to client.");
     this.client.emit('start_game', JSON.stringify(g));
 }
 
@@ -645,6 +502,12 @@ function empty_state(g){
     };
 }
 
+
+
+
+
+
+
 //----------------------------
 //---------MODELS-------------
 //----------------------------
@@ -737,12 +600,12 @@ ge.User = function (username, password, name, email, is_admin) {
 
 
 
-ge.Node = function (id, x, y, is_start_position, connects_to) {
-	this.id = id;
-	this.x = x;
-	this.y = y;
-	this.is_start_position = is_start_position;
-	this.connects_to = connects_to; // Nodes
+ge.Node = function (n) {
+	this.id = n.id;
+	this.x = n.x;
+	this.y = n.y;
+	this.is_start_position = n.is_start_position;
+	this.connects_to = n.connects_to; // Nodes
 	this.has_information_center = false;
 	this.has_road_block = false;
 
@@ -861,9 +724,6 @@ ge.Role = function (title, info, effect) {
 
 
 
-
-
-
 ge.Event = function (text, effect) {
 	this.text = text;
 	this.effect = effect;
@@ -878,14 +738,14 @@ ge.Event = function (text, effect) {
 
 
 
-ge.Zone = function (id, nodes, zones) {
-	this.id = id;
-	this.type = "residential";
-	this.people = 0;
-	this.nodes = nodes;
-	this.adjacent_zones = zones;
-	this.panic_level = 0;//settes til 0 i starten??
-	this.centroid = [0,0];//center (centroid) X and Y of zone polygon to put panic info
+ge.Zone = function (z) {
+	this.id = z.id;
+	this.type = z.type;
+	this.people = z.people;
+	this.nodes = z.nodes;
+	this.adjacent_zones = z.zones;
+	this.panic_level = z.panic_level || 0;//settes til 0 i starten??
+	this.centroid = z.centroid;//center (centroid) X and Y of zone polygon to put panic info
 	
 }
 ge.Zone.prototype.update_panic = function (panic_level) {
