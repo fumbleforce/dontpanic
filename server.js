@@ -176,9 +176,7 @@ socket_listener.sockets.on('connection', function (client) {
         console.log('');
         console.log('**SOCKET_LISTENER** Received:');
         var parsed = JSON.parse(c);
-        replay_string += c;
-        replay_string2 += c;
-        console.log("*******REPLAY STRING:::****: " + replay_string2);
+        
         if(games[client.userid]) games[client.game_id].command(client, parsed);
     });
 	
