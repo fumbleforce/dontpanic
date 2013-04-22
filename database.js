@@ -144,6 +144,14 @@ db.get_all_templates = function (next) {
 	});
 	
 }
+
+db.set_event = function(id, name, effect) {
+	connection.query('INSERT INTO event SET?', {id: id, name: name, effect: effect}, 
+	function (err, rows, fields) {
+		if (err) throw err;
+		console.log('Successfully added event to database');	
+	});
+})
 //kallet til get all templates
 /*db.get_all_templates(function(result) {
 	//console.log(result);
