@@ -19,13 +19,7 @@
 		</div>
 	</div>
 	
-	<div class="content-row">
-		<div class="content-column clearfix">
-		
-		
-		
-		</div>
-	</div>
+
 	<div class="content-row">
 		
 		
@@ -39,7 +33,10 @@
 						<div id="1_player_info_label" class="info-label-form"> 
 							Create a new effect:
 							<br>
-							if a field is empty then nothing will be created
+							A created effect will be added to 
+							<br>
+							Info Card creation
+							
 						</div>
 						
 					</div>
@@ -50,21 +47,30 @@
 						
 						<div class="content-row">
 							<div class="content-column">
-								Role:
+								Name:
 							</div>
 							<div class="content-column">
-								<input id="player_role" type="text" name="something">
+								<input id="effect_name" type="text" name="something">
+							</div>
+						</div>
+						<div class="content-row">
+							<div class="content-column">
+								Domain:
+							</div>
+							<div class="content-column">
+								<input id="effect_domain" type="text" name="something">
 							</div>
 						</div>
 							
 						
 						<div class="content-row">
 							<div class="content-column">
-								Startnode:
+								Type:
 							</div>
 							<div id="node_column" class="content-column">
-								<select id="player_node">
-									<option value="-1">none exists</option>
+								<select id="effect_type">
+									<option value="panic">panic</option>
+									<option value="event">event</option>
 									
 								</select>
 							</div>
@@ -72,19 +78,52 @@
 						
 					</div>
 					<div class="content-row">
-						<button class="button" onclick="gco.add_player();">Add Player</button>
-						<button class="button" onclick="gco.change_player();">Change selected player</button>
+						<button class="button" id="card_add_effect" onClick="gco.card_create_add_effect()">Add Effect</button>
+						
 					</div>
 					
 				</div>
+				<div class="content-column">
+					<div class="content-row">
+						<div class="content-row">
+							<div class="content-column">
+								Panic:
+							</div>
+							<div class="content-column">
+								<input id="effect_panic" type="text" name="something">
+							</div>
+						</div>
+						<div class="content-row">
+							<div class="content-column">
+								Affects:
+							</div>
+							<div class="content-column">
+								<input id="effect_affects" type="text" name="something">
+							</div>
+						</div>
+						
+					</div>
+				</div>
+				
 			</div>
 			<div class="sidebar-textform">
 				<div class="content-column">
 					<div class="content-row">
 						<div id="1_player_info_label" class="info-label-form">
-							Create a new Role:
-							<br>
-							if a field is empty, nothing will be created
+							Create a new informationcard:
+							
+						</div>
+						
+					</div>
+					<div class="content-row">
+						<div class="content-column">
+							Show Card:
+						</div>
+						<div id="card_show_column" class="content-column">
+							<select id="card_show" onChange="gco.show_card()">
+								<option value="-1">none exists</option>
+								
+							</select>
 						</div>
 						
 					</div>
@@ -95,41 +134,76 @@
 						
 						<div class="content-row">
 							<div class="content-column">
-								Title:
+								Name:
 							</div>
 							<div class="content-column">
-								<input id="role_title" type="text" name="something">
+								<input id="card_name" type="text" name="something">
 							</div>
 						</div>
 							
 						<div class="content-row">
 							<div class="content-column">
-								Info:
+								Desc:
 							</div>
 							<div class="content-column">
-								<input id="role_info" type="text" name="something">
+								<input id="card_desc" type="text" name="something">
 							</div>
 						</div>
 						
 						<div class="content-row">
 							<div class="content-column">
-								Startnode:
-							</div>
-							<div id="node_column" class="content-column">
-								<select id="role_effect">
-									<option value="-1">none exists</option>
-									
-								</select>
-							</div>
+							Nr of cards:
+						</div>
+						<div class="content-column">
+							<input id="card_count" type="text" name="something">
+						</div>
 						</div>
 						
 					</div>
 					<div class="content-row">
-						<button class="button" onclick="gco.add_player();">Create Role</button>
-						<button class="button" onclick="gco.change_player();">Delete Role</button>
+						<button class="button" onclick="gco.add_info_card();">Create ICard</button>
+						<button class="button" onclick="gco.change_player();">Delete ICard</button>
 					</div>
 					
 				</div>
+				<div class="content-column">
+					<div class="content-row">
+						
+						<div class="content-column">
+							Nr of Eff:
+						</div>
+						<div class="content-column">
+							<input id="card_effect_count" type="text" name="something">
+						</div>
+					
+						
+					</div>
+					<div class="content-row">
+						
+						
+						<div class="content-column">
+							Effect:
+						</div>
+						<div id="node_column" class="content-column">
+							<select id="card_effect">
+								<option value="-1">none added</option>
+								
+							</select>
+						</div>
+					
+						
+					</div>
+					<div class="content-row">
+						<div class="content-column">
+							
+						</div>
+						<div id="card_show_column" class="content-column">
+							
+							<button class="button" id="card_remove_effect" onClick="gco.card_create_remove_effect">Remove Effect</button>
+						</div>
+					</div>
+				</div>
+				
 			</div>
 			
 			<div class="sidebar-textform">
@@ -147,8 +221,16 @@
 							<div class="content-column">
 								Role:
 							</div>
-							<div class="content-column">
-								<input id="player_role" type="text" name="something">
+							<div id="player_role_column" class="content-column">
+								<select id="player_role">
+									<option value="coordinator">coordinator</option>
+									<option value="crowd manager">crowd manager</option>
+									<option value="driver">driver</option>
+									<option value="operation expert">operation expert</option>
+									<option value="volunteer">volunteer</option>
+									<option value="passer by">passer by</option>
+									
+								</select>
 							</div>
 						</div>
 							
@@ -169,17 +251,82 @@
 					<div class="content-row">
 						<button class="button" onclick="gco.add_player();">Add Player</button>
 						<button class="button" onclick="gco.change_player();">Change selected player</button>
+						<button class="button" onclick="gco.del_selected_player();">Delete Player</button>
 					</div>
 					
 				</div>
 			</div>
 			
-			<input type="text" name="something"><br>
-
 			
-			<input type="checkbox" name="check-this"><br>
+			<div class="sidebar-textform">
+				<div class="content-column">
+					<div class="content-row">
+						<div id="1_player_info_label" class="info-label-form"> 
+							Zone changing:
+							<br>
+							Edit the info of the zone
+						</div>
+						
+					</div>
+				</div>
+				
+				<div class="content-column">
+					<div class="content-row">
+						
+						<div class="content-row">
+							<div class="content-column">
+								Name:
+							</div>
+							<div class="content-column">
+								<div id="zone_id" type="info_label">no zone selected</div>
+							</div>
+						</div>
+							
+						
+						<div class="content-row">
+							<div class="content-column">
+								Type:
+							</div>
+							<div id="content_column" class="content-column">
+								<select id="edit_zone_type">
+									<option value="residential">residential</option>
+									<option value="industry">industry</option>
+									<option value="park">park</option>
+									<option value="largecity">largecity</option>
+									
+								</select>
+							</div>
+						</div>
+						
+						<div class="content-row">
+							<div class="content-column">
+								People:
+							</div>
+							<div id="content_column" class="content-column">
+								<input type="text" id="zone_people" value="0">
+							</div>
+						</div>
+						<div class="content-row">
+							<div class="content-column">
+								Panic:
+							</div>
+							<div id="content_column" class="content-column">
+								<input type="text" id="zone_panic" value="0">
+							</div>
+						</div>
+					</div>
+					<div class="content-row">
+						<button class="button" onclick="gco.edit_zone();">Change</button>
+					</div>
+					
+				</div>
+			</div>
+			
+			
+			Map name: 
+			<input id="template_name" type="text" name="something"><br>
 
-			<input type="radio" name="radio-this"><br>
+	
 
 			<div class="content-row">
 				<button class="button" onclick="gco.export_to_database();">Export To Database</button>
@@ -201,13 +348,15 @@
 					<p><a href="https://www.google.com/intl/no/chrome/browser/">Chrome</a></p>
 				</canvas>
 			</div>
+			
+			
+
 		</div>
 	</div>
 
 </div>
 
 <script src="expert_interface.js"></script>
-
 
 </body>
 </html>

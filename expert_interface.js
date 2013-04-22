@@ -38,6 +38,26 @@ var c_height = 1550,
 	var book_img = new Image();
 	book_img.src = "client/rec/img/cat.jpg"
 	
+	
+	
+	var coordinator_img = new Image();
+	coordinator_img.src = "client/rec/img/coordinator.png";
+	
+	var crowd_manager_img = new Image();
+	crowd_manager_img.src = "client/rec/img/crowd_manager.png";
+	
+	var driver_img = new Image();
+	driver_img.src = "client/rec/img/driver.png";
+	
+	var operation_expert_img = new Image();
+	operation_expert_img.src = "client/rec/img/operation_expert.png";
+	
+	var volunteer_img = new Image();
+	volunteer_img.src = "client/rec/img/volunteer.png";
+	
+	var passer_by_img = new Image();
+	passer_by_img.src = "client/rec/img/passer_by.png";
+	
 
 /* TEMPORARY ZONE IMAGES
 
@@ -95,7 +115,11 @@ var gco = {
 	selected_player : -1,
 	connection : -1,
 	zone_container : [],
-	node_container : []
+	node_container : [],
+	effects : [],
+	info_cards : [],
+	rdy_effects :[]
+		  
 }
 gco.ctx = gco.canvas.getContext("2d");
 
@@ -116,12 +140,54 @@ gco.init_game = function (d) {
     
     gco.setup_canvas();
     gco.set_canvas_listener();
+	
 
+	if(gco.info_cards.length == 0){
+	
+		gco.info_cards.push(newIcard = {
+					name:"Calm financial",
+					desc:"Calm financial districts",
+					effects: [{
+						name:"financ calm",
+						domain:'zone',
+						type:'panic',
+						panic:(-5),
+						affects:'largecity'
+					}]
+				});
+		gco.info_cards.push(newIcard = {
+					name:"Calm industry",
+					desc:"Calm industry districts",
+					effects: [{
+						name:"indus calm",
+						domain:'zone',
+						type:'panic',
+						panic:(-5),
+						affects:'industry'
+					}]
+				});
+		gco.info_cards.push(newIcard = {
+					name:"Calm residental",
+					desc:"Calm residental districts",
+					effects: [{
+						name:"resid calm",
+						domain:'zone',
+						type:'panic',
+						panic:(-5),
+						affects:'residential'
+					}]
+				});
+	
+	}
+	gco.icard_container_update();
 
     gco.draw();
 
 
 }
+
+
+
 
 gco.export_to_database = function(){
 
@@ -181,7 +247,8 @@ gco.export_to_database = function(){
 			id : szone.id, 
 			nodes : snodes,
 			type : szone.type,
-			adjacent_zones : szone.zones //find a way to calculate adjacent zones
+			adjacent_zones : szone.zones, //find a way to calculate adjacent zones
+			controid : szone.centroid
 			});
 	}
 	
@@ -317,33 +384,46 @@ gco.player_draw = function(player, ctx){
 	
 
 	
-    ctx.beginPath();
-    ctx.arc(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size, 0, Math.PI*2, true); 
-    ctx.closePath();
-    //ctx.fill();
-    //TODO draw circle to show active player when dragging/active?
-    /*if (this.active_player===player.id){
-    	var gradiant = ctx.createRadialGradient(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size-10, player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size);
-    	gradiant.addColorStop(0, player.color);
-    	gradiant.addColorStop(1, 'blue');
-    	ctx.fillStyle=gradiant;
-    	ctx.fill();
-    }
-    else{*/
+	ctx.fillStyle = "rgba(255,0,0,0)";
+	ctx.save();
+
+
 	
-	ctx.fillStyle = player.color;
-	if(gco.selected_player == player.id){
-		ctx.fillStyle = 'brown';
-	}
-	ctx.fill();
-	ctx.strokeStyle = 'black';
-	ctx.lineWidth = 2;
-	ctx.stroke();
-    
-	ctx.fillStyle = 'black';
-    
+    ctx.beginPath();
+    ctx.arc(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size, 0, Math.PI*7, true); 
+
+
     ctx.font="bold 15px Arial",
     ctx.fillText(player.id, player.x+player_offsetX[player.id]-5, player.y+player_offsetY[player.id]+6);
+
+	if(gco.selected_player == player.id){
+		ctx.fillStyle = "rgba(255,0,0,"+(0.2+(0.12*25/11))+")";
+	}
+			//draw the images
+	if (player.role==='coordinator'){
+		ctx.drawImage(coordinator_img, player.x + player_offsetX[player.id]-24, player.y+player_offsetY[player.id]-24);
+	}
+	else if (player.role==='crowd manager'){
+		ctx.drawImage(crowd_manager_img, player.x + player_offsetX[player.id]-24, player.y+player_offsetY[player.id]-24);
+	}
+	else if (player.role==='driver'){
+		ctx.drawImage(driver_img, player.x + player_offsetX[player.id]-35, player.y+player_offsetY[player.id]-35);
+	}
+	else if (player.role==='operation expert'){
+		ctx.drawImage(operation_expert_img, player.x + player_offsetX[player.id]-24, player.y+player_offsetY[player.id]-24);	
+	}	
+	else if (player.role==='volunteer'){
+		ctx.drawImage(volunteer_img, player.x + player_offsetX[player.id]-24, player.y+player_offsetY[player.id]-24);
+	}	
+	else if (player.role==='passer by'){
+		ctx.drawImage(passer_by_img, player.x + player_offsetX[player.id]-24, player.y+player_offsetY[player.id]-24);
+	}
+	
+	ctx.closePath();
+	ctx.save();
+	ctx.clip()
+	ctx.fill();
+	ctx.restore();
 }
 
 gco.node_draw = function(node, ctx){ //draws a node with the provided context
@@ -517,7 +597,7 @@ gco.zone_draw = function(zone, ctx){ // draws a zone with the provided context
 	    	xx+=gco.nodes[gco.zones[zon].nodes[i].id].x;
 	    	yy+=gco.nodes[gco.zones[zon].nodes[i].id].y;
 	    }
-    gco.zones[zon].centroid=[xx/gco.zones[zon].nodes.length, yy/gco.zones[zon].nodes.length];
+		gco.zones[zon].centroid=[xx/gco.zones[zon].nodes.length, yy/gco.zones[zon].nodes.length];
     }
 	
 	
@@ -526,7 +606,7 @@ gco.zone_draw = function(zone, ctx){ // draws a zone with the provided context
 		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]-22,40,30); 
 	}
 	else{
-		console.log("checking zone draw panic");
+		// console.log("checking zone draw panic");
 		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]-22,25,30); 
 	}
 	ctx.fillStyle = 'white';
@@ -608,6 +688,8 @@ gco.zone_contains = function(z, mx, my){ // checks if the clicked area contains 
 }
 
 gco.draw = function(){ //Draws everything
+
+	
     var to_node = {},
         node = {},
         zone = {},
@@ -660,6 +742,43 @@ gco.draw = function(){ //Draws everything
         document.getElementById("player-turn-label").innerHTML = "Player "+(gco.active_player)+"'s turn";
         document.getElementById("action-label").innerHTML = "Actions left: "+(players[gco.active_player].actions_left); 
     } */
+	ctx.fillStyle="White";
+	ctx.font="10px verdana";
+	selected_line = "Selected: ";
+	selected_line2 = "";
+	selected_line3 = "";
+	if(gco.selected_node > -1){
+		selected_line += "Node " + gco.selected_node ;
+		selected_line2 += "X: " + gco.nodes[gco.selected_node].x + " Y: " + gco.nodes[gco.selected_node].y;
+	}
+	else if(gco.selected_zone > -1){
+		selected_line += "Zone " + gco.selected_zone;
+		selected_line2 += "Nodes:";
+		for(var i = 0; i < gco.zones[gco.selected_zone].nodes.length; i++){
+			selected_line2 += " " + gco.zones[gco.selected_zone].nodes[i].id;
+		}
+		
+	}
+	else if(gco.selected_player > -1){
+		selected_line += "Player " + gco.selected_player;
+		selected_line2 += "X: " + gco.players[gco.selected_player].x + " Y: " + gco.players[gco.selected_player].y;
+	}
+	else {
+		selected_line += "Nothing";
+	}
+	
+	
+	
+	
+	
+	ctx.fillText(selected_line, gco.canvas.width - ctx.measureText(selected_line).width, 10);
+	ctx.fillText(selected_line2, gco.canvas.width - ctx.measureText(selected_line2).width, 20);
+	ctx.fillText(selected_line3, gco.canvas.width - ctx.measureText(selected_line3).width, 40);
+	
+	
+	
+	
+	
     
 }// end draw
 
@@ -679,13 +798,13 @@ gco.add_player = function(){ // creates a player and adds it to the game.
 		console.log("to many players");
 		return;
 	}
-	console.log("color: " + player_colors[gco.next_player]);
+	
 		
 	gco.players.push(player = {
 				id:gco.next_player,
 				user:"player",
 				node:gco.nodes[player_node],
-				color:player_colors[gco.next_player],
+				//color:player_colors[gco.next_player],
 				role:player_role,
 				actions_left : 4
 			});
@@ -740,6 +859,22 @@ gco.create_connection = function(){ // creates a connection between the 2 select
 		
 	
 }
+gco.edit_zone = function(){
+	if(gco.selected_zone < 0){
+		console.log("no Zone selected");
+		return;
+	}
+	
+	//var zone = gco.zones[gco.selected_zone];
+	console.log("changing zone");
+	gco.zones[gco.selected_zone].type = document.getElementById("edit_zone_type").value;
+	gco.zones[gco.selected_zone].people = document.getElementById("zone_people").value;
+	gco.zones[gco.selected_zone].panic_level = document.getElementById("zone_panic").value;
+	//console.log("changing zone");
+	gco.draw();
+	
+	
+}
 gco.node_connection = function(){ // saves the selected node fot connection purposes
 
 	gco.connection = gco.selected_node; 
@@ -774,7 +909,7 @@ gco.del_selected_zone = function(){ // delete the selected zone, if none is sele
 
 	if(gco.selected_zone > -1){
 		index = gco.selected_zone;
-		zone = gco.zones[index];
+		
 		
 		
 		gco.zones.splice(index, 1);
@@ -785,6 +920,20 @@ gco.del_selected_zone = function(){ // delete the selected zone, if none is sele
 		gco.clear_zone_nodes();
 		gco.draw();
 		
+	}
+}
+gco.del_selected_player = function(){
+	if(gco.selected_player > -1){
+		
+		index = gco.selected_player;
+		
+		
+		
+		gco.players.splice(index, 1);
+		
+		gco.selected_player = -1;
+		gco.re_id();
+		gco.draw();
 	}
 }
 
@@ -926,20 +1075,71 @@ gco.create_zone = function(){ // checks if it is possible to create a zone, and 
 	
 	
 }
+gco.add_info_card = function() {
+	
+	cname = document.getElementById("card_name").value;
+	cdesc = document.getElementById("card_desc").value;
+	ceff = gco.rdy_effects; 
+	
+	if(ceff.lenght == 0 || cname == "" || cdesc == ""){
+		return;
+	}
 
+	
+	gco.info_cards.push(newCard = {
+		
+		name : cname,
+		desc : cdesc,
+		effects : ceff
+		});
+}
+gco.card_create_add_effect = function() {
 
-
+	gco.rdy_effects.push("effect");
+	ename = document.getElementById("effect_name").value;
+	edomain = document.getElementById("effect_domain").value;
+	etype = document.getElementById("effect_type").value;
+	epanic = document.getElementById("effect_panic").value;
+	eaffects = document.getElementById("effect_affects").value;
+	
+	if(ename == "" || edomain == "" || etype == "" || epanic == "" || eaffects == ""){
+		return;
+	}
+	
+	gco.rdy_effects.push( newEffect = {
+		name : ename,
+		domain : edomain,
+		type : etype,
+		panic : epanic,
+		affects : eaffects
+	});
+	
+	var effbox = document.getElementById("card_effect");
+	
+	effbox.options.length = gco.rdy_effects.length;
+	for( var i = 0; i < gco.rdy_effects.length ; i++){
+	
+		effbox.options[i] = new Option(gco.rdy_effects[i].name, i);
+	}
+	// TODO add the effect properly
+	
+}
+gco.card_create_remove_effect = function() {
+	// splice some shit
+	
+}
 gco.update_startnode_column = function() {
 
 	var ddbox = document.getElementById("player_node");
 	
 
 	if(gco.nodes.length == 0){
-		document.player_node.options.length=1;
+		
 		ddbox.options[0] = new Option('-1','none exists');
+		document.player_node.options.length=1;
 		return;
 	}
-	ddbox.options.length=gco.nodes.length;
+	ddbox.options.length = gco.nodes.length;
 	for( var i = 0; i < gco.nodes.length; i++){
 		ddbox.options[i] = new Option(i ,i);
 		
@@ -948,6 +1148,45 @@ gco.update_startnode_column = function() {
 	
 	
 }
+
+gco.zone_box_update = function(){
+	if(gco.selected_zone < 0){
+		document.getElementById("zone_id").innerHTML = "no zone selected";
+		return;
+	}
+	
+	document.getElementById("zone_id").innerHTML = gco.selected_zone;
+}
+gco.icard_container_update = function() {
+	
+	var ddbox = document.getElementById("card_show");
+	
+
+	if(gco.info_cards.length == 0){
+		//document.player_node.options.length=1;
+		ddbox.options[0] = new Option('-1','none exists');
+		return;
+	}
+	ddbox.options.length = gco.info_cards.length;
+	for( var i = 0; i < gco.info_cards.length; i++){
+		ddbox.options[i] = new Option(gco.info_cards[i].name, i);
+		
+	
+	}
+}
+gco.show_card = function(){
+	var card = gco.info_cards[document.getElementById("card_show").value];
+	document.getElementById("card_name").value = card.name;
+	document.getElementById("card_desc").value = card.desc;
+	
+	var effbox = document.getElementById("card_effect");
+	effbox.options.length = card.effects.length;
+	for( var i = 0; i < card.effects.length ; i++){
+	
+		effbox.options[i] = new Option(card.effects[i].name, i);
+	}
+}
+
 
 gco.set_canvas_listener = function(){
     var canvas = gco.canvas,
@@ -959,6 +1198,30 @@ gco.set_canvas_listener = function(){
         
     canvas.addEventListener('selectstart', function(e) { e.preventDefault(); return false; }, false);
 
+	
+	//canvas.addEventListener('sw', gco.zone_box_update(), true); // end keylistener
+	
+	window.addEventListener('keydown',function(e) {
+		console.log("key" + e.keyCode);
+		
+		
+		if(e.keyCode == 68 || e.keyCode == 46){
+			gco.del_selected_node();
+			gco.del_selected_zone();
+		}
+		if(e.keyCode == 67){
+			gco.node_connection();
+		}
+		if(e.keyCode == 65){
+			gco.add_zone_nodes();
+		}
+		if(e.keyCode == 90){
+			gco.create_zone();
+		}
+	
+	},true); // end key listener
+	
+	
     canvas.addEventListener('mousedown', function(e) {
 		
         
@@ -972,6 +1235,8 @@ gco.set_canvas_listener = function(){
 		gco.selected_player = -1;
         cst.selected_zone = null;
         cst.selected_node = null;
+		
+		gco.zone_box_update();
        
 		/*
 		if (cst.selection) {
@@ -1046,6 +1311,7 @@ gco.set_canvas_listener = function(){
 			if(gco.zone_contains(zones[z], mx, my)){
 				console.log("Clicked on zone " + z);
 				gco.selected_zone = z;
+				gco.zone_box_update();
 				
 				gco.draw();
 				return;
@@ -1105,6 +1371,10 @@ gco.set_canvas_listener = function(){
         
     }, true);//end mouseup listener
     
+
+	
+
+	
 }//end set canvas listener
 
 
