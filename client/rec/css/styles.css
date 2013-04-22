@@ -216,6 +216,29 @@ p
 {
 	margin-top:20px;
 }
+.indexbtn
+{
+	width:634px;
+	height:100px;
+	margin-bottom:20px;
+	font-size:40px;
+}
+.template-entry
+{
+	padding:10px;
+	background-color: white;
+	margin-bottom:20px;
+	width:100%;
+}
+.template-info
+{
+	margin:10px;
+	font-size: 20px;
+	color:black;
+	width:180px;
+	text-align:center;
+	float:left;
+}
 
 
 

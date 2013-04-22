@@ -4,11 +4,6 @@
 */
 
 var ge = module.exports = function (id, client, template) {
-<<<<<<< HEAD
-=======
-
->>>>>>> e104e443ec62b5e463deb8a7e0c453fe2b579ebd
-
 	this.id = id || 0;
 	this.map = {};
 	this.settings = {};
@@ -244,7 +239,6 @@ var ge = module.exports = function (id, client, template) {
     //add some event(s)
 
     this.events = [
-<<<<<<< HEAD
                    {   id:0,
                 	   name:"Fire engulfs industrial complex! Workers in all districts gives into panic.\nPanic increased by 20 in all industrial districts",
                 	   effects: [{
@@ -283,7 +277,7 @@ var ge = module.exports = function (id, client, template) {
                     	}]
                     } ,
                     {   id:4,
-                    	name:"Whispering about an epedemic can be heard.\nPanic increased by 10 in all districts",
+                    	name:"Shouting about an epedemic can be heard.\nPanic increased by 10 in all districts",
                     	effects: [{
                     		domain:'zone',
                     		type:'event',
@@ -355,41 +349,7 @@ var ge = module.exports = function (id, client, template) {
                     	}]
                     }
                      ];
-					}
-
-=======
-                   { id:0,
-                 name:"Fire in all industry zones!",
-                 effects: [{
-                 domain:'zone',
-                 type:'event',
-                 panic:(20),
-                 affects:'industry'
-                 }]
-            },
-            {	id:1,
-            name:"Power outage in all residential zones!",
-                     effects: [{
-                     domain:'zone',
-                     type:'event',
-                     panic:(5),
-                     affects:'residential'
-                     }]
-                    },
-            {	id:2,
-                     name:"Terrorist attack in all city zones!",
-                     effects: [{
-                     domain:'zone',
-                     type:'event',
-                     panic:(35),
-                     affects:[9, 10, 11]
-                     }]
-                    }
-            ];
-                
-            }
->>>>>>> e104e443ec62b5e463deb8a7e0c453fe2b579ebd
-    
+					}  
 //round panic by nearest five
 function round5(x)
 {
@@ -470,7 +430,7 @@ ge.prototype.command = function(client, c){
 			
 			
 		case 'move_people':
-			// TODO: find out how many people we can move
+			// TODO: find out how many people we can move, driver can move 10, regulars can only move 5
 			console.log("Trying to move people from zone: " + c.zone_from+
 				"to zone: " + c.zone_to);
 
@@ -625,6 +585,7 @@ ge.prototype.save_state = function(client, c) {
 }
 ge.prototype.delete_game = function(client, c) {
 }
+
 
 
 

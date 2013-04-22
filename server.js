@@ -4,7 +4,8 @@
     Imports the game engine that handles all game logic.
     Imports http and makes a server that socket.io can listen to.
 */
-var express     = require('express'),
+var http		= require('http'),
+	express     = require('express'),
     server      = module.exports = express(),
     engine      = require('./server/js/engine.js'),
     ioserver    = require('http').createServer(server),
@@ -29,7 +30,7 @@ server.use('/img', (__dirname + '/client/rec/img'));
 server.set('view engine', 'html');
 server.set('port', process.env.PORT || 8008);
 
-console.log('Server running at http://127.0.0.1:8008/');
+console.log('View server running at http://127.0.0.1:8008/');
 
 /*  Handle http requests:
     
@@ -37,21 +38,48 @@ console.log('Server running at http://127.0.0.1:8008/');
     index.html page that contains the canvas.
 */
 server.get('/', function(request, response){
-    response.render('game');
-})
+    response.render('index');
+});
 
-server.get('/create', function(request, response){
-    response.render('create');
-})
+server.get('/expert', function(request, response){
+    response.render('expert_form');
+});
 
 server.get('/login', function(request, response){
     console.log("Request for '/login'");
     response.render('login');
-})
+});
 
-server.get('/game', function(request, response){
+server.get('/game/:id', function(request, response){
+	var id = request.params.id;
+	console.log("Chose game template "+id);
     response.render('game');
-})
+});
+
+
+
+/*	Data server
+*/
+
+
+http.createServer(function (req, res) {
+    console.log('Data request received');
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    
+
+    db.get_all_templates(function(result) {
+		console.log(result);
+		var	gametemplates = [];
+		for (var i = 0; i < result.length;i++){
+			gametemplates.push(result[i].json_string);
+		}
+		
+    	console.log("Sending list of templates");
+    	res.end('templates('+gametemplates+')');
+
+	});  
+}).listen(8124);
+console.log('Data server running at http://127.0.0.1:8124/');
 
 
 /* Configure Socket.IO:
@@ -117,8 +145,9 @@ socket_listener.sockets.on('connection', function (client) {
     });
 	
     client.on('create_game', function(c) {
-    	//henter ut gametemplate med gitt template id
-    	db.get_template_string(1, function(result) {
+		//henter ut gametemplate med gitt template id
+    	db.get_template_string(c.template_id, function(result) {
+
 			console.log(result);
 			var	gametemplate = JSON.parse(result[0].json_string);
 			
@@ -130,6 +159,7 @@ socket_listener.sockets.on('connection', function (client) {
 
 		});
     })
+
     
     client.on('join_game', function(c) {
         console.log('**SOCKET_LISTENER** received join command ' + c);
@@ -152,7 +182,8 @@ socket_listener.sockets.on('connection', function (client) {
 
     client.on('disconnect', function () {
         console.log('**SOCKET_LISTENER** client ' + client.userid + ' disconnected.');
-        //engine.endGame(client.game.id, client.userid);
+       	//TODO Save to DB
+        games[client.userid] = {};
     });
       
 });// end onConnection
