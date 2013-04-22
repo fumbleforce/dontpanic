@@ -119,7 +119,7 @@ db.get_all_zones = function(gametemplate_id, next) {
 		return next(rows);
 	});
 }
-
+//denne burde hete get_template
 db.get_template_string = function (gametemplate_id, next) {
 	connection.query('SELECT id, json_string FROM gametemplate WHERE id = ' 
 	+ gametemplate_id, function (err, rows) {
@@ -128,8 +128,8 @@ db.get_template_string = function (gametemplate_id, next) {
 	});
 }
 
-db.set_template_string = function (gametemplate_id, json_string) {
-	connection.query('INSERT INTO gametemplate SET?', {id: gametemplate_id, json_string: json_string},
+db.set_template_string = function (json_string) {
+	connection.query('INSERT INTO gametemplate SET?', {json_string: json_string},
 	function(err, rows, fields) {
 		if (err) throw err;
 		console.log('successfully added gametemplate to database');
@@ -148,16 +148,14 @@ db.get_all_templates = function (next) {
 /*db.get_all_templates(function(result) {
 	//console.log(result);
 });*/
-
+//ikke i bruk?
 db.get_template = function(gametemplate_id, next) {
 	var nodes = 0;
 	var zones = 0;
 	db.get_all_zones(gametemplate_id, function(result) {
 		zones = result;
-		console.log("database steg 1");
 		db.get_all_nodes(gametemplate_id, function(result) {
 			nodes = result;
-			console.log("Database steg 2");
 			var gametemplate = {
 				nodes : nodes,
 				zones : zones,
@@ -201,19 +199,19 @@ db.get_all_usernames = function () {
 	Puts the given replay string to Replay in the database, works
 */
 
-db.set_replay_state = function (game_id, turn_id, replay_string)  {
-	connection.query('INSERT INTO Replay SET?', {Game_ID: game_id, 
-	Turn_id: turn_id, State_array: replay_string}, function (err, result) {
+db.set_command = function (replay_id, command_id, command)  {
+	connection.query('INSERT INTO Replay SET?', {replay_id: replay_id, 
+	command_id: command_id, command: command}, function (err, result) {
 		if (err) throw err;
 		console.log('Sucessfully added', replay_string, 'to replay state');
 	});
 }
 
 /* 
-	Gets the replay state of the given game and turn id. 
+	Gets the command of the given game with given command id.
 */
 
-db.get_replay_state = function (replay_id, command_id, next) {
+db.get_command = function (replay_id, command_id, next) {
 	connection.query('SELECT command AS solution FROM Replay WHERE replay_id = ' + 
 	replay_id, 'AND command_id = ' + command_id, function (err, rows, fields) {
 		if (err) throw err;
