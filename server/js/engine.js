@@ -829,7 +829,7 @@ ge.Zone = function (z) {
 	this.type = z.type;
 	this.people = z.people;
 	this.nodes = z.nodes;
-	this.adjacent_zones = z.zones;
+	this.adjacent_zones = z.adjacent_zones;
 	this.panic_level = z.panic_level || 0;//settes til 0 i starten??
 	this.centroid = z.centroid;//center (centroid) X and Y of zone polygon to put panic info
 	
@@ -887,6 +887,7 @@ ge.Zone.prototype.move_people = function (p, to_zone, num) {
 	if(able){
 		this.people -= num;
 		to_zone.people += num;
+		p.update_actions(-1);
 		return true;
 	}
 	return false;
