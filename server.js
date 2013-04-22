@@ -9,7 +9,9 @@ var express     = require('express'),
     engine      = require('./server/js/engine.js'),
     ioserver    = require('http').createServer(server),
     games       = {},
-    uuid        = require('node-uuid');
+    uuid        = require('node-uuid'),
+    db			= require('./database.js');
+    
 
 
 
@@ -113,14 +115,21 @@ socket_listener.sockets.on('connection', function (client) {
         console.log('**SOCKET_LISTENER** received command ' + c);
         engine.end_game(client, c);
     });
-    
+	
     client.on('create_game', function(c) {
-        console.log('**SOCKET_LISTENER** received create command ' + c);
-        var g = new engine(client.userid, client);
-        games[g.id] = g;
-        client.game_id = g.id;
-        g.start(client);
-    });
+    	//henter ut gametemplate med gitt template id
+    	db.get_template_string(1, function(result) {
+			console.log(result);
+			var	gametemplate = JSON.parse(result[0].json_string);
+			
+			console.log('**SOCKET_LISTENER** received create command ' + c);
+        	var g = new engine(client.userid, client, gametemplate);
+        	games[g.id] = g;
+        	client.game_id = g.id;
+        	g.start(client);
+
+		});
+    })
     
     client.on('join_game', function(c) {
         console.log('**SOCKET_LISTENER** received join command ' + c);
