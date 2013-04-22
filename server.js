@@ -12,10 +12,6 @@ var http		= require('http'),
     games       = {},
     uuid        = require('node-uuid'),
     db			= require('./database.js');
-    
-
-
-
 /*  Configuration of express server:
     
     Makes the ejs module handle all html files.
@@ -150,13 +146,11 @@ socket_listener.sockets.on('connection', function (client) {
 
 			console.log(result);
 			var	gametemplate = JSON.parse(result[0].json_string);
-			
 			console.log('**SOCKET_LISTENER** received create command ' + c);
         	var g = new engine(client.userid, client, gametemplate);
         	games[g.id] = g;
         	client.game_id = g.id;
         	g.start(client);
-
 		});
     })
 
@@ -171,15 +165,16 @@ socket_listener.sockets.on('connection', function (client) {
         engine.leave_game(client, c);
     });
     
-    
     client.on('game_command', function(c) {
         console.log('');
         console.log('**SOCKET_LISTENER** Received:');
         var parsed = JSON.parse(c);
-        console.log(parsed);
+        replay_string += c;
+        replay_string2 += c;
+        console.log("*******REPLAY STRING:::****: " + replay_string2);
         if(games[client.userid]) games[client.game_id].command(client, parsed);
     });
-
+	
     client.on('disconnect', function () {
         console.log('**SOCKET_LISTENER** client ' + client.userid + ' disconnected.');
        	//TODO Save to DB
