@@ -120,7 +120,7 @@ db.get_all_zones = function(gametemplate_id, next) {
 		return next(rows);
 	});
 }
-//denne burde hete get_template
+
 db.get_template_string = function (gametemplate_id, next) {
 	connection.query('SELECT id, json_string FROM gametemplate WHERE id = ' 
 	+ gametemplate_id, function (err, rows) {
@@ -146,6 +146,17 @@ db.get_all_templates = function (next) {
 	
 }
 
+db.get_all_replays = function (next) {
+	connection.query('SELECT distinct replay_id FROM replay', function (err, rows, fields) {
+		if (err) throw err;
+		return next(rows);
+	});
+}
+
+//db.get_all_replays(function (result) {
+//	console.log(result);
+//});
+
 db.set_event = function(effect) {
 	connection.query('INSERT INTO event SET?', {effect: effect}, 
 	function (err, rows, fields) {
@@ -153,6 +164,13 @@ db.set_event = function(effect) {
 		console.log('Successfully added event to database');	
 	});
 }
+
+db.get_all_events = function (next) {
+	connection.query('SELECT * FROM event', function (err, rows, fields) {
+		return next(rows);
+	});
+}
+
 //kallet til get all templates
 /*db.get_all_templates(function(result) {
 	//console.log(result);
@@ -188,17 +206,16 @@ db.add_info_card = function (name) {
 
 /* get all Usernames, works*/ 
 
-db.get_all_usernames = function () {
+db.get_all_usernames = function (next) {
 	var query = connection.query('SELECT User_Name AS solution FROM User');
 	query.on('error', function(err) {
 		throw err;
 	})
 	
 	.on('result', function(result) {
-		return result;
+		return next(result);
 	})
 }
-
 
 /*
 	Sends a callback with the replay state for the given game id and turn id
