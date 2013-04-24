@@ -5,8 +5,16 @@
     <link rel="stylesheet" href="/css/styles.css" >
 </head>
 
-<body>
-<div class="content-table" style="height:2000px">
+<body style="height:2000px">
+
+
+<div style="float:right;margin:0 15px 5px 0;width:400px;">
+<embed
+embed {left: 50px; margin-left: 450px; } src="/music/dynamite.mp3" width="400" height="120" loop="true" autostart="true" ></embed>
+</div>
+
+<div class="content-table">
+
     
     <div class="title-row content-row">
         <div class="content-column"></div>
@@ -19,7 +27,7 @@
     <div class="content-row">
     	<div class="content-column"></div>
         <div class="content-column" id="maindiv">
-			<button class="indexbtn">Play</button>
+			<button class="indexbtn" onclick="play()">Play</button>
        		<a href="/expert" ><button class="indexbtn">Expert Interface</button></a>
         </div>
         <div class="content-column"></div>
