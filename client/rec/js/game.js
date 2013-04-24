@@ -312,6 +312,7 @@ gco.info_card_click = function(p, c) {
 
 gco.move_people = function(){
 	if(gco.cst.selected_zone !== null){
+		gco.update_status("Moving people from zone "+gco.cst.selected_zone+"...");
 		gco.cst.moving_people = true;
 		gco.cst.moving_from = gco.cst.selected_zone;
 	}
@@ -708,6 +709,7 @@ gco.set_canvas_listener = function(){
             selected;
 		
 		gco.update_status("");
+		gco.update_options([]);
         cst.selected_zone = null;
         cst.selected_node = null;
         
