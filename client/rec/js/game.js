@@ -294,6 +294,10 @@ gco.update_cards = function() {
 }
 
 
+gco.update_status = function(status){
+	$('#status_label').html(status);
+}
+
 gco.info_card_click = function(p, c) {
 	console.log(p);
 	console.log(c);
@@ -460,7 +464,7 @@ gco.roadblock_draw = function(node, ctx){
 }
 
 gco.background_draw = function(ctx){
-    ctx.fillStyle="black";
+    ctx.fillStyle="rgba(0, 0, 0, 0.0)";
     ctx.fillRect(0,0, c_width, c_height);
 }
 
@@ -664,9 +668,12 @@ gco.draw = function(){
     for (var i = 0; i < players.length; i++) {
         pl = players[i];
         gco.player_draw(pl, ctx);
-        var id = "p"+i;
-        document.getElementById(id).style.background = "gray";
-        if (i === gco.active_player) document.getElementById(id).style.background = "white";
+
+        var $pdiv = $("#p"+i);
+        $pdiv.removeClass("active-player");
+        if (i === gco.active_player){
+        	$pdiv.addClass("active-player");
+        }
     }
     
     if(players.length > 1){
@@ -702,6 +709,7 @@ gco.set_canvas_listener = function(){
         
         if (cst.selection) {
             console.log("clearing selection");
+            gco.update_status("");
             cst.selection.x = nodes[cst.selection.node].x
             cst.selection.y = nodes[cst.selection.node].y
             cst.selection = undefined;
@@ -712,7 +720,7 @@ gco.set_canvas_listener = function(){
         for (var i = 0; i < players.length; i++) {
 
         	if (gco.player_contains(players[i], mx, my)) {
-        		console.log("Clicked on a player "+players[i].id);
+        		gco.update_status("Clicked on player  "+i);
         		selected = players[i];
         		//Check if player is active, so it can be moved
         		if (i===gco.active_player){
@@ -732,7 +740,7 @@ gco.set_canvas_listener = function(){
 		for (var i = 0; i < nodes.length; i++) {
 
         	if (gco.node_contains(nodes[i], mx, my)) {
-        		console.log("Clicked on node "+i);
+        		gco.update_status("Selected node "+i);
         		cst.selected_node = i;
 				command('select_node', {node_id : cst.selected_node});
         		gco.draw();
@@ -744,10 +752,12 @@ gco.set_canvas_listener = function(){
 
         	if (gco.zone_contains(zones[i], mx, my)) {
         		console.log("Clicked on zone "+i);
+        		gco.update_status("Selected zone "+i);
         		cst.selected_zone = i;
         		//TODO for testing, we add 'decrease_panic' when selecting zones
         		if(cst.moving_people){
         			command('move_people', {zone_from: cst.moving_from, zone_to:i});
+        			gco.update_status("Moved people to zone "+i);
         			cst.moving_from = null;
         			cst.moving_people = false;
         		}
@@ -774,6 +784,7 @@ gco.set_canvas_listener = function(){
             cst.selection.x = mx - cst.dragoffx;
             cst.selection.y = my - cst.dragoffy;   
             gco.draw();
+            gco.update_status("Dragging player "+cst.selection.id);
         }
     }, true);//end mousemove listener
     
@@ -790,9 +801,11 @@ gco.set_canvas_listener = function(){
                         player_id : cst.selection.id,
                         node_id : i
                     });
+                    gco.update_status("Moved player "+cst.selection.id);
                     cst.selection = undefined;
                     cst.dragging = false;
                     gco.draw();
+                    
                     return;
                 }
             }
