@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="/css/styles.css" >
+</head>
+
+<body>
+<div class="content-table">
+    
+    <div class="content-row">
+        <div class="margin-row"></div>
+    </div>
+    
+    <div class="content-row top-bar-row">
+        <div class="content-column"></div>
+        <div class="content-column top-bar clearfix">
+        	<div class="top-bar-info">
+		        
+		        <div id="player-turn-label" class="info-label">Player 0's turn</div>
+		        <div id="turn-label" class="info-label">Turn: 0</div>
+		        <div id="action-label" class="info-label">Action points left: 4</div>
+		        <div id="timer-label" class="info-label">Panic Increase in: 00</div>
+            </div>
+            <div class="margin-row">
+            	
+            </div>
+            <div class="information-row clearfix">
+            
+           		<div id="selection" class="info-container">
+            		<button class="btn-end-turn" onclick="command('end_turn');">Next Turn</button>
+            	
+            	</div>
+            	<div id="status_label" class="info-container"></div>
+            </div>
+        </div>
+        <div id="event-column" class="content-column"></div>
+    </div>
+	<div class="content-row">
+		<div class="margin-row"></div>
+	</div>
+    <div class="content-row">
+        <div class="content-column">
+            <div id="left-sidebar" class="sidebar-left">
+            </div>
+        </div>
+        
+        <div class="content-column">
+            <div class="column-wrap">
+            <canvas id="viewport">
+                <p>Your browser is terrible</p>
+                <p>Get a good one here:</p>
+                <p><a href="http://www.mozilla.org/en-US/firefox/new/">Firefox</a></p>
+                <p><a href="https://www.google.com/intl/no/chrome/browser/">Chrome</a></p>
+            </canvas>
+            </div>
+        </div>
+        <div class="content-column">
+            <div id="right-sidebar" class="sidebar-right">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>A game by Group 10</footer>
+
+<script src="/js/cookies.js"></script>
+<script src="/js/jquery-1.9.1.min.js"></script>
+<script src="/js/game.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/client.js"></script>
+
+
+</body>
+</html>
