@@ -562,7 +562,7 @@ function effect(card, g) {
 						break;
 						
 						//player actions are increased to 6
-					case 'increasemoves'
+					case 'increasemoves':
 						
 						var apai = players[this.active_player];
 						apai.actions_left = apai.actions_left +2;
@@ -570,7 +570,7 @@ function effect(card, g) {
 						break;
 						
 						//Active player steals an action from the next player
-					case 'stealaction' 
+					case 'stealaction':
 					
 						var apsa = players[this.active_player]; 
 						apsa.actions_left = apsa.actions_left +1;
@@ -578,15 +578,15 @@ function effect(card, g) {
 						break;
 						
 					//TODO
-					case 'tradecards'
+					case 'tradecards':
 						break;
 					
 					//TODO	
-					case 'moveanotherplayer'
+					case 'moveanotherplayer':
 						break;
 						
 					//TODO
-					case 'blocknextevent'
+					case 'blocknextevent':
 					
 						this.eventTurns = 2;
 						
