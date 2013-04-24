@@ -2,54 +2,43 @@
 <html lang="en">
 
 <head>
-    <link rel="stylesheet" href="/css/styles.css" >
+    <link rel="stylesheet" href="client/rec/css/styles.css" >
 </head>
 
-<body style="background-color:white;">
+<body>
 <div class="content-table">
 	
 	<div class="content-row">
-		<div class="content-column"></div>
+		<div class="content-column">
 		<div class="content-column top-bar clearfix">
 			<div id="top_text_expert" class="info-label">
 				Expert interface form
 			</div>
+			
 		</div>
-		<div class="content-column"></div>
+		</div>
 	</div>
 	
 
 	<div class="content-row">
-
-		<div class="content-column"></div>
-		<div class="content-column clearfix">
-
-		
-		
-		
-		</div>
-	</div>
-	<div class="content-row">
 		
 		
 		<div class="content-column">
-
+			
+			
+			
 			<div class="sidebar-textform">
 				<div class="content-column">
 					<div class="content-row">
 						<div id="1_player_info_label" class="info-label-form"> 
 							Create a new effect:
 							<br>
-
 							A created effect will be added to 
 							<br>
 							Info Card creation
 							
+						</div>
 						
-
-							if a field is empty then nothing will be created
-						</div>					
-
 					</div>
 				</div>
 				
@@ -89,7 +78,8 @@
 						
 					</div>
 					<div class="content-row">
-						<button class="button" id="card_add_effect" onClick="gco.card_create_add_effect()">Add Effect</button>
+						<button class="button" id="card_add_effect" onClick="gco.card_create_add_effect()">Add Effect(Card)</button>
+						<button class="button" id="event_add_effect" onClick="gco.event_add_effect()">Add Effect(Event)</button>
 						
 					</div>
 					
@@ -132,7 +122,7 @@
 						</div>
 						<div id="card_show_column" class="content-column">
 							<select id="card_show" onChange="gco.show_card()">
-								<option value="-1">none exists</option>
+								<option value="-1">none added</option>
 								
 							</select>
 						</div>
@@ -210,7 +200,7 @@
 						</div>
 						<div id="card_show_column" class="content-column">
 							
-							<button class="button" id="card_remove_effect" onClick="gco.card_create_remove_effect">Remove Effect</button>
+							<button class="button" id="card_remove_effect" onClick="gco.card_create_remove_effect()">Remove Effect</button>
 						</div>
 					</div>
 				</div>
@@ -252,7 +242,7 @@
 							</div>
 							<div id="node_column" class="content-column">
 								<select id="player_node">
-									<option value="-1">none exists</option>
+									<option value="-1">none added</option>
 									
 								</select>
 							</div>
@@ -339,7 +329,6 @@
 
 	
 
-
 			<div class="content-row">
 				<button class="button" onclick="gco.export_to_database();">Export To Database</button>
 			</div>
@@ -368,7 +357,7 @@
 
 </div>
 
-<script src="/js/expert_interface.js"></script>
+<script src="expert_interface.js"></script>
 
 </body>
 </html>
