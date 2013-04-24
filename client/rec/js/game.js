@@ -464,8 +464,11 @@ gco.roadblock_draw = function(node, ctx){
 }
 
 gco.background_draw = function(ctx){
+	gco.canvas.width = gco.canvas.width;
+	/*
     ctx.fillStyle="rgba(0, 0, 0, 0.0)";
     ctx.fillRect(0,0, c_width, c_height);
+    */
 }
 
 gco.zone_draw = function(zone, ctx){
@@ -703,13 +706,14 @@ gco.set_canvas_listener = function(){
         var mx = e.offsetX,
             my = e.offsetY,
             selected;
-
+		
+		gco.update_status("");
         cst.selected_zone = null;
         cst.selected_node = null;
         
         if (cst.selection) {
             console.log("clearing selection");
-            gco.update_status("");
+
             cst.selection.x = nodes[cst.selection.node].x
             cst.selection.y = nodes[cst.selection.node].y
             cst.selection = undefined;
