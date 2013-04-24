@@ -78,7 +78,8 @@
 						
 					</div>
 					<div class="content-row">
-						<button class="button" id="card_add_effect" onClick="gco.card_create_add_effect()">Add Effect</button>
+						<button class="button" id="card_add_effect" onClick="gco.card_create_add_effect()">Add Effect(Card)</button>
+						<button class="button" id="event_add_effect" onClick="gco.event_add_effect()">Add Effect(Event)</button>
 						
 					</div>
 					
@@ -121,7 +122,7 @@
 						</div>
 						<div id="card_show_column" class="content-column">
 							<select id="card_show" onChange="gco.show_card()">
-								<option value="-1">none exists</option>
+								<option value="-1">none added</option>
 								
 							</select>
 						</div>
@@ -199,7 +200,7 @@
 						</div>
 						<div id="card_show_column" class="content-column">
 							
-							<button class="button" id="card_remove_effect" onClick="gco.card_create_remove_effect">Remove Effect</button>
+							<button class="button" id="card_remove_effect" onClick="gco.card_create_remove_effect()">Remove Effect</button>
 						</div>
 					</div>
 				</div>
@@ -241,7 +242,7 @@
 							</div>
 							<div id="node_column" class="content-column">
 								<select id="player_node">
-									<option value="-1">none exists</option>
+									<option value="-1">none added</option>
 									
 								</select>
 							</div>
