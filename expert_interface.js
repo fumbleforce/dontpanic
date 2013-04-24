@@ -938,7 +938,12 @@ gco.del_selected_player = function(){
 }
 
 gco.del_selected_node = function(){ // deletes the selected node, if none is selected nothing will be removed
-									// will not delete if node is a part of a zone
+			
+			// will not delete if node is a part of a zone
+
+	gco.clear_zone_nodes();
+	gco.connection = -1;
+	
 	
 	if(gco.selected_node > -1){
 		index = gco.selected_node;
@@ -949,6 +954,7 @@ gco.del_selected_node = function(){ // deletes the selected node, if none is sel
 		for (var z = 0; z < gco.zones.length ; z++){
 			if(gco.zones[z].nodes.indexOf(gco.nodes[gco.selected_node]) > -1 ){
 				console.log("failed delete test");
+				gco.selected_node = -1;
 				return;
 			}
 		}
@@ -957,6 +963,7 @@ gco.del_selected_node = function(){ // deletes the selected node, if none is sel
 		for (var i = 0; i< gco.players.length ; i++){
 			if(gco.players[i].node == node){
 				console.log("failed delete test");
+				gco.selected_node = -1;
 				return;
 			}
 		}
@@ -971,11 +978,10 @@ gco.del_selected_node = function(){ // deletes the selected node, if none is sel
 		gco.nodes.splice(index, 1);
 
 		
-		gco.selected_node = -1;
+		
 		gco.re_id();
-		gco.clear_zone_nodes();
-		gco.connection = -1;
-		gco.update_startnode_column();
+		gco.selected_node = -1;
+		gco.update_ddbox(document.getElementById("player_node"), gco.nodes);
 		gco.draw();
 	}
 }
@@ -1077,13 +1083,14 @@ gco.create_zone = function(){ // checks if it is possible to create a zone, and 
 }
 gco.add_info_card = function() {
 	
-	cname = document.getElementById("card_name").value;
-	cdesc = document.getElementById("card_desc").value;
-	ceff = gco.rdy_effects; 
+	cname = "new card";
+	cdesc = "new card";
+	ceff = []; 
 	
+	/*
 	if(ceff.lenght == 0 || cname == "" || cdesc == ""){
 		return;
-	}
+	}*/
 
 	
 	gco.info_cards.push(newCard = {
@@ -1092,10 +1099,18 @@ gco.add_info_card = function() {
 		desc : cdesc,
 		effects : ceff
 		});
+	
+	
+	
+	
+	
+	
+	gco.update_ddbox(document.getElementById("card_show"), gco.info_cards);
+	gco.show_card();
 }
 gco.card_create_add_effect = function() {
 
-	gco.rdy_effects.push("effect");
+	
 	ename = document.getElementById("effect_name").value;
 	edomain = document.getElementById("effect_domain").value;
 	etype = document.getElementById("effect_type").value;
@@ -1114,35 +1129,39 @@ gco.card_create_add_effect = function() {
 		affects : eaffects
 	});
 	
-	var effbox = document.getElementById("card_effect");
-	
-	effbox.options.length = gco.rdy_effects.length;
-	for( var i = 0; i < gco.rdy_effects.length ; i++){
-	
-		effbox.options[i] = new Option(gco.rdy_effects[i].name, i);
-	}
-	// TODO add the effect properly
+	gco.update_ddbox(document.getElementById("card_effect"), gco.rdy_effects);
 	
 }
 gco.card_create_remove_effect = function() {
-	// splice some shit
 	
+	var index = document.getElementById("card_effect").value;
+
+	gco.rdy_effects.splice(index, 1);
+	
+
+	gco.update_ddbox(document.getElementById("card_effect"), gco.rdy_effects);
 }
-gco.update_startnode_column = function() {
 
-	var ddbox = document.getElementById("player_node");
+
+gco.update_ddbox = function(ddbox, list) {
+
 	
 
-	if(gco.nodes.length == 0){
+	if(list.length == 0){
 		
-		ddbox.options[0] = new Option('-1','none exists');
-		document.player_node.options.length=1;
+		ddbox.options[0] = new Option('none added', '-1');
+		ddbox.options.length=1;
 		return;
 	}
 	ddbox.options.length = gco.nodes.length;
-	for( var i = 0; i < gco.nodes.length; i++){
-		ddbox.options[i] = new Option(i ,i);
-		
+	for( var i = 0; i < list.length; i++){
+		if(!list[i].name){
+			ddbox.options[i] = new Option(i ,i);
+		}
+		else{
+			ddbox.options[i] = new Option(list[i].name, i);
+			
+		}
 	
 	}
 	
@@ -1176,15 +1195,14 @@ gco.icard_container_update = function() {
 }
 gco.show_card = function(){
 	var card = gco.info_cards[document.getElementById("card_show").value];
+	
 	document.getElementById("card_name").value = card.name;
 	document.getElementById("card_desc").value = card.desc;
 	
-	var effbox = document.getElementById("card_effect");
-	effbox.options.length = card.effects.length;
-	for( var i = 0; i < card.effects.length ; i++){
+	gco.update_ddbox(document.getElementById("card_effect"), card.effects); 
 	
-		effbox.options[i] = new Option(card.effects[i].name, i);
-	}
+	gco.rdy_effects = card.effects;
+	
 }
 
 
@@ -1206,6 +1224,7 @@ gco.set_canvas_listener = function(){
 		
 		
 		if(e.keyCode == 68 || e.keyCode == 46){
+			gco.connection = -1;
 			gco.del_selected_node();
 			gco.del_selected_zone();
 		}
@@ -1330,7 +1349,7 @@ gco.set_canvas_listener = function(){
 		gco.next_node++;
 		
 		gco.selected_node = gco.next_node -1;
-		gco.update_startnode_column();
+		gco.update_ddbox(document.getElementById("player_node"), gco.nodes);
         gco.draw();
         
     }, true);//end mousedown listener
