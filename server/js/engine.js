@@ -532,9 +532,65 @@ function effect(card, g) {
                         }
                         break;
                         
-                    case 'people':
-                        
-                        break;
+                   	//The player gets his moves decreased
+					case 'decreasemoves1':
+						
+						var apal = players[this.active_player];
+						apal.actions_left = apal.actions_left -1;
+						
+						break;
+						
+						
+					case 'decreasemoves2':
+						
+						var apal = players[this.active_player];
+						apal.actions_left = apal.actions_left -2;
+						
+						break;
+						
+					case 'decreasemoves3':
+						
+						var apal = players[this.active_player];
+						apal.actions_left = apal.actions_left -3;
+						
+						break;
+						
+						//The player must skip a turn
+					case 'nextplayer':
+						game.active_player = ge.players[(game.turn-1) % game.players-length];
+						
+						break;
+						
+						//player actions are increased to 6
+					case 'increasemoves'
+						
+						var apai = players[this.active_player];
+						apai.actions_left = apai.actions_left +2;
+						
+						break;
+						
+						//Active player steals an action from the next player
+					case 'stealaction' 
+					
+						var apsa = players[this.active_player]; 
+						apsa.actions_left = apsa.actions_left +1;
+						//TODO decrease next players actions
+						break;
+						
+					//TODO
+					case 'tradecards'
+						break;
+					
+					//TODO	
+					case 'moveanotherplayer'
+						break;
+						
+					//TODO
+					case 'blocknextevent'
+					
+						this.eventTurns = 2;
+						
+						break;
                 
                 }
             
