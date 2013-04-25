@@ -15,48 +15,48 @@ var c_height = 1550,
 	max_players = 7;
 	//set images
 	var residential_img = new Image();
-	residential_img.src = "client/rec/img/residential.jpg";
+	residential_img.src = "/img/residential.jpg";
 	var park_img = new Image();
-	park_img.src = "client/rec/img/park.jpg";
+	park_img.src = "/img/park.jpg";
 	var industry_img = new Image();
-	industry_img.src = "client/rec/img/industry.jpg";
+	industry_img.src = "/img/industry.jpg";
 	var largecity_img = new Image();
-	largecity_img.src = "client/rec/img/largecity.jpg";
+	largecity_img.src = "/img/largecity.jpg";
 	
 	var cat_img = new Image();
-	cat_img.src = "client/rec/img/cat.jpg"
+	cat_img.src = "/img/cat.jpg"
 	
 	var penguin_img = new Image();
-	penguin_img.src = "client/rec/img/cat.jpg"
+	penguin_img.src = "/img/cat.jpg"
 	
 	var tophat_img = new Image();
-	tophat_img.src = "client/rec/img/cat.jpg"
+	tophat_img.src = "/img/cat.jpg"
 	
 	var lifejacket_img = new Image();
-	lifejacket_img.src = "client/rec/img/cat.jpg"
+	lifejacket_img.src = "/img/cat.jpg"
 	
 	var book_img = new Image();
-	book_img.src = "client/rec/img/cat.jpg"
+	book_img.src = "/img/cat.jpg"
 	
 	
 	
 	var coordinator_img = new Image();
-	coordinator_img.src = "client/rec/img/coordinator.png";
+	coordinator_img.src = "/img/coordinator.png";
 	
 	var crowd_manager_img = new Image();
-	crowd_manager_img.src = "client/rec/img/crowd_manager.png";
+	crowd_manager_img.src = "/img/crowd_manager.png";
 	
 	var driver_img = new Image();
-	driver_img.src = "client/rec/img/driver.png";
+	driver_img.src = "/img/driver.png";
 	
 	var operation_expert_img = new Image();
-	operation_expert_img.src = "client/rec/img/operation_expert.png";
+	operation_expert_img.src = "/img/operation_expert.png";
 	
 	var volunteer_img = new Image();
-	volunteer_img.src = "client/rec/img/volunteer.png";
+	volunteer_img.src = "/img/volunteer.png";
 	
 	var passer_by_img = new Image();
-	passer_by_img.src = "client/rec/img/passer_by.png";
+	passer_by_img.src = "/img/passer_by.png";
 	
 
 /* TEMPORARY ZONE IMAGES
@@ -195,12 +195,14 @@ gco.export_to_database = function(){
 	
 
 	var game_template = {
-		nodes : [],
-		zones : [],
+		map : {
+			nodes : [],
+			zones : []
+		},
 		players : [],
 		info_cards : [],
 		events : [],
-		author : "forfatter"
+		author : "EXPERTLY MADE"
 		
 		
 	};
@@ -212,7 +214,7 @@ gco.export_to_database = function(){
 			sconnects_to.push(snode.connects_to[z].id);
 		}
 		
-		game_template.nodes.push(node = {
+		game_template.map.nodes.push(node = {
 			id : snode.id, 
 			x : snode.x, 
 			y : snode.y, 
@@ -220,18 +222,7 @@ gco.export_to_database = function(){
 			connects_to : sconnects_to
 			});
 	}
-	/*
 
-	(id, x, y, is_start_position, connects_to)
-	newNode = {
-				id:gco.next_node,
-				x:mx,
-				y:my,
-				is_start_position:false,
-				connects_to:[]
-			});
-			
-			*/
 	
 	
 	for (var i = 0; i < gco.zones.length; i++){
@@ -243,30 +234,55 @@ gco.export_to_database = function(){
 			snodes.push(szone.nodes[z].id);		
 		}
 		
-		game_template.zones.push(zone = {
+		game_template.map.zones.push(zone = {
 			id : szone.id, 
 			nodes : snodes,
 			type : szone.type,
+			panic_level : szone.panic_level,
 			adjacent_zones : szone.zones, //find a way to calculate adjacent zones
-			controid : szone.centroid
+			centroid : szone.centroid
 			});
 	}
+	// (id, user, node, color, role, actions_left)
+	for(var i = 0; i < gco.players.length;i++){
+	
+		splayer = gco.players[i];
+		
+		game_template.players.push(player = {
+			id : splayer.id,
+			user : "",
+			x : splayer.node.x,
+			y : splayer.node.y,
+			node : splayer.node.id,
+			color : splayer.color,
+			role : splayer.role,
+			actions_left : splayer.actions_left
+		});
+		
+		
+		
+	}
+	
+	
 	
 	console.log(JSON.stringify(game_template));
 	
-	/*
-	(id, nodes, zones)
-	}
-	newZone = {
-			id : gco.next_zone,
-			people : 0,
-			panic_level : 0,
-			type : 'residential',
-			centroid : [0,0],
-			nodes : gco.node_container,
-			zones : []
-		};*/
 	
+	$.post('http://127.0.0.1:8124/', JSON.stringify(game_template));
+/*/
+	   $.ajax({
+		  type: "POST",
+		  url: 'http://127.0.0.1:8124/',
+		  data: game_template,
+		  success: function(data) {
+            console.log("Received data: "+data);
+            console.log(data);
+        },
+		  dataType: "jsonp"
+	});
+/*/	
+	
+
 }
 
 

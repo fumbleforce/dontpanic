@@ -58,7 +58,11 @@
 								Domain:
 							</div>
 							<div class="content-column">
-								<input id="effect_domain" type="text" name="something">
+								<select id="effect_type">
+									<option value="zone">zone</option>
+									<option value="player">player</option>
+									
+								</select>
 							</div>
 						</div>
 							
@@ -71,6 +75,14 @@
 								<select id="effect_type">
 									<option value="panic">panic</option>
 									<option value="event">event</option>
+									<option value="decreasemoves1">decreasemoves1</option>
+									<option value="decreasemoves2">decreasemoves2</option>
+									<option value="decreasemoves3">decreasemoves3</option>
+									<option value="nextplayer">nextplayer</option>
+									<option value="stealaction">stealaction</option>
+									<option value="tradecards">tradecards</option>
+									<option value="moveanotherplayer">moveanotherplayer</option>
+									<option value="blocknextevent">blocknextevent</option>
 									
 								</select>
 							</div>
@@ -356,8 +368,8 @@
 	</div>
 
 </div>
-
-<script src="expert_interface.js"></script>
+<script src="/js/jquery-1.9.1.min.js"></script>
+<script src="/js/expert_interface.js"></script>
 
 </body>
 </html>
