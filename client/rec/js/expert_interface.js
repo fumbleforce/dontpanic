@@ -202,7 +202,7 @@ gco.export_to_database = function(){
 		players : [],
 		info_cards : [],
 		events : [],
-		author : "EXPERTLY MADE"
+		author : "EXPERTLY MADE 3"
 		
 		
 	};
@@ -219,6 +219,7 @@ gco.export_to_database = function(){
 			x : snode.x, 
 			y : snode.y, 
 			is_start_position : true, 
+			has_information_center : false,
 			connects_to : sconnects_to
 			});
 	}
@@ -238,9 +239,11 @@ gco.export_to_database = function(){
 			id : szone.id, 
 			nodes : snodes,
 			type : szone.type,
+			people : szone.people,
 			panic_level : szone.panic_level,
 			adjacent_zones : szone.zones, //find a way to calculate adjacent zones
-			centroid : szone.centroid
+			centroid : szone.centroid,
+			color : 'tomato'
 			});
 	}
 	// (id, user, node, color, role, actions_left)
@@ -250,7 +253,7 @@ gco.export_to_database = function(){
 		
 		game_template.players.push(player = {
 			id : splayer.id,
-			user : "",
+			user : "player" + i,
 			x : splayer.node.x,
 			y : splayer.node.y,
 			node : splayer.node.id,
@@ -262,9 +265,10 @@ gco.export_to_database = function(){
 		
 		
 	}
-	
-	
-	
+	for(var i = 0; i < gco.info_cards.length; i++){
+		game_template.info_cards.push(gco.info_cards[i]);
+	}
+
 	console.log(JSON.stringify(game_template));
 	
 	
