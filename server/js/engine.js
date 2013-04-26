@@ -8,8 +8,10 @@ var ge = module.exports = function (id, client, template) {
 
 	console.log("Base template:");
 	console.log(template);
-	
 	console.log("Populating....");
+	
+	//Clients
+	this.clients = [client];
 
 	//Game related
 	this.info_cards = template.info_cards || [];
@@ -27,7 +29,11 @@ var ge = module.exports = function (id, client, template) {
 		this.map.nodes.push(new ge.Node(template.map.nodes[i]));
 	}
 	for(var i = 0;i<template.map.zones.length; i++){
-		this.map.zones.push(new ge.Zone(template.map.zones[i]));
+		var tzone = template.map.zones[i];
+		//var zone = new
+		
+		//id, type, people, nodes, adjacent_zones, panic_level, centroid
+		this.map.zones.push(new ge.Zone(tzone));
 	}
 	console.log("Map:");
 	console.log(this.map);
@@ -41,20 +47,24 @@ var ge = module.exports = function (id, client, template) {
 	var player_role =["crowd manager", "driver", "volunteer", "operation expert", "coordinator","passer by"];
 	
 	var player;
-	var len = template.players.length || 8;
+	
+	var len = template.players.length;
     for(var i = 0; i < len; i++){
-		player = new ge.Player(i, "player" + i, i*2, player_colors[i], player_role[Math.floor(Math.random()*player_role.length)],4);
+		var tplayer = template.players[i]
+		player = new ge.Player(tplayer.id, tplayer.user, tplayer.node , tplayer.color, tplayer.role, tplayer.actions_left);
+    	
+		player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
     	player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
-    	player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
+		
     	this.players.push(player);
-    }
-	/*for(var i = 0;i<template.players.length; i++){
+    }/*
+	for(var i = 0;i<template.players.length; i++){
 		this.players.push(new ge.Player(template.players[i]));
 	}
 	console.log("Players:");
-	console.log(this.players);*/
+	console.log(this.players);
 	
-	
+	*/
 	
 	
 	
@@ -618,6 +628,7 @@ function effect(card, g) {
 					case 'tradecards':
 					
 					//this.player_card[1] = players[math.random(1-6)][cards[1];
+
 						break;
 					
 					//TODO	
@@ -901,13 +912,13 @@ ge.Event = function (text, effect) {
 
 
 
-ge.Zone = function (z) {
+ge.Zone = function (z) {//(id, type, people, nodes, adjacent_zones, panic_level, centroid) {
 	this.id = z.id;
 	this.type = z.type;
 	this.people = z.people;
 	this.nodes = z.nodes;
 	this.adjacent_zones = z.adjacent_zones;
-	this.panic_level = z.panic_level || 0;//settes til 0 i starten??
+	this.panic_level = 0;// z.panic_level;//settes til 0 i starten??
 	this.centroid = z.centroid;//center (centroid) X and Y of zone polygon to put panic info
 	
 }
@@ -922,6 +933,9 @@ ge.Zone.prototype.update_panic = function (panic_level) {
 }
 ge.Zone.prototype.is_panic_zero = function () {
 	return this.panic_level === 0 ?  true : false;
+}
+ge.Zone.prototype.get_panic_level = function () {
+	return this.panic_level;
 }
 ge.Zone.prototype.dec_panic = function(player, node) {
 	var able = this.can_dec_panic(player, node);

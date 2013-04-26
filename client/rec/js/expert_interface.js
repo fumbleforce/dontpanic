@@ -15,48 +15,48 @@ var c_height = 1550,
 	max_players = 7;
 	//set images
 	var residential_img = new Image();
-	residential_img.src = "client/rec/img/residential.jpg";
+	residential_img.src = "/img/residential.jpg";
 	var park_img = new Image();
-	park_img.src = "client/rec/img/park.jpg";
+	park_img.src = "/img/park.jpg";
 	var industry_img = new Image();
-	industry_img.src = "client/rec/img/industry.jpg";
+	industry_img.src = "/img/industry.jpg";
 	var largecity_img = new Image();
-	largecity_img.src = "client/rec/img/largecity.jpg";
+	largecity_img.src = "/img/largecity.jpg";
 	
 	var cat_img = new Image();
-	cat_img.src = "client/rec/img/cat.jpg"
+	cat_img.src = "/img/cat.jpg"
 	
 	var penguin_img = new Image();
-	penguin_img.src = "client/rec/img/cat.jpg"
+	penguin_img.src = "/img/cat.jpg"
 	
 	var tophat_img = new Image();
-	tophat_img.src = "client/rec/img/cat.jpg"
+	tophat_img.src = "/img/cat.jpg"
 	
 	var lifejacket_img = new Image();
-	lifejacket_img.src = "client/rec/img/cat.jpg"
+	lifejacket_img.src = "/img/cat.jpg"
 	
 	var book_img = new Image();
-	book_img.src = "client/rec/img/cat.jpg"
+	book_img.src = "/img/cat.jpg"
 	
 	
 	
 	var coordinator_img = new Image();
-	coordinator_img.src = "client/rec/img/coordinator.png";
+	coordinator_img.src = "/img/coordinator.png";
 	
 	var crowd_manager_img = new Image();
-	crowd_manager_img.src = "client/rec/img/crowd_manager.png";
+	crowd_manager_img.src = "/img/crowd_manager.png";
 	
 	var driver_img = new Image();
-	driver_img.src = "client/rec/img/driver.png";
+	driver_img.src = "/img/driver.png";
 	
 	var operation_expert_img = new Image();
-	operation_expert_img.src = "client/rec/img/operation_expert.png";
+	operation_expert_img.src = "/img/operation_expert.png";
 	
 	var volunteer_img = new Image();
-	volunteer_img.src = "client/rec/img/volunteer.png";
+	volunteer_img.src = "/img/volunteer.png";
 	
 	var passer_by_img = new Image();
-	passer_by_img.src = "client/rec/img/passer_by.png";
+	passer_by_img.src = "/img/passer_by.png";
 	
 
 /* TEMPORARY ZONE IMAGES
@@ -112,9 +112,7 @@ var gco = {
 	mode : "add node", // not in use
 	selected_node : -1,
 	selected_zone : -1,
-
 	selected_player : -1,
-
 	connection : -1,
 	zone_container : [],
 	node_container : [],
@@ -197,12 +195,14 @@ gco.export_to_database = function(){
 	
 
 	var game_template = {
-		nodes : [],
-		zones : [],
+		map : {
+			nodes : [],
+			zones : []
+		},
 		players : [],
 		info_cards : [],
 		events : [],
-		author : "forfatter"
+		author : "EXPERTLY MADE 3"
 		
 		
 	};
@@ -214,26 +214,16 @@ gco.export_to_database = function(){
 			sconnects_to.push(snode.connects_to[z].id);
 		}
 		
-		game_template.nodes.push(node = {
+		game_template.map.nodes.push(node = {
 			id : snode.id, 
 			x : snode.x, 
 			y : snode.y, 
 			is_start_position : true, 
+			has_information_center : false,
 			connects_to : sconnects_to
 			});
 	}
-	/*
 
-	(id, x, y, is_start_position, connects_to)
-	newNode = {
-				id:gco.next_node,
-				x:mx,
-				y:my,
-				is_start_position:false,
-				connects_to:[]
-			});
-			
-			*/
 	
 	
 	for (var i = 0; i < gco.zones.length; i++){
@@ -245,30 +235,59 @@ gco.export_to_database = function(){
 			snodes.push(szone.nodes[z].id);		
 		}
 		
-		game_template.zones.push(zone = {
+		game_template.map.zones.push(zone = {
 			id : szone.id, 
 			nodes : snodes,
 			type : szone.type,
+			people : szone.people,
+			panic_level : szone.panic_level,
 			adjacent_zones : szone.zones, //find a way to calculate adjacent zones
-			controid : szone.centroid
+			centroid : szone.centroid,
+			color : 'tomato'
+
 			});
 	}
+	// (id, user, node, color, role, actions_left)
+	for(var i = 0; i < gco.players.length;i++){
 	
+		splayer = gco.players[i];
+		
+		game_template.players.push(player = {
+			id : splayer.id,
+			user : "player" + i,
+			x : splayer.node.x,
+			y : splayer.node.y,
+			node : splayer.node.id,
+			color : splayer.color,
+			role : splayer.role,
+			actions_left : splayer.actions_left
+		});
+		
+		
+		
+	}
+	for(var i = 0; i < gco.info_cards.length; i++){
+		game_template.info_cards.push(gco.info_cards[i]);
+	}
+
 	console.log(JSON.stringify(game_template));
 	
-	/*
-	(id, nodes, zones)
-	}
-	newZone = {
-			id : gco.next_zone,
-			people : 0,
-			panic_level : 0,
-			type : 'residential',
-			centroid : [0,0],
-			nodes : gco.node_container,
-			zones : []
-		};*/
 	
+	$.post('http://127.0.0.1:8124/', JSON.stringify(game_template));
+/*/
+	   $.ajax({
+		  type: "POST",
+		  url: 'http://127.0.0.1:8124/',
+		  data: game_template,
+		  success: function(data) {
+            console.log("Received data: "+data);
+            console.log(data);
+        },
+		  dataType: "jsonp"
+	});
+/*/	
+	
+
 }
 
 
@@ -398,8 +417,6 @@ gco.player_draw = function(player, ctx){
     ctx.font="bold 15px Arial",
     ctx.fillText(player.id, player.x+player_offsetX[player.id]-5, player.y+player_offsetY[player.id]+6);
 
-	ctx.fillStyle = player.color;
-
 	if(gco.selected_player == player.id){
 		ctx.fillStyle = "rgba(255,0,0,"+(0.2+(0.12*25/11))+")";
 	}
@@ -407,7 +424,6 @@ gco.player_draw = function(player, ctx){
 	if (player.role==='coordinator'){
 		ctx.drawImage(coordinator_img, player.x + player_offsetX[player.id]-24, player.y+player_offsetY[player.id]-24);
 	}
-
 	else if (player.role==='crowd manager'){
 		ctx.drawImage(crowd_manager_img, player.x + player_offsetX[player.id]-24, player.y+player_offsetY[player.id]-24);
 	}
@@ -427,8 +443,6 @@ gco.player_draw = function(player, ctx){
 	ctx.closePath();
 	ctx.save();
 	ctx.clip()
-
-,
 	ctx.fill();
 	ctx.restore();
 }
@@ -820,7 +834,6 @@ gco.add_player = function(){ // creates a player and adds it to the game.
 
 }
 
-
 gco.change_player = function()
 {
 	if(gco.selected_player == -1){
@@ -848,7 +861,6 @@ gco.change_player = function()
 	gco.draw();
 	
 }
-
 gco.create_connection = function(){ // creates a connection between the 2 selected nodes
 	if((gco.connection > -1) && (gco.selected_node > -1) && (gco.connection != gco.selected_node) && 
 			(gco.nodes[gco.connection].connects_to.indexOf(gco.nodes[gco.selected_node]) < 0)){
@@ -947,7 +959,12 @@ gco.del_selected_player = function(){
 }
 
 gco.del_selected_node = function(){ // deletes the selected node, if none is selected nothing will be removed
-									// will not delete if node is a part of a zone
+			
+			// will not delete if node is a part of a zone
+
+	gco.clear_zone_nodes();
+	gco.connection = -1;
+	
 	
 	if(gco.selected_node > -1){
 		index = gco.selected_node;
@@ -958,6 +975,7 @@ gco.del_selected_node = function(){ // deletes the selected node, if none is sel
 		for (var z = 0; z < gco.zones.length ; z++){
 			if(gco.zones[z].nodes.indexOf(gco.nodes[gco.selected_node]) > -1 ){
 				console.log("failed delete test");
+				gco.selected_node = -1;
 				return;
 			}
 		}
@@ -966,6 +984,7 @@ gco.del_selected_node = function(){ // deletes the selected node, if none is sel
 		for (var i = 0; i< gco.players.length ; i++){
 			if(gco.players[i].node == node){
 				console.log("failed delete test");
+				gco.selected_node = -1;
 				return;
 			}
 		}
@@ -980,11 +999,10 @@ gco.del_selected_node = function(){ // deletes the selected node, if none is sel
 		gco.nodes.splice(index, 1);
 
 		
-		gco.selected_node = -1;
+		
 		gco.re_id();
-		gco.clear_zone_nodes();
-		gco.connection = -1;
-		gco.update_startnode_column();
+		gco.selected_node = -1;
+		gco.update_ddbox(document.getElementById("player_node"), gco.nodes);
 		gco.draw();
 	}
 }
@@ -1086,13 +1104,14 @@ gco.create_zone = function(){ // checks if it is possible to create a zone, and 
 }
 gco.add_info_card = function() {
 	
-	cname = document.getElementById("card_name").value;
-	cdesc = document.getElementById("card_desc").value;
-	ceff = gco.rdy_effects; 
+	cname = "new card";
+	cdesc = "new card";
+	ceff = []; 
 	
+	/*
 	if(ceff.lenght == 0 || cname == "" || cdesc == ""){
 		return;
-	}
+	}*/
 
 	
 	gco.info_cards.push(newCard = {
@@ -1101,10 +1120,18 @@ gco.add_info_card = function() {
 		desc : cdesc,
 		effects : ceff
 		});
+	
+	
+	
+	
+	
+	
+	gco.update_ddbox(document.getElementById("card_show"), gco.info_cards);
+	gco.show_card();
 }
 gco.card_create_add_effect = function() {
 
-	gco.rdy_effects.push("effect");
+	
 	ename = document.getElementById("effect_name").value;
 	edomain = document.getElementById("effect_domain").value;
 	etype = document.getElementById("effect_type").value;
@@ -1123,35 +1150,39 @@ gco.card_create_add_effect = function() {
 		affects : eaffects
 	});
 	
-	var effbox = document.getElementById("card_effect");
-	
-	effbox.options.length = gco.rdy_effects.length;
-	for( var i = 0; i < gco.rdy_effects.length ; i++){
-	
-		effbox.options[i] = new Option(gco.rdy_effects[i].name, i);
-	}
-	// TODO add the effect properly
+	gco.update_ddbox(document.getElementById("card_effect"), gco.rdy_effects);
 	
 }
 gco.card_create_remove_effect = function() {
-	// splice some shit
 	
+	var index = document.getElementById("card_effect").value;
+
+	gco.rdy_effects.splice(index, 1);
+	
+
+	gco.update_ddbox(document.getElementById("card_effect"), gco.rdy_effects);
 }
-gco.update_startnode_column = function() {
 
-	var ddbox = document.getElementById("player_node");
+
+gco.update_ddbox = function(ddbox, list) {
+
 	
 
-	if(gco.nodes.length == 0){
+	if(list.length == 0){
 		
-		ddbox.options[0] = new Option('-1','none exists');
-		document.player_node.options.length=1;
+		ddbox.options[0] = new Option('none added', '-1');
+		ddbox.options.length=1;
 		return;
 	}
 	ddbox.options.length = gco.nodes.length;
-	for( var i = 0; i < gco.nodes.length; i++){
-		ddbox.options[i] = new Option(i ,i);
-		
+	for( var i = 0; i < list.length; i++){
+		if(!list[i].name){
+			ddbox.options[i] = new Option(i ,i);
+		}
+		else{
+			ddbox.options[i] = new Option(list[i].name, i);
+			
+		}
 	
 	}
 	
@@ -1185,37 +1216,16 @@ gco.icard_container_update = function() {
 }
 gco.show_card = function(){
 	var card = gco.info_cards[document.getElementById("card_show").value];
+	
 	document.getElementById("card_name").value = card.name;
 	document.getElementById("card_desc").value = card.desc;
 	
-	var effbox = document.getElementById("card_effect");
-	effbox.options.length = card.effects.length;
-	for( var i = 0; i < card.effects.length ; i++){
+	gco.update_ddbox(document.getElementById("card_effect"), card.effects); 
 	
-		effbox.options[i] = new Option(card.effects[i].name, i);
-	}
-}
-
-
-gco.update_startnode_column = function() {
-
-	var ddbox = document.getElementById("player_node");
-	
-
-	if(gco.nodes.length == 0){
-		document.player_node.options.length=1;
-		ddbox.options[0] = new Option('-1','none exists');
-		return;
-	}
-	ddbox.options.length=gco.nodes.length;
-	for( var i = 0; i < gco.nodes.length; i++){
-		ddbox.options[i] = new Option(i ,i);
-		
-	
-	}
-	
+	gco.rdy_effects = card.effects;
 	
 }
+
 
 gco.set_canvas_listener = function(){
     var canvas = gco.canvas,
@@ -1235,6 +1245,7 @@ gco.set_canvas_listener = function(){
 		
 		
 		if(e.keyCode == 68 || e.keyCode == 46){
+			gco.connection = -1;
 			gco.del_selected_node();
 			gco.del_selected_zone();
 		}
@@ -1309,7 +1320,6 @@ gco.set_canvas_listener = function(){
 				return;
 			}
 		}
-
 	
 		for (var i = 0; i < gco.nodes.length; i++) {
 
@@ -1360,7 +1370,7 @@ gco.set_canvas_listener = function(){
 		gco.next_node++;
 		
 		gco.selected_node = gco.next_node -1;
-		gco.update_startnode_column();
+		gco.update_ddbox(document.getElementById("player_node"), gco.nodes);
         gco.draw();
         
     }, true);//end mousedown listener
@@ -1406,5 +1416,3 @@ gco.set_canvas_listener = function(){
 
 	
 }//end set canvas listener
-
-

@@ -8,15 +8,11 @@
 <body>
 <div class="content-table">
     
-    <div class="title-row content-row">
-        <div class="content-column"></div>
-        <div class="content-column title-text">
-            DON'T PANIC
-        </div>
-        <div class="content-column"></div>
+    <div class="content-row">
+        <div class="margin-row"></div>
     </div>
     
-    <div class="content-row top-bar-row" style="height:100px;">
+    <div class="content-row top-bar-row">
         <div class="content-column"></div>
         <div class="content-column top-bar clearfix">
         	<div class="top-bar-info">
@@ -29,13 +25,20 @@
             <div class="margin-row">
             	
             </div>
-            <div id="selection">
-            	<button class="btn-end-turn" onclick="command('end_turn');">Next Turn</button>
+            <div class="information-row clearfix">
+            
+           		<div id="selection" class="info-container">
+            		<button class="btn-end-turn" onclick="command('end_turn');">Next Turn</button>
+            	
+            	</div>
+            	<div id="status_label" class="info-container"></div>
             </div>
         </div>
-        <div class="content-column"></div>
+        <div id="event-column" class="content-column"></div>
     </div>
-
+	<div class="content-row">
+		<div class="margin-row"></div>
+	</div>
     <div class="content-row">
         <div class="content-column">
             <div id="left-sidebar" class="sidebar-left">

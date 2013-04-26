@@ -60,23 +60,45 @@ server.get('/game/', function(request, response){
 
 http.createServer(function (req, res) {
     console.log('Data request received');
-    res.writeHead(200, {'Content-Type': 'text/plain'});
     
+	
+	
 
-    db.get_all_templates(function(result) {
-
-		var	gametemplates = [];
-		var temp;
-		for (var i = 0; i < result.length;i++){
-			temp = result[i];
-			gametemplates.push(JSON.stringify(temp));
-		}
+	if(req.method == "POST"){
+		console.log("recieve template");
 		
-    	console.log("Sending list of templates");
+		req.on("data", function(data) {
+			
+			console.log(JSON.parse(data.toString()));
+			db.set_template_string(data.toString());
+		
+		});
+		
+		//res.end();
+		
+		//console.log(req.
+	}
+	
+	else {
+	
+		res.writeHead(200, {'Content-Type': 'text/plain'});
+		db.get_all_templates(function(result) {
 
-    	res.end('templates('+JSON.stringify(gametemplates)+')');
+			var	gametemplates = [];
+			var temp;
+			for (var i = 0; i < result.length;i++){
+				temp = result[i];
+				gametemplates.push(JSON.stringify(temp));
+			}
+			
+			console.log("Sending list of templates");
 
-	});
+			res.end('templates('+JSON.stringify(gametemplates)+')');
+
+		});
+	}
+	
+	
 }).listen(8124);
 console.log('Data server running at http://127.0.0.1:8124/');
 
