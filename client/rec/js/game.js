@@ -280,15 +280,15 @@ gco.update_cards = function() {
 
         $con = $("#"+i+"_cards");
         $con.empty();
-        if ((cards.length)*110+75 > (parseInt($con.parent().parent().css('width')))) {
-            $con.parent().parent().css('width', ''+(parseInt($con.parent().parent().css('width'))+110)+'px');
-        }
-        
-        for (c = cards.length-1; c >= 0; c--){
-            button = $("<button id='"+i+"-"+c+"' class='info-card' onclick='gco.info_card_click("+i+","+c+")'>"+cards[c].desc+ "</button>");
-            button.appendTo($con);
+			if ((cards.length)*110+75 > (parseInt($con.parent().parent().css('width')))) {
+				$con.parent().parent().css('width', ''+(parseInt($con.parent().parent().css('width'))+110)+'px');
+			}
 			
-        }
+			for (c = cards.length-1; c >= 0; c--){
+				button = $("<button id='"+i+"-"+c+"' class='info-card' onclick='gco.info_card_click("+i+","+c+")'>"+cards[c].desc+ "</button>");
+				button.appendTo($con);
+				
+			}
 		
     }
 }
@@ -503,6 +503,7 @@ gco.zone_draw = function(zone, ctx){
 	ctx.clip();
 	
 	
+	
 	//draw the images
 	if (zone.type==='residential'){
 		ctx.drawImage(residential_img, minx, miny);
@@ -542,12 +543,16 @@ gco.zone_draw = function(zone, ctx){
    
     //TODO TEMPORARY show simple panic info
     ctx.fillStyle = 'black';
-	if (zone.panic_level > 9){
+
+	ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]-22,25,30); 
+	if (zone.panic_level >= 10){
 		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]-22,40,30); 
 	}
 	else{
+		//console.log("was here");
 		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]-22,25,30); 
 	}
+	ctx.save();
 	ctx.fillStyle = 'white';
 	ctx.font='27px Arial'
 	ctx.fillText(zone.panic_level, zone.centroid[0]-20, zone.centroid[1]+3);
@@ -555,6 +560,7 @@ gco.zone_draw = function(zone, ctx){
 	//TODO simple people info
 	ctx.fillStyle = 'black';
 	if (zone.people > 9 && zone.people < 100){
+	
 		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]+28,40,30); 
 	}
 	else if(zone.people > 99){
@@ -563,6 +569,7 @@ gco.zone_draw = function(zone, ctx){
 	else{
 		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]+28,25,30); 
 	}
+	ctx.save();
 	ctx.fillStyle = 'white';
 	ctx.font='27px Arial'
 	ctx.fillText(zone.people, zone.centroid[0]-20, zone.centroid[1]+54);
