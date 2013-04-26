@@ -188,7 +188,7 @@ var ge = module.exports = function (id, client, template) {
                     	}]
                     },
                     {   id:9,
-                    	name:"Antrax has been spread on an undergroud!\nPanic increased by 10 in all financial districts",
+                    	name:"Anthrax has been spread on an undergroud!\nPanic increased by 10 in all financial districts",
                     	effects: [{
                     		domain:'zone',
                     		type:'event',
@@ -214,7 +214,7 @@ var ge = module.exports = function (id, client, template) {
                     		panic:(10),
                     		affects:'residential'
                     	}]
-                    },
+                    },/*
 					{   id:12,
                     	name:"WTF, DID THAT JUST HAPPEN?!",
                     	effects: [{
@@ -222,7 +222,7 @@ var ge = module.exports = function (id, client, template) {
                     		type:'increasemoves'
                     		},]
 							
-                    },
+                    },*/
 
             ];
                 
@@ -412,21 +412,21 @@ ge.prototype.command = function(client, c){
 			}
 			
 
-		/*	//fire a random event every Xth turn
+			//fire a random event every Xth turn
 			if (this.turnsSinceEvent===this.eventTurns){
 			var randomEvent=Math.floor(Math.random()*this.events.length);
 			changed = effect(this.events[randomEvent], this);
 			changed.event = this.events[randomEvent];
 			this.turnsSinceEvent=0;
-			}*/
+			}
 			
-			//fire a random event every Xth turn
+			/*fire a random event every Xth turn
 			if (this.turnsSinceEvent===this.eventTurns){
 			var randomEvent=Math.floor(Math.random()*this.events.length);
 			changed = effect(this.events[12], this);
 			changed.event = this.events[12];
 			this.turnsSinceEvent=0;
-			}
+			}*/
 			
 			
 			changed.players = [ap];
