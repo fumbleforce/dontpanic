@@ -245,6 +245,7 @@ gco.export_to_database = function(){
 			adjacent_zones : szone.zones, //find a way to calculate adjacent zones
 			centroid : szone.centroid,
 			color : 'tomato'
+
 			});
 	}
 	// (id, user, node, color, role, actions_left)

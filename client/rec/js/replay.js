@@ -660,7 +660,6 @@ gco.draw = function(){
     
     
     
-    
     for (var i = 0; i < nodes.length; i++) {
     	if (nodes[i].has_road_block){
     		node = nodes[i]
@@ -691,145 +690,9 @@ gco.draw = function(){
         document.getElementById("turn-label").innerHTML = "Turn: "+(gco.turn); 
         document.getElementById("player-turn-label").innerHTML = "Player "+(gco.active_player)+"'s turn";
         document.getElementById("action-label").innerHTML = "Actions left: "+(players[gco.active_player].actions_left); 
-    } 
-    
-}// end draw
+    }
 
 
-gco.set_canvas_listener = function(){
-    var canvas = gco.canvas,
-        cst = gco.cst,
-        draw = gco.draw,
-        nodes = gco.nodes,
-        players = gco.players,
-        zones = gco.zones;
-    
-    cst.moving_people = false;
-    cst.moving_from = null;
-    
-    canvas.addEventListener('selectstart', function(e) { e.preventDefault(); return false; }, false);
-
-    canvas.addEventListener('mousedown', function(e) {
-        
-        var mx = e.offsetX,
-            my = e.offsetY,
-            selected;
-		
-		gco.update_status("");
-		gco.update_options([]);
-        cst.selected_zone = null;
-        cst.selected_node = null;
-        
-        if (cst.selection) {
-            console.log("clearing selection");
-
-            cst.selection.x = nodes[cst.selection.node].x
-            cst.selection.y = nodes[cst.selection.node].y
-            cst.selection = undefined;
-            cst.dragging = false;
-            gco.draw();
-        }
-
-        for (var i = 0; i < players.length; i++) {
-
-        	if (gco.player_contains(players[i], mx, my)) {
-        		gco.update_status("Clicked on player  "+i);
-        		selected = players[i];
-        		//Check if player is active, so it can be moved
-        		if (i===gco.active_player){
-
-        			selected.x = nodes[players[i].node].x;
-        			selected.y = nodes[players[i].node].y;
-        			cst.dragoffx = mx - selected.x;
-        			cst.dragoffy = my - selected.y;
-        			cst.dragging = true;
-        			cst.selection = selected;
-        			gco.draw();
-        			return;
-        		}
-        	}
-        }
-
-		for (var i = 0; i < nodes.length; i++) {
-
-        	if (gco.node_contains(nodes[i], mx, my)) {
-        		gco.update_status("Selected node "+i);
-        		cst.selected_node = i;
-				command('select_node', {node_id : cst.selected_node});
-        		gco.draw();
-        		return;
-           }
-        }
-		
-        for (var i = 0; i < zones.length; i++) {
-
-        	if (gco.zone_contains(zones[i], mx, my)) {
-        		console.log("Clicked on zone "+i);
-        		gco.update_status("Selected zone "+i);
-        		cst.selected_zone = i;
-        		//TODO for testing, we add 'decrease_panic' when selecting zones
-        		if(cst.moving_people){
-        			command('move_people', {zone_from: cst.moving_from, zone_to:i});
-        			gco.update_status("Moved people to zone "+i);
-        			cst.moving_from = null;
-        			cst.moving_people = false;
-        		}
-        		else{
-        			command('select_zone', {zone_id : cst.selected_zone});
-        		}
-        		gco.draw();
-        		return;
-           }
-        }
-
-        
-        
-        gco.draw();
-        
-        
-    }, true);//end mousedown listener
-  
-    canvas.addEventListener('mousemove', function(e) {
-        if (cst.dragging){
-            console.log("Mouse is dragging");
-            var mx = e.offsetX,
-                my = e.offsetY;
-            cst.selection.x = mx - cst.dragoffx;
-            cst.selection.y = my - cst.dragoffy;   
-            gco.draw();
-            gco.update_status("Dragging player "+cst.selection.id);
-        }
-    }, true);//end mousemove listener
-    
-    canvas.addEventListener('mouseup', function(e) {
-        var mx = e.offsetX,
-            my = e.offsetY;
-             
-        if (cst.dragging && cst.selection !== undefined) {
-            console.log("Mouse let go of player");
-            for (var i = 0; i < nodes.length; i++) {
-                if (gco.node_contains(nodes[i], mx, my)) {
-                    
-                    command('move_player', {
-                        player_id : cst.selection.id,
-                        node_id : i
-                    });
-                    gco.update_status("Moved player "+cst.selection.id);
-                    cst.selection = undefined;
-                    cst.dragging = false;
-                    gco.draw();
-                    
-                    return;
-                }
-            }
-            cst.selection.x = nodes[cst.selection.node].x
-            cst.selection.y = nodes[cst.selection.node].y
-            cst.selection = undefined;
-            cst.dragging = false;
-            gco.draw();
-        }
-        
-    }, true);//end mouseup listener
     
 }//end set canvas listener
 

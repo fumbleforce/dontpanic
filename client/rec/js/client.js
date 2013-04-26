@@ -1,7 +1,6 @@
 
 var socket = io.connect('http://localhost');
 
-
 socket.on('is_connected', function () {
     console.log('Connected');
     var cookie = read_cookie('dp_user_id');
