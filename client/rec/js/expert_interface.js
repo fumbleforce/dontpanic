@@ -202,7 +202,8 @@ gco.export_to_database = function(){
 		players : [],
 		info_cards : [],
 		events : [],
-		author : "EXPERTLY MADE 3"
+		author : "EXPERTLY MADE 3",
+		desc : document.getElementById("template_desc").value
 		
 		
 	};
