@@ -8,8 +8,10 @@ var ge = module.exports = function (id, client, template) {
 
 	console.log("Base template:");
 	console.log(template);
-	
 	console.log("Populating....");
+	
+	//Clients
+	this.clients = [client];
 
 	//Game related
 	this.info_cards = template.info_cards || [];

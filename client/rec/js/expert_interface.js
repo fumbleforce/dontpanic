@@ -240,7 +240,8 @@ gco.export_to_database = function(){
 			type : szone.type,
 			panic_level : szone.panic_level,
 			adjacent_zones : szone.zones, //find a way to calculate adjacent zones
-			centroid : szone.centroid
+			centroid : szone.centroid,
+			people : szone.people,
 			});
 	}
 	// (id, user, node, color, role, actions_left)
