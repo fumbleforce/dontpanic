@@ -204,7 +204,15 @@ var ge = module.exports = function (id, client, template) {
                     		panic:(10),
                     		affects:'residential'
                     	}]
-                    }
+                    },
+					{   id:12,
+                    	name:"WTF, DID THAT JUST HAPPEN?!",
+                    	effects: [{
+                    		domain:'player',
+                    		type:'increasemoves'
+                    		},]
+							
+                    },
 
             ];
                 
@@ -394,11 +402,19 @@ ge.prototype.command = function(client, c){
 			}
 			
 
-			//fire a random event every Xth turn
+		/*	//fire a random event every Xth turn
 			if (this.turnsSinceEvent===this.eventTurns){
 			var randomEvent=Math.floor(Math.random()*this.events.length);
 			changed = effect(this.events[randomEvent], this);
 			changed.event = this.events[randomEvent];
+			this.turnsSinceEvent=0;
+			}*/
+			
+			//fire a random event every Xth turn
+			if (this.turnsSinceEvent===this.eventTurns){
+			var randomEvent=Math.floor(Math.random()*this.events.length);
+			changed = effect(this.events[12], this);
+			changed.event = this.events[12];
 			this.turnsSinceEvent=0;
 			}
 			
@@ -455,9 +471,9 @@ ge.prototype.delete_game = function(client, c) {
 
 
 
-ge.prototype.next_player = function(game) {
-	game.active_player.set_actions_left(4);
-	game.active_player = ge.players[(game.turn-1) % game.players-length];
+ge.prototype.next_player = function() {
+	this.active_player.set_actions_left(4);
+	this.active_player = this.players[(this.turn-1) % this.players-length];
 }
 
 
@@ -532,67 +548,7 @@ function effect(card, g) {
                         }
                         break;
                         
-                   	//The player gets his moves decreased
-					case 'decreasemoves1':
-						
-						var apal = players[this.active_player];
-						apal.actions_left = apal.actions_left -1;
-						
-						break;
-						
-						
-					case 'decreasemoves2':
-						
-						var apal = players[this.active_player];
-						apal.actions_left = apal.actions_left -2;
-						
-						break;
-						
-					case 'decreasemoves3':
-						
-						var apal = players[this.active_player];
-						apal.actions_left = apal.actions_left -3;
-						
-						break;
-						
-						//The player must skip a turn
-					case 'nextplayer':
-						game.active_player = ge.players[(game.turn-1) % game.players-length];
-						
-						break;
-						
-						//player actions are increased to 6
-					case 'increasemoves'
-						
-						var apai = players[this.active_player];
-						apai.actions_left = apai.actions_left +2;
-						
-						break;
-						
-						//Active player steals an action from the next player
-					case 'stealaction' 
-					
-						var apsa = players[this.active_player]; 
-						apsa.actions_left = apsa.actions_left +1;
-						//TODO decrease next players actions
-						break;
-						
-					//TODO
-					case 'tradecards'
-						break;
-					
-					//TODO	
-					case 'moveanotherplayer'
-						break;
-						
-					//TODO
-					case 'blocknextevent'
-					
-						this.eventTurns = 2;
-						
-						break;
-                
-                }
+                   	}
             
             
             
@@ -609,6 +565,71 @@ function effect(card, g) {
                     case '':
                         
                         break;
+						
+					//The player gets his moves decreased. apal; active player actions left
+					case 'decreasemoves1':
+						
+						var apal = players[g.active_player];
+						apal.actions_left = apal.actions_left -1;
+						
+						break;
+						
+						
+					case 'decreasemoves2':
+						
+						var apal = players[g.active_player];
+						apal.actions_left = apal.actions_left -2;
+						
+						break;
+						
+					case 'decreasemoves3':
+						
+						var apal = players[g.active_player];
+						apal.actions_left = apal.actions_left -3;
+						
+						break;
+						
+						//The player must skip a turn
+					case 'nextplayer':
+					
+						g.next_player();
+						g.next_player();
+						changed.turn = g.turn;
+						changed.active_player = g.active_player;
+						break;
+						
+						//player actions are increased to 6
+					case 'increasemoves':
+						
+						var apai = players[g.active_player];
+						apai.actions_left = apai.actions_left +2;
+						
+						break;
+						
+						//Active player steals an action from the next player
+					case 'stealaction':
+					
+						var apsa = players[g.active_player]; 
+						apsa.actions_left = apsa.actions_left +1;
+						//TODO decrease next players actions
+						break;
+						
+					//TODO
+					case 'tradecards':
+					
+					//this.player_card[1] = players[math.random(1-6)][cards[1];
+						break;
+					
+					//TODO	
+					case 'moveanotherplayer':
+						break;
+						
+					//TODO
+					case 'blocknextevent':
+					
+						
+						
+						break;
                 }
             
             
