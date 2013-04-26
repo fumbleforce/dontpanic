@@ -214,15 +214,15 @@ var ge = module.exports = function (id, client, template) {
                     		panic:(10),
                     		affects:'residential'
                     	}]
-                    },/*
+                    },
 					{   id:12,
                     	name:"WTF, DID THAT JUST HAPPEN?!",
                     	effects: [{
                     		domain:'player',
-                    		type:'increasemoves'
+                    		type:'stealaction'
                     		},]
 							
-                    },*/
+                    },
 
             ];
                 
@@ -412,21 +412,21 @@ ge.prototype.command = function(client, c){
 			}
 			
 
-			//fire a random event every Xth turn
+			/*//fire a random event every Xth turn
 			if (this.turnsSinceEvent===this.eventTurns){
 			var randomEvent=Math.floor(Math.random()*this.events.length);
 			changed = effect(this.events[randomEvent], this);
 			changed.event = this.events[randomEvent];
 			this.turnsSinceEvent=0;
-			}
+			}*/
 			
-			/*fire a random event every Xth turn
+			//fire a random event every Xth turn
 			if (this.turnsSinceEvent===this.eventTurns){
 			var randomEvent=Math.floor(Math.random()*this.events.length);
 			changed = effect(this.events[12], this);
 			changed.event = this.events[12];
 			this.turnsSinceEvent=0;
-			}*/
+			}
 			
 			
 			changed.players = [ap];
@@ -602,11 +602,16 @@ function effect(card, g) {
 						//The player must skip a turn
 					case 'nextplayer':
 					
-						g.next_player();
-						g.next_player();
-						changed.turn = g.turn;
-						changed.active_player = g.active_player;
-						break;
+						var objectsas = {
+							type : 'end_turn',
+							domain : 'something'
+							};
+						g.command(g.client, objectsas);
+						
+						
+					
+					break;
+						
 						
 						//player actions are increased to 6
 					case 'increasemoves':
@@ -621,7 +626,8 @@ function effect(card, g) {
 					
 						var apsa = players[g.active_player]; 
 						apsa.actions_left = apsa.actions_left +1;
-						//TODO decrease next players actions
+						players[(g.active_player + 1) % (g.players.length)].actions_left -=1;
+						
 						break;
 						
 					//TODO
