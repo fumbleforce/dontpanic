@@ -51,7 +51,10 @@ server.get('/game/', function(request, response){
 	console.log("Chose game template "+id);
     response.render('game');
 });
-
+server.get('/gm', function(request, response){
+    console.log("Request for '/gm'");
+    response.render('game');
+});
 
 
 /*	Data server

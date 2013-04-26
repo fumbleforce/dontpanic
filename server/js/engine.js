@@ -295,7 +295,7 @@ ge.prototype.command = function(client, c){
             }
 			
 			else {
-				client.emit('error', 'Could not decrease panic');
+				this.emit('error', 'Could not decrease panic');
 				break;
 			}
 					
@@ -397,7 +397,7 @@ ge.prototype.command = function(client, c){
 
             ap = players[this.active_player];
             //TODO Add random info cards
-			client.emit('msg', this.cards_left);
+			this.emit('msg', "Cards left: "+this.cards_left);
 			if(this.cards_left > 0){
 				ap.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
 				this.cards_left -= 1;
@@ -436,7 +436,7 @@ ge.prototype.command = function(client, c){
         console.log(changed);
     }
     var stringed = JSON.stringify(changed);
-    client.emit('change', stringed);	
+    this.emit('change', stringed);	
     
 }
 
@@ -445,7 +445,7 @@ ge.prototype.command = function(client, c){
 ge.prototype.start = function(){
     var g = state(this);
     console.log("Sending start state to client.");
-    this.client.emit('start_game', JSON.stringify(g));
+    this.emit('start_game', JSON.stringify(g));
 }
 
 
@@ -458,9 +458,21 @@ ge.prototype.reconnect_game = function(client, c) {
 ge.prototype.save_state = function(client, c) {
 
 }
+
 ge.prototype.delete_game = function(client, c) {
 }
 
+ge.prototype.join_game = function(client) {
+	if (this.clients.indexOf(client) < 0){
+		this.clients.push(client);
+	}
+}
+
+ge.prototype.emit = function(type, o){
+	for(var i = 0; i < this.clients.length; i++){
+		this.clients[i].emit(type, o);
+	}
+}
 
 
 

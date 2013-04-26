@@ -86,7 +86,8 @@ var gco = {
     canvas : document.getElementById("viewport"),
     cst : {},
     turn : 0,
-    active_player : 0
+    active_player : 0,
+    is_gm : false,
 }
 gco.ctx = gco.canvas.getContext("2d");
 
@@ -131,7 +132,6 @@ gco.start_timer = function(dur){
         lab = document.getElementById("timer-label");
     var inter = setInterval(function(){
         lab.innerHTML = "Panic Increase in: "+left;
-        
         left--;
         if (left === -1) {
             command('inc_panic', {});
@@ -535,11 +535,6 @@ gco.zone_draw = function(zone, ctx){
 	ctx.stroke(); // Now draw our path
 	ctx.restore(); // Put the canvas back how it was before we started
 	
-	
-	
-
-    
-	
    
     //TODO TEMPORARY show simple panic info
     ctx.fillStyle = 'black';
@@ -736,7 +731,7 @@ gco.set_canvas_listener = function(){
         		gco.update_status("Clicked on player  "+i);
         		selected = players[i];
         		//Check if player is active, so it can be moved
-        		if (i===gco.active_player){
+        		if (i===gco.active_player || gco.is_gm){
 
         			selected.x = nodes[players[i].node].x;
         			selected.y = nodes[players[i].node].y;
