@@ -42,6 +42,10 @@ server.get('/expert', function(request, response){
     response.render('expert_form');
 });
 
+server.get('/replay', function (request, response){
+	response.render('replay');
+});
+
 server.get('/login', function(request, response){
     console.log("Request for '/login'");
     response.render('login');
@@ -182,7 +186,6 @@ socket_listener.sockets.on('connection', function (client) {
 		});
     })
 
-    
     client.on('join_game', function(c) {
         console.log('**SOCKET_LISTENER** received join command ' + c);
         engine.join_game(client, c);
@@ -202,9 +205,24 @@ socket_listener.sockets.on('connection', function (client) {
     });
 	
 	client.on('replay', function (c) {
-		//var r = new replay(db.get_all_replays(function (result) {
-				
-		//});		
+		db.get_all_replays(function(result) {
+			
+			var r = new replay(result);
+			var	replays = [];
+			var temp;
+			
+			for (var i = 0; i < result.length;i++){
+				temp = result[i];
+				replays.push(JSON.stringify(temp));
+			}
+			res.end('replays('+JSON.stringify(replays)+')');
+		});
+	})
+	
+	client.on('next_command', function (c) {
+		db.get_command(c.replay_id, c.command_id, function(result) {
+			
+		});
 	})
 	
     client.on('disconnect', function () {
