@@ -11,7 +11,8 @@ var http		= require('http'),
     ioserver    = require('http').createServer(server),
     games       = {},
     uuid        = require('node-uuid'),
-    db			= require('./database.js');
+    db			= require('./database.js'),
+    replay 		= require('./client/rec/js/replay.js');
 /*  Configuration of express server:
     
     Makes the ejs module handle all html files.
@@ -39,6 +40,10 @@ server.get('/', function(request, response){
 
 server.get('/expert', function(request, response){
     response.render('expert_form');
+});
+
+server.get('/replay', function (request, response){
+	response.render('replay');
 });
 
 server.get('/login', function(request, response){
@@ -181,7 +186,6 @@ socket_listener.sockets.on('connection', function (client) {
 		});
     })
 
-    
     client.on('join_game', function(c) {
         console.log('**SOCKET_LISTENER** received join command ' + c);
         engine.join_game(client, c);
@@ -199,6 +203,27 @@ socket_listener.sockets.on('connection', function (client) {
         
         if(games[client.userid]) games[client.game_id].command(client, parsed);
     });
+	
+	client.on('replay', function (c) {
+		db.get_all_replays(function(result) {
+			
+			var r = new replay(result);
+			var	replays = [];
+			var temp;
+			
+			for (var i = 0; i < result.length;i++){
+				temp = result[i];
+				replays.push(JSON.stringify(temp));
+			}
+			res.end('replays('+JSON.stringify(replays)+')');
+		});
+	})
+	
+	client.on('next_command', function (c) {
+		db.get_command(c.replay_id, c.command_id, function(result) {
+			
+		});
+	})
 	
     client.on('disconnect', function () {
         console.log('**SOCKET_LISTENER** client ' + client.userid + ' disconnected.');
