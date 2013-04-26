@@ -53,7 +53,7 @@ var ge = module.exports = function (id, client, template) {
 		var tplayer = template.players[i]
 		player = new ge.Player(tplayer.id, tplayer.user, tplayer.node , tplayer.color, tplayer.role, tplayer.actions_left);
     	
-		player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
+		player.info_cards.push(this.info_cards[this.info_cards.length-1]);
     	player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
 		
     	this.players.push(player);
