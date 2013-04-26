@@ -12,14 +12,14 @@ var http		= require('http'),
     games       = {},
     uuid        = require('node-uuid'),
     db			= require('./database.js'),
-    replay 		= require('./client/rec/js/replay.js');
-/*  Configuration of express server:
+	replay 		= require('./client/rec/js/replay.js');
+  Configuration of express server:
     
     Makes the ejs module handle all html files.
     Sets port to 8008.
     Directs all view-requests to the views folder.
     All static files are served from the rec folder
-*/
+
 server.engine('.html', require('ejs').__express);
 server.set('views', __dirname + '/client/views');
 server.use(express.static(__dirname + '/client/rec'));
@@ -224,7 +224,7 @@ socket_listener.sockets.on('connection', function (client) {
 			
 		});
 	})
-	
+	*/
     client.on('disconnect', function () {
         console.log('**SOCKET_LISTENER** client ' + client.userid + ' disconnected.');
        	//TODO Save to DB
