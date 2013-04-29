@@ -12,15 +12,15 @@ var http		= require('http'),
     games       = {},
     uuid        = require('node-uuid'),
     db			= require('./database.js');
-    
-    
-/*  Configuration of express server:
+
+ 	 /* Configuration of express server:
     
     Makes the ejs module handle all html files.
     Sets port to 8008.
     Directs all view-requests to the views folder.
     All static files are served from the rec folder
-*/
+	*/
+
 server.engine('.html', require('ejs').__express);
 server.set('views', __dirname + '/client/views');
 server.use(express.static(__dirname + '/client/rec'));
@@ -42,6 +42,10 @@ server.get('/expert', function(request, response){
     response.render('expert_form');
 });
 
+server.get('/replay', function (request, response){
+	response.render('replay');
+});
+
 server.get('/login', function(request, response){
     console.log("Request for '/login'");
     response.render('login');
@@ -57,7 +61,6 @@ server.get('/gm', function(request, response){
     response.render('game');
 });
 
-
 /*	Data server
 
 	Used with AJAX to retrieve, send and modify data in the Database.
@@ -68,33 +71,64 @@ server.get('/gm', function(request, response){
 http.createServer(function (req, res) {
     console.log('Data request received');
 
-	if(req.method == "POST"){
-		console.log("received template from expert interface");
-		
+    
+	
+	if(req.method === "POST"){
+	
+		console.log("recieve template");
+			
 		req.on("data", function(data) {
 			
-			db.set_template_string(data.toString());
+			console.log(JSON.parse(data.toString()));
+			db.set_template_string(data.toString());			
+
 		
 		});
+		
+		//res.end();
+
 	}
 	
-	else {
-	
-		res.writeHead(200, {'Content-Type': 'text/plain'});
-		db.get_all_templates(function(result) {
+	else if (req.method === "GET") {
+		console.log(req.url);
+		if (req.url.indexOf("replays") !== -1) {
+			console.log("requesting replay");
+			
+			res.writeHead(200, {'Content-Type': 'text/plain'});
+			db.get_all_replays(function (result) {
+				console.log(result);
+				var	replays = [];
+				var temp;
+				for (var i = 0; i < result.length;i++){
+					temp = result[i];
+					replays.push(JSON.stringify(temp));
+				}	
+				console.log("Sending list of replays");
 
-		var	gametemplates = [];
-		var temp;
-		for (var i = 0; i < result.length;i++){
-			temp = result[i];
-			gametemplates.push(JSON.stringify(temp));
+				res.end('replays('+JSON.stringify(replays)+')');
+			});
 		}
 		
-		console.log("Sending list of templates");
+		else {
+	
+			res.writeHead(200, {'Content-Type': 'text/plain'});
+			db.get_all_templates(function(result) {
 
-		res.end('templates('+JSON.stringify(gametemplates)+')');
-		});
+				var	gametemplates = [];
+				var temp;
+				for (var i = 0; i < result.length;i++){
+					temp = result[i];
+					gametemplates.push(JSON.stringify(temp));
+				}
+			
+				console.log("Sending list of templates");
+
+				res.end('templates('+JSON.stringify(gametemplates)+')');
+
+			});
+		}
 	}
+	
 
 }).listen(8124);
 console.log('Data server running at http://127.0.0.1:8124/');
@@ -182,7 +216,6 @@ socket_listener.sockets.on('connection', function (client) {
     	 games[room].join_game(client);
     }
 
-    
     client.on('join_game', function(c) {
         console.log('**SOCKET_LISTENER** received join command ' + c);
         engine.join_game(client, c);
@@ -201,12 +234,33 @@ socket_listener.sockets.on('connection', function (client) {
         if(client.game_id) games[client.game_id].command(client, parsed);
     });
 	
+	client.on('replay', function (c) {
+		db.get_all_replays(function(result) {
+			
+			var r = new replay(result);
+			var	replays = [];
+			var temp;
+			
+			for (var i = 0; i < result.length;i++){
+				temp = result[i];
+				replays.push(JSON.stringify(temp));
+			}
+			res.end('replays('+JSON.stringify(replays)+')');
+		});
+	})
+	
+	client.on('next_command', function (c) {
+		db.get_command(c.replay_id, c.command_id, function(result) {
+			
+		});
+	})
+
     client.on('disconnect', function () {
         console.log('**SOCKET_LISTENER** client ' + client.userid + ' disconnected.');
        	//TODO Save to DB
         //TODO close game
     });
-      
+
 });// end onConnection
 
 
