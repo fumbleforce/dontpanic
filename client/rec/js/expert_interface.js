@@ -134,7 +134,7 @@ gco.ctx = gco.canvas.getContext("2d");
 */
 gco.init_game = function (d) {
     console.log("Game initiated");
-
+	console.log("asdasdasdasdASasdasdasdasdASasdasdasdasdASasdasdasdasdASasdasdasdasdA");
 
 
     

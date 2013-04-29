@@ -1,7 +1,7 @@
-/*  Engine module
+/**  Engine module
 
     This module will be a game "Class".
-*/
+**/
 
 var ge = module.exports = function (id, client, template) {
 
@@ -84,6 +84,7 @@ var ge = module.exports = function (id, client, template) {
 	this.cards_left = 10;
 	this.eventTurns = 3;
 	this.turnsSinceEvent = 0;
+	this.eventblocked = false;
 	
 	//Local
 	var SCALE= 90;
@@ -214,15 +215,15 @@ var ge = module.exports = function (id, client, template) {
                     		panic:(10),
                     		affects:'residential'
                     	}]
-                    },
-					{   id:12,
+                    }/*,
+					{   id:2,
                     	name:"WTF, DID THAT JUST HAPPEN?!",
                     	effects: [{
                     		domain:'player',
-                    		type:'stealaction'
+                    		type:'blocknextevent'
                     		},]
 							
-                    },
+                    },*/
 
             ];
                 
@@ -461,21 +462,30 @@ ge.prototype.command = function(client, c){
 			changed.event = this.events[randomEvent];
 			this.turnsSinceEvent=0;
 			}
+			console.log("what is event blocked now?  " + this.eventblocked);
+			if (this.turnsSinceEvent>=this.eventTurns){
 			
-			//fire a random event every Xth turn
-//			if (this.turnsSinceEvent===this.eventTurns){
-//			var randomEvent=Math.floor(Math.random()*this.events.length);
-//			changed = effect(this.events[12], this);
-//			changed.event = this.events[12];
-//			this.turnsSinceEvent=0;
-//			}
+				if (this.eventblocked){
+				console.log("event to set to false 134456 " + this.eventblocked);
+				this.eventblocked = false;
+				this.turnsSinceEvent=0;
+				console.log("event to set to false " + this.eventblocked);
 			
+
+				}
 			
+				else{
+				var randomEvent=Math.floor(Math.random()*this.events.length);
+				changed = effect(this.events[randomEvent], this);
+				changed.event = this.events[randomEvent];
+				this.turnsSinceEvent=0;
+				}
+			}
 			changed.players = [ap];
 			changed.turn = this.turn;
 			changed.active_player = this.active_player;
-
-			break;
+				
+				break;
         
         console.log("No matching command types");
             
@@ -671,21 +681,24 @@ function effect(card, g) {
 						players[(g.active_player + 1) % (g.players.length)].actions_left -=1;
 						
 						break;
-						
-					//TODO
+					/*	
+					//TODO This code was a proposal for tradecards
 					case 'tradecards':
-					
-					//this.player_card[1] = players[math.random(1-6)][cards[1];
-
+						var playercard = players[(g.active_player)].info_cards[0];
+						players[(g.active_player)].info_cards[0] = players[(g.active_player + 1) % (g.players.length)].info_cards[0];
+						players[(g.active_player + 1) % (g.players.length)].info_cards[0] = playercard;
+						
+						changed.players.push(players);
 						break;
-					
+					*/
 					//TODO	
 					case 'moveanotherplayer':
 						break;
 						
 					//TODO
 					case 'blocknextevent':
-					
+						g.eventblocked =true;
+						
 						
 						
 						break;
