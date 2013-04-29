@@ -134,9 +134,9 @@ gco.init_game = function (d) {
 gco.update_timer = function(time){
 	
 	
-	if (timer===10)
+	if (time===10){
 	snd.play();
-	
+	}
 	var lab = document.getElementById("timer-label");
     lab.innerHTML = "Panic Increase in: "+time;
 }
