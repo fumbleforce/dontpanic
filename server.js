@@ -11,15 +11,16 @@ var http		= require('http'),
     ioserver    = require('http').createServer(server),
     games       = {},
     uuid        = require('node-uuid'),
-    db			= require('./database.js'),
-	replay 		= require('./client/rec/js/replay.js');
-	/*Configuration of express server:
+    db			= require('./database.js');
+
+ 	 /* Configuration of express server:
     
     Makes the ejs module handle all html files.
     Sets port to 8008.
     Directs all view-requests to the views folder.
     All static files are served from the rec folder
 	*/
+
 server.engine('.html', require('ejs').__express);
 server.set('views', __dirname + '/client/views');
 server.use(express.static(__dirname + '/client/rec'));
@@ -27,13 +28,12 @@ server.use('/img', (__dirname + '/client/rec/img'));
 server.set('view engine', 'html');
 server.set('port', process.env.PORT || 8008);
 
+//The main server running the game client
 console.log('View server running at http://127.0.0.1:8008/');
 
-/*  Handle http requests:
-    
-    Only the '/' adress is handled, and returns the 
-    index.html page that contains the canvas.
-*/
+
+/*  Handle http requests	*/
+
 server.get('/', function(request, response){
     response.render('index');
 });
@@ -56,74 +56,99 @@ server.get('/game/', function(request, response){
 	console.log("Chose game template "+id);
     response.render('game');
 });
-
-
+server.get('/gm', function(request, response){
+    console.log("Request for '/gm'");
+    response.render('game');
+});
 
 /*	Data server
+
+	Used with AJAX to retrieve, send and modify data in the Database.
+	POST messages are templates sent from the expert interface, while GET
+	messages are requests from the index page for templates.
+
 */
-
-
 http.createServer(function (req, res) {
     console.log('Data request received');
-    
+	console.log("method: "+req.method);
+    console.log("url: "+req.url);
 	
+	if(req.method === "POST"){
 	
-
-	if(req.method == "POST"){
 		console.log("recieve template");
-		
+			
 		req.on("data", function(data) {
 			
 			console.log(JSON.parse(data.toString()));
-			db.set_template_string(data.toString());
+			db.set_template_string(data.toString());			
+
 		
 		});
 		
 		//res.end();
-		
-		//console.log(req.
+
 	}
 	
-	else {
-	
-		res.writeHead(200, {'Content-Type': 'text/plain'});
-		db.get_all_templates(function(result) {
+	else if (req.method === "GET") {
 
-			var	gametemplates = [];
-			var temp;
-			for (var i = 0; i < result.length;i++){
-				temp = result[i];
-				gametemplates.push(JSON.stringify(temp));
-			}
+		if (req.url.indexOf("replays") !== -1) {
+			console.log("requesting replay");
 			
-			console.log("Sending list of templates");
+			res.writeHead(200, {'Content-Type': 'text/plain'});
+			db.get_all_replays(function (result) {
+				console.log(result);
+				var	replays = [];
+				var temp;
+				for (var i = 0; i < result.length;i++){
+					temp = result[i];
+					replays.push(JSON.stringify(temp));
+				}	
+				console.log("Sending list of replays");
 
-			res.end('templates('+JSON.stringify(gametemplates)+')');
+				res.end('replays('+JSON.stringify(replays)+')');
+			});
+		}
+		else if (req.url.indexOf("game_master") !== -1) {
+			res.writeHead(200, {'Content-Type': 'text/plain'});
+			
+			var game_list = [];
+			for (var g in games){
+				game_list.push(JSON.stringify({id:games[g].id}));
+			}
+			res.end('game_master('+JSON.stringify(game_list)+')');
+		}
+		else if (req.url.indexOf("templates") !== -1) {
+	
+			res.writeHead(200, {'Content-Type': 'text/plain'});
+			db.get_all_templates(function(result) {
 
-		});
+				var	gametemplates = [];
+				var temp;
+				for (var i = 0; i < result.length;i++){
+					temp = result[i];
+					gametemplates.push(JSON.stringify(temp));
+				}
+			
+				console.log("Sending list of templates");
+
+				res.end('templates('+JSON.stringify(gametemplates)+')');
+
+			});
+		}
 	}
 	
-	
+
 }).listen(8124);
 console.log('Data server running at http://127.0.0.1:8124/');
 
 
 /* Configure Socket.IO:
     
-    The socket.IO server listens to a http-server that listens to the express server.
+    The socket.IO server listens to a http-server, that in turn listens to the express server.
 */
 ioserver.listen(server.get('port'));
 var socket_listener = require('socket.io').listen(ioserver, {log:false});
 
-
-/*  TODO Configures the socket.io server
-*/
-//socket_listener.configure(function (){
-//    socket_listener.set('log level', 0);
-//    socket_listener.set('authorization', function //(handshakeData, callback) {
-//        callback(null, true);
-//    });
-//});
 
 /*  Handle client interaction through socket.io:
     
@@ -131,30 +156,39 @@ var socket_listener = require('socket.io').listen(ioserver, {log:false});
     TODO Starts a game session with the client.
     Listens for commands and sends them to the game engine.
     TODO Listens for disconnects and ends the game associated with the disconnected player.
+    TODO Handles game manager
 */   
 socket_listener.sockets.on('connection', function (client) {
 
-    // TODO Client setup
     client.userid = uuid.v1();
+    console.log("Set client ID to "+client.userid);
     client.emit('is_connected');
     console.log('**SOCKET_LISTENER** client ' + client.userid + ' connected');
     
     client.on('dp_user_id', function(o) {
-        console.log("Checking for user ID");
-        /* if (o.id) {
+        console.log("Checking for user ID... "+o.id);
+        
+        if(o.is_gm){
+        	client.emit("get_room_id");
+        }
+        
+        else if (o.id !== undefined && o.id !== null && o.id !== "undefined") {
             console.log("Found client with ID "+o.id);
             client.userid = o.id;
-            if (games[client.userid]) {
-                games[client.userid].client = client;
-                games[client.userid].start();
+            var game = find_game(client.userid);
+            if (game) {
+            	client.game_id = game;
+                games[game].join_game(client);
             }
             else{
-                client.emit('not_in_game', {});
+            	console.log("Client was not in game");
+                client.emit('not_in_game', {userid:client.userid});
             }
         }
-        else{*/
-            client.emit('not_in_game', {});
-        /*}*/
+        else{
+        	console.log("Client was not in game");
+            client.emit('not_in_game', {userid:client.userid});
+       }
     });
     
     //Client sent log message
@@ -163,28 +197,32 @@ socket_listener.sockets.on('connection', function (client) {
     });
     
 
-            
     client.on('end_game', function(c) {
         console.log('**SOCKET_LISTENER** received command ' + c);
         engine.end_game(client, c);
     });
 	
+	//Client has chosen a game template, and sent a template_id to start a game with.
     client.on('create_game', function(c) {
 		
 		console.log('**SOCKET_LISTENER** received create command ');
-    	//henter ut gametemplate med gitt template id
+
     	console.log('Retrieving template with id: '+c.template_id);
     	db.get_template_string(c.template_id, function(result) {
 			var	gametemplate = JSON.parse(result[0].json_string);
 			
 			console.log("Creating game object based on template..");
-			var g = new engine(client.userid, client, gametemplate);
+			var g = new engine(client.userid, client, gametemplate, c.template_id);
 			console.log("Created.");
 	    	games[g.id] = g;
 	    	client.game_id = g.id;
 	    	g.start(client);		
 		});
     })
+    
+    client.on('selected_room_id', function(room){
+    	 games[room].join_game(client);
+    });
 
     client.on('join_game', function(c) {
         console.log('**SOCKET_LISTENER** received join command ' + c);
@@ -193,7 +231,8 @@ socket_listener.sockets.on('connection', function (client) {
     
     client.on('leave_game', function(c) {
         console.log('**SOCKET_LISTENER** received leave command ' + c);
-        engine.leave_game(client, c);
+        //TODO Save game replay
+        delete games[client.game_id];
     });
     
     client.on('game_command', function(c) {
@@ -201,7 +240,7 @@ socket_listener.sockets.on('connection', function (client) {
         console.log('**SOCKET_LISTENER** Received:');
         var parsed = JSON.parse(c);
         
-        if(games[client.userid]) games[client.game_id].command(client, parsed);
+        if(client.game_id) games[client.game_id].command(client, parsed);
     });
 	
 	client.on('replay', function (c) {
@@ -224,13 +263,25 @@ socket_listener.sockets.on('connection', function (client) {
 			
 		});
 	})
-	
+
     client.on('disconnect', function () {
         console.log('**SOCKET_LISTENER** client ' + client.userid + ' disconnected.');
        	//TODO Save to DB
-        games[client.userid] = {};
+        //TODO close game
     });
-      
+
 });// end onConnection
 
-   
+
+/*	Find Existing Game
+
+	Finds an existing game by searching through 
+	the client ids of active games.
+*/
+function find_game(userid){
+	for(var g in games){
+		console.log("Checking game.. "+games[g].id);
+		if(games[g].has_client(userid)) return games[g].id;
+	}
+	return;
+}

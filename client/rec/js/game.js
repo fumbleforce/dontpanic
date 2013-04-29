@@ -86,7 +86,8 @@ var gco = {
     canvas : document.getElementById("viewport"),
     cst : {},
     turn : 0,
-    active_player : 0
+    active_player : 0,
+    is_gm : false,
 }
 gco.ctx = gco.canvas.getContext("2d");
 
@@ -100,6 +101,7 @@ gco.ctx = gco.canvas.getContext("2d");
     Object map      The map object containing list of Zones and Nodes
 */
 gco.init_game = function (d) {
+	
     console.log("Game initiated.");
     gco.players = d.players;
     gco.zones = d.zones;
@@ -109,7 +111,7 @@ gco.init_game = function (d) {
     gco.construct_player_divs(gco.players);
     gco.setup_canvas();
     gco.set_canvas_listener();
-    gco.start_timer(d.timer);
+
     
     gco.draw();
     gco.update_cards();
@@ -125,23 +127,12 @@ gco.init_game = function (d) {
     
     Int dur         Duration of timer.
 */
-gco.start_timer = function(dur){
-    console.log("Timer Started.");
-    var left = dur,
-        lab = document.getElementById("timer-label");
-    var inter = setInterval(function(){
-        lab.innerHTML = "Panic Increase in: "+left;
-        
-        left--;
-        if (left === -1) {
-            command('inc_panic', {});
-            clearInterval(inter);
-        }
-    }, 1000);
-    
-    
-}
 
+
+gco.update_timer = function(time){
+	var lab = document.getElementById("timer-label");
+    lab.innerHTML = "Panic Increase in: "+time;
+}
 
 /*  Set up Canvas
     
@@ -547,11 +538,6 @@ gco.zone_draw = function(zone, ctx){
 	ctx.stroke(); // Now draw our path
 	ctx.restore(); // Put the canvas back how it was before we started
 	
-	
-	
-
-    
-	
    
     //TODO TEMPORARY show simple panic info
     ctx.fillStyle = 'black';
@@ -748,7 +734,7 @@ gco.set_canvas_listener = function(){
         		gco.update_status("Clicked on player  "+i);
         		selected = players[i];
         		//Check if player is active, so it can be moved
-        		if (i===gco.active_player){
+        		if (i===gco.active_player || gco.is_gm){
 
         			selected.x = nodes[players[i].node].x;
         			selected.y = nodes[players[i].node].y;
