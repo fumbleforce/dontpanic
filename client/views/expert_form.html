@@ -75,7 +75,7 @@
 							<div id="node_column" class="content-column">
 								<select id="effect_type">
 									<option value="panic">panic</option>
-									<option value="event">event</option>
+									
 									
 									
 								</select>
@@ -112,6 +112,133 @@
 					</div>
 				</div>
 				
+			</div>
+			<div class="sidebar-textform">
+				<div class="content-column">
+					<div class="content-row">
+						<div id="event_info_label" class="info-label-form">
+							Create/Edit a Event:
+							
+						</div>
+						
+					</div>
+					
+				</div>
+				
+				<div class="content-column">
+					<div class="content-row">
+						
+						<div class="content-row">
+							<div class="content-column">
+								Name:
+							</div>
+							<div class="content-column">
+								<input id="event_name" type="text" name="something">
+							</div>
+						</div>
+							
+						<div class="content-row">
+							<div class="content-column">
+								Desc:
+							</div>
+							<div class="content-column">
+								<input id="event_desc" type="text" name="something">
+							</div>
+						</div>
+						
+						
+						
+						
+					</div>
+					<div class="content-row">
+						<button class="button" onclick="gco.add_event();">Create Event</button>
+						<button class="button" onclick="gco.edit_event();">Edit Event</button>
+						<button class="button" onclick="gco.delete_event();">Delete Event</button>
+					</div>
+					
+				</div>
+				<div class="content-column">
+					
+					<div class="content-row">
+						
+						
+						<div class="content-column">
+							Effect:
+						</div>
+						<div id="node_column" class="content-column">
+							<select id="event_effect">
+								<option value="-1">none added</option>
+								
+							</select>
+						</div>
+					
+						
+					</div>
+					<div class="content-row">
+						<div class="content-column">
+							
+						</div>
+						<div id="card_show_column" class="content-column">
+							
+							<button class="button" id="event_remove_effect" onClick="gco.event_create_remove_effect()">Remove Effect</button>
+						</div>
+					</div>
+				</div>
+				
+			</div>
+			<div class="sidebar-textform">
+				<div class="content-column">
+					<div class="content-row">
+						<div id="show_event_info_label" class="info-label-form">
+							Show an Event
+							
+						</div>
+						
+					</div>
+					<div class="content-row">
+						<div class="content-column">
+							Show Event:
+						</div>
+						<div class="content-row">
+							<div class="content-column">
+								<select id="event_show" onChange="gco.show_card()">
+									<option value="-1">none added</option>
+									
+								</select>							
+							</div>
+						</div>
+						<div class="content-row">
+							<button class="button" onclick="gco.event_move_to_edit();">Move To Edit</button>
+						</div>
+					</div>
+				</div>
+				<div class="content-column">
+					<div class="content-row">
+						Name:
+						<div id="event_name_label" type="info_label"></div>
+						
+					</div>
+					<div class="content-row">
+						Desc:
+						<div id="event_desc_label" type="info_label"></div>
+						
+					</div>
+	
+					
+				</div>
+				<div class="content-column">
+					
+					Effects:
+					<div id="event_effects_label" type="info_label"></div>
+	
+				</div>
+				<div class="content-column">
+					
+					
+					<div id="event_effects_label2" type="info_label"></div>
+
+					
+				</div>
 			</div>
 			<div class="sidebar-textform">
 				<div class="content-column">

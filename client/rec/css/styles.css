@@ -72,11 +72,11 @@ p
 }
 #selection
 {
-
+	width:60%;
 }
 #status_label
 {
-
+	width:40%;
 	font-size:50px;
 	color:white;
 	text-align:center;
@@ -84,7 +84,7 @@ p
 .info-container
 {
 	height:70px;
-	width:50%;
+
 
 	float:left;
 }
@@ -173,7 +173,7 @@ background-image: -webkit-gradient(
 .btn
 {
     float:left;
-    font-size:35px;
+    font-size:30px;
     padding:7px;
     background: -webkit-gradient( linear, left top, left bottom, from(#81cbbc), color-stop(2%, #fcf59b) );
 background: -moz-repeating-linear-gradient( top, #fcf59b, #fcf59b 38px, #81cbbc 40px );
