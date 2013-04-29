@@ -146,7 +146,7 @@ gco.init_game = function (d) {
 	
 		gco.info_cards.push(newIcard = {
 					name:"Calm financial",
-					desc:"Calm financial districts",
+					desc:"Calm financial23 districts",
 					effects: [{
 						name:"financ calm",
 						domain:'zone',
@@ -157,7 +157,7 @@ gco.init_game = function (d) {
 				});
 		gco.info_cards.push(newIcard = {
 					name:"Calm industry",
-					desc:"Calm industry districts",
+					desc:"Calm industry2 districts",
 					effects: [{
 						name:"indus calm",
 						domain:'zone',
@@ -168,7 +168,7 @@ gco.init_game = function (d) {
 				});
 		gco.info_cards.push(newIcard = {
 					name:"Calm residental",
-					desc:"Calm residental districts",
+					desc:"Calm residental11 districts",
 					effects: [{
 						name:"resid calm",
 						domain:'zone',
@@ -179,7 +179,7 @@ gco.init_game = function (d) {
 				});
 	
 	}
-	gco.icard_container_update();
+	gco.update_ddbox(document.getElementById("card_show"), gco.info_cards);
 
     gco.draw();
 
@@ -202,7 +202,8 @@ gco.export_to_database = function(){
 		players : [],
 		info_cards : [],
 		events : [],
-		author : "EXPERTLY MADE 3"
+		author : document.getElementById("template_author").value,
+		desc : document.getElementById("template_desc").value
 		
 		
 	};
@@ -1139,10 +1140,18 @@ gco.card_create_add_effect = function() {
 	eaffects = document.getElementById("effect_affects").value;
 	
 	if(ename == "" || edomain == "" || etype == "" || epanic == "" || eaffects == ""){
-		return;
+		//return;
 	}
 	
 	gco.rdy_effects.push( newEffect = {
+		name : ename,
+		domain : edomain,
+		type : etype,
+		panic : epanic,
+		affects : eaffects
+	});
+	
+	gco.info_cards[document.getElementById("card_show").value].effects.push(newEffect = {
 		name : ename,
 		domain : edomain,
 		type : etype,
@@ -1174,7 +1183,7 @@ gco.update_ddbox = function(ddbox, list) {
 		ddbox.options.length=1;
 		return;
 	}
-	ddbox.options.length = gco.nodes.length;
+	ddbox.options.length = list.lenght;
 	for( var i = 0; i < list.length; i++){
 		if(!list[i].name){
 			ddbox.options[i] = new Option(i ,i);
@@ -1197,23 +1206,7 @@ gco.zone_box_update = function(){
 	
 	document.getElementById("zone_id").innerHTML = gco.selected_zone;
 }
-gco.icard_container_update = function() {
-	
-	var ddbox = document.getElementById("card_show");
-	
 
-	if(gco.info_cards.length == 0){
-		//document.player_node.options.length=1;
-		ddbox.options[0] = new Option('-1','none exists');
-		return;
-	}
-	ddbox.options.length = gco.info_cards.length;
-	for( var i = 0; i < gco.info_cards.length; i++){
-		ddbox.options[i] = new Option(gco.info_cards[i].name, i);
-		
-	
-	}
-}
 gco.show_card = function(){
 	var card = gco.info_cards[document.getElementById("card_show").value];
 	
