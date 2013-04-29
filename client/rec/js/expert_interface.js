@@ -14,7 +14,7 @@ var c_height = 1550,
 	player_colors = ["red","orange","yellow","chartreuse ","green","aqua","blue","purple"];
 	effect_zone_list = ["panic"];
 	
-	effect_people_list = ["decreasemoves1", "decreasemoves2", "decreasemoves2", "nextplayer", "stealaction", "tradecards", "moveanotherplayer", "blocknextevent"];
+	effect_people_list = ["decreasemoves1", "decreasemoves2", "decreasemoves3", "increasemoves",  "nextplayer", "stealaction", "blocknextevent"];
 	
 	
 	max_players = 7;
@@ -979,10 +979,11 @@ gco.event_add_effect = function(){ // adds an effect to the event, see info_card
 	epanic = document.getElementById("effect_panic").value;
 	eaffects = document.getElementById("effect_affects").value;
 	
-	if(ename == "" || edomain == "" || etype == "" || epanic == "" || eaffects == ""){
-		//return;
-	}
 	
+	if(ename == ""){
+		console.log("Missing name of effect");
+		return;
+	}
 	// errorcheck the input
 	
 	if(edomain == "zone") {
@@ -1101,6 +1102,10 @@ gco.card_create_add_effect = function() { // creates an effect and adds it to a 
 	
 	// errorcheck the input
 	
+	if(ename == ""){
+		console.log("Missing name of effect");
+		return;
+	}
 	if(edomain == "zone") {
 		if(etype == "panic"){
 		
