@@ -12,6 +12,8 @@ var http		= require('http'),
     games       = {},
     uuid        = require('node-uuid'),
     db			= require('./database.js');
+    
+    
 /*  Configuration of express server:
     
     Makes the ejs module handle all html files.
@@ -26,13 +28,12 @@ server.use('/img', (__dirname + '/client/rec/img'));
 server.set('view engine', 'html');
 server.set('port', process.env.PORT || 8008);
 
+//The main server running the game client
 console.log('View server running at http://127.0.0.1:8008/');
 
-/*  Handle http requests:
-    
-    Only the '/' adress is handled, and returns the 
-    index.html page that contains the canvas.
-*/
+
+/*  Handle http requests	*/
+
 server.get('/', function(request, response){
     response.render('index');
 });
@@ -58,28 +59,23 @@ server.get('/gm', function(request, response){
 
 
 /*	Data server
+
+	Used with AJAX to retrieve, send and modify data in the Database.
+	POST messages are templates sent from the expert interface, while GET
+	messages are requests from the index page for templates.
+
 */
-
-
 http.createServer(function (req, res) {
     console.log('Data request received');
-    
-	
-	
 
 	if(req.method == "POST"){
-		console.log("recieve template");
+		console.log("received template from expert interface");
 		
 		req.on("data", function(data) {
 			
-			console.log(JSON.parse(data.toString()));
 			db.set_template_string(data.toString());
 		
 		});
-		
-		//res.end();
-		
-		//console.log(req.
 	}
 	
 	else {
@@ -87,41 +83,30 @@ http.createServer(function (req, res) {
 		res.writeHead(200, {'Content-Type': 'text/plain'});
 		db.get_all_templates(function(result) {
 
-			var	gametemplates = [];
-			var temp;
-			for (var i = 0; i < result.length;i++){
-				temp = result[i];
-				gametemplates.push(JSON.stringify(temp));
-			}
-			
-			console.log("Sending list of templates");
+		var	gametemplates = [];
+		var temp;
+		for (var i = 0; i < result.length;i++){
+			temp = result[i];
+			gametemplates.push(JSON.stringify(temp));
+		}
+		
+		console.log("Sending list of templates");
 
-			res.end('templates('+JSON.stringify(gametemplates)+')');
-
+		res.end('templates('+JSON.stringify(gametemplates)+')');
 		});
 	}
-	
-	
+
 }).listen(8124);
 console.log('Data server running at http://127.0.0.1:8124/');
 
 
 /* Configure Socket.IO:
     
-    The socket.IO server listens to a http-server that listens to the express server.
+    The socket.IO server listens to a http-server, that in turn listens to the express server.
 */
 ioserver.listen(server.get('port'));
 var socket_listener = require('socket.io').listen(ioserver, {log:false});
 
-
-/*  TODO Configures the socket.io server
-*/
-//socket_listener.configure(function (){
-//    socket_listener.set('log level', 0);
-//    socket_listener.set('authorization', function //(handshakeData, callback) {
-//        callback(null, true);
-//    });
-//});
 
 /*  Handle client interaction through socket.io:
     
@@ -129,30 +114,30 @@ var socket_listener = require('socket.io').listen(ioserver, {log:false});
     TODO Starts a game session with the client.
     Listens for commands and sends them to the game engine.
     TODO Listens for disconnects and ends the game associated with the disconnected player.
+    TODO Handles game manager
 */   
 socket_listener.sockets.on('connection', function (client) {
 
-    // TODO Client setup
     client.userid = uuid.v1();
     client.emit('is_connected');
     console.log('**SOCKET_LISTENER** client ' + client.userid + ' connected');
     
     client.on('dp_user_id', function(o) {
         console.log("Checking for user ID");
-        /* if (o.id) {
+        if (o.id) {
             console.log("Found client with ID "+o.id);
             client.userid = o.id;
-            if (games[client.userid]) {
-                games[client.userid].client = client;
-                games[client.userid].start();
+            var game = find_game(client.userid);
+            if (game) {
+                game.join_game(client);
             }
             else{
                 client.emit('not_in_game', {});
             }
         }
-        else{*/
+        else{
             client.emit('not_in_game', {});
-        /*}*/
+       }
     });
     
     //Client sent log message
@@ -161,16 +146,16 @@ socket_listener.sockets.on('connection', function (client) {
     });
     
 
-            
     client.on('end_game', function(c) {
         console.log('**SOCKET_LISTENER** received command ' + c);
         engine.end_game(client, c);
     });
 	
+	//Client has chosen a game template, and sent a template_id to start a game with.
     client.on('create_game', function(c) {
 		
 		console.log('**SOCKET_LISTENER** received create command ');
-    	//henter ut gametemplate med gitt template id
+
     	console.log('Retrieving template with id: '+c.template_id);
     	db.get_template_string(c.template_id, function(result) {
 			var	gametemplate = JSON.parse(result[0].json_string);
@@ -206,9 +191,20 @@ socket_listener.sockets.on('connection', function (client) {
     client.on('disconnect', function () {
         console.log('**SOCKET_LISTENER** client ' + client.userid + ' disconnected.');
        	//TODO Save to DB
-        games[client.userid] = {};
+        //TODO close game
     });
       
 });// end onConnection
 
-   
+
+/*	Find Existing Game
+
+	Finds an existing game by searching through 
+	the client ids of active games.
+*/
+function find_game(userid){
+	for(var g in games){
+		if(g.has_client(userid)) return g.id;
+	}
+	return;
+}

@@ -5,11 +5,12 @@ var socket = io.connect('http://localhost');
 socket.on('is_connected', function () {
     console.log('Connected');
     var cookie = read_cookie('dp_user_id');
+    var gm = read_cookie('is_gm');
     if (cookie !== null) {
-        socket.emit('dp_user_id', {id:cookie});
+        socket.emit('dp_user_id', {id:cookie, gm:gm});
     }
     else {
-        socket.emit('dp_user_id', {});
+        socket.emit('dp_user_id', {gm:gm});
     }
     
 });
@@ -65,6 +66,14 @@ socket.on('change', function (data) {
     }
     if (d.event) {
     	window.alert(d.event.name);
+    }
+    if (d.win) {
+    	window.alert("You won the game! Congratulations! Replay is saved to database.");
+    	//Save to database
+    }
+    if (d.lose) {
+    	window.alert("You lost the game! Replay is saved to database.");
+    	//Save to database
     }
     gco.draw();
     

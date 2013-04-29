@@ -59,13 +59,15 @@ function templates(d){
 
 function selected_template(id){
 	console.log("Creating cookie for chosen template: "+id);
+	create_cookie("is_gm", false, 1);
 	create_cookie("template_id", id, 1);
 }
 
 
-
-
-
+function game_manager(){
+	console.log("Creating cookie for GM: ");
+	create_cookie("is_gm", true, 1);
+}
 
 
 
