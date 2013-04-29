@@ -12,7 +12,7 @@ var c_height = 1550,
     panic_info_size = 40,
     w_inc = 0;
 	//set images
-	var snd = new Audio("/music/clocktickfastpain10sec"); // buffers automatically when created
+	var snd = new Audio("/music/clocktickfastpain10sec.mp3"); // buffers automatically when created
 	
 	var residential_img = new Image();
 	residential_img.src = "/img/residential.jpg";
@@ -134,9 +134,9 @@ gco.init_game = function (d) {
 gco.update_timer = function(time){
 	
 	
-	if (timer===10)
+	if (time===10){
 	snd.play();
-	
+	}
 	var lab = document.getElementById("timer-label");
     lab.innerHTML = "Panic Increase in: "+time;
 }
