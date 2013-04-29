@@ -11,15 +11,16 @@ var http		= require('http'),
     ioserver    = require('http').createServer(server),
     games       = {},
     uuid        = require('node-uuid'),
-    db			= require('./database.js'),
-	replay 		= require('./client/rec/js/replay.js');
-	/*Configuration of express server:
+    db			= require('./database.js');
+
+ 	 /* Configuration of express server:
     
     Makes the ejs module handle all html files.
     Sets port to 8008.
     Directs all view-requests to the views folder.
     All static files are served from the rec folder
 	*/
+
 server.engine('.html', require('ejs').__express);
 server.set('views', __dirname + '/client/views');
 server.use(express.static(__dirname + '/client/rec'));
@@ -58,7 +59,6 @@ server.get('/game/', function(request, response){
 });
 
 
-
 /*	Data server
 */
 
@@ -67,42 +67,61 @@ http.createServer(function (req, res) {
     console.log('Data request received');
     
 	
+	if(req.method === "POST"){
 	
-
-	if(req.method == "POST"){
 		console.log("recieve template");
-		
+			
 		req.on("data", function(data) {
 			
 			console.log(JSON.parse(data.toString()));
-			db.set_template_string(data.toString());
+			db.set_template_string(data.toString());			
+
 		
 		});
 		
 		//res.end();
 		
-		//console.log(req.
 	}
 	
-	else {
-	
-		res.writeHead(200, {'Content-Type': 'text/plain'});
-		db.get_all_templates(function(result) {
-
-			var	gametemplates = [];
-			var temp;
-			for (var i = 0; i < result.length;i++){
-				temp = result[i];
-				gametemplates.push(JSON.stringify(temp));
-			}
+	else if (req.method === "GET") {
+		console.log(req.url);
+		if (req.url.indexOf("replays") !== -1) {
+			console.log("requesting replay");
 			
-			console.log("Sending list of templates");
+			res.writeHead(200, {'Content-Type': 'text/plain'});
+			db.get_all_replays(function (result) {
+				console.log(result);
+				var	replays = [];
+				var temp;
+				for (var i = 0; i < result.length;i++){
+					temp = result[i];
+					replays.push(JSON.stringify(temp));
+				}	
+				console.log("Sending list of replays");
 
-			res.end('templates('+JSON.stringify(gametemplates)+')');
-
-		});
-	}
+				res.end('replays('+JSON.stringify(replays)+')');
+			});
+		}
+		
+		else {
 	
+			res.writeHead(200, {'Content-Type': 'text/plain'});
+			db.get_all_templates(function(result) {
+
+				var	gametemplates = [];
+				var temp;
+				for (var i = 0; i < result.length;i++){
+					temp = result[i];
+					gametemplates.push(JSON.stringify(temp));
+				}
+			
+				console.log("Sending list of templates");
+
+				res.end('templates('+JSON.stringify(gametemplates)+')');
+
+			});
+		}
+	}
 	
 }).listen(8124);
 console.log('Data server running at http://127.0.0.1:8124/');
@@ -224,13 +243,13 @@ socket_listener.sockets.on('connection', function (client) {
 			
 		});
 	})
-	
+
     client.on('disconnect', function () {
         console.log('**SOCKET_LISTENER** client ' + client.userid + ' disconnected.');
        	//TODO Save to DB
         games[client.userid] = {};
     });
-      
+
 });// end onConnection
 
    

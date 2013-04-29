@@ -62,7 +62,65 @@ function selected_template(id){
 	create_cookie("template_id", id, 1);
 }
 
+function replay(){
+	var $md = $("#maindiv");
+	$md.html("");
+	
+	
+	  $.ajax({
+        url: 'http://127.0.0.1:8124/replays',
+        dataType: "jsonp",
+        jsonpCallback: "replays",
+        cache: false,
+        timeout: 5000,
+        success: function(data) {
+            console.log("Received data: "+data);
+            console.log(data);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert('error ' + textStatus + " " + errorThrown);
+        }
+    });
+}
 
+function replays(d){
+	var cont = "",
+		t;
+	console.log(d);
+	console.log("Type: " + typeof d);
+	var info, desc;
+	if (d.length){
+		for (var i = 0; i < d.length; i++){
+			t = JSON.parse(d[i]);
+			info = JSON.parse(t.replay_id);
+			console.log("Replay parsed:");
+			console.log(info);
+			desc = info.desc ? info.desc : "Default replay";
+			cont += "<a href='http://127.0.0.1:8008/replay/' onclick='selected_template("+t.id+")'><div class='template-entry clearfix'>";
+			cont += "<div class='template-info'>"+ t.replay_id + "</div>";	
+			cont += "<div class='template-info'>"+ desc + "</div>";	
+			cont += "</div></a>";
+		}
+		$("#maindiv").html(cont);
+	}
+	else if (typeof d === 'object'){
+		info = JSON.parse(d.json_string);
+		desc = info.desc ? info.desc : "Default replay";
+		cont += "<a href='http://127.0.0.1:8008/replay/' onclick='selected_template("+d.replay_id+")'><div class='template-entry clearfix'>";
+		cont += "<div class='template-info'>"+ d.replay_id + "</div>";	
+		cont += "<div class='template-info'>"+ desc + "</div>";
+		cont += "</div></a>";
+		$("#maindiv").html(cont);
+	}
+	else{
+		alert("No replays are available!");
+	}
+}
+
+function selected_replay(id){
+	console.log("Creating cookie for chosen replay: "+id);
+	create_cookie("replay_id", id, 1);
+}
 
 
 
