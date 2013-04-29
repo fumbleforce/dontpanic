@@ -119,24 +119,33 @@ var socket_listener = require('socket.io').listen(ioserver, {log:false});
 socket_listener.sockets.on('connection', function (client) {
 
     client.userid = uuid.v1();
+    console.log("Set client ID to "+client.userid);
     client.emit('is_connected');
     console.log('**SOCKET_LISTENER** client ' + client.userid + ' connected');
     
     client.on('dp_user_id', function(o) {
-        console.log("Checking for user ID");
-        if (o.id) {
+        console.log("Checking for user ID... "+o.id);
+        
+        if(o.is_gm){
+        	client.emit("get_room_id");
+        }
+        
+        else if (o.id !== undefined && o.id !== null && o.id !== "undefined") {
             console.log("Found client with ID "+o.id);
             client.userid = o.id;
             var game = find_game(client.userid);
             if (game) {
-                game.join_game(client);
+            	client.game_id = game;
+                games[game].join_game(client);
             }
             else{
-                client.emit('not_in_game', {});
+            	console.log("Client was not in game");
+                client.emit('not_in_game', {userid:client.userid});
             }
         }
         else{
-            client.emit('not_in_game', {});
+        	console.log("Client was not in game");
+            client.emit('not_in_game', {userid:client.userid});
        }
     });
     
@@ -161,13 +170,17 @@ socket_listener.sockets.on('connection', function (client) {
 			var	gametemplate = JSON.parse(result[0].json_string);
 			
 			console.log("Creating game object based on template..");
-			var g = new engine(client.userid, client, gametemplate);
+			var g = new engine(client.userid, client, gametemplate, c.template_id);
 			console.log("Created.");
 	    	games[g.id] = g;
 	    	client.game_id = g.id;
 	    	g.start(client);		
 		});
     })
+    
+    client.on('selected_room_id', function(room){
+    	 games[room].join_game(client);
+    }
 
     
     client.on('join_game', function(c) {
@@ -185,7 +198,7 @@ socket_listener.sockets.on('connection', function (client) {
         console.log('**SOCKET_LISTENER** Received:');
         var parsed = JSON.parse(c);
         
-        if(games[client.userid]) games[client.game_id].command(client, parsed);
+        if(client.game_id) games[client.game_id].command(client, parsed);
     });
 	
     client.on('disconnect', function () {
@@ -204,7 +217,8 @@ socket_listener.sockets.on('connection', function (client) {
 */
 function find_game(userid){
 	for(var g in games){
-		if(g.has_client(userid)) return g.id;
+		console.log("Checking game.. "+games[g].id);
+		if(games[g].has_client(userid)) return games[g].id;
 	}
 	return;
 }

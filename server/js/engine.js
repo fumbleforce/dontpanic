@@ -7,7 +7,7 @@
     client		socket.io client	The client that created the game
     template	Object				Contains the map, players and settings configured as a template by an expert
 */
-var ge = module.exports = function (id, client, template) {
+var ge = module.exports = function (id, client, template,template_id) {
 	
 	//Clients
 	this.clients = [client];
@@ -16,6 +16,7 @@ var ge = module.exports = function (id, client, template) {
 	this.info_cards = template.info_cards || [];
 	this.events = template.events || [];
 	this.settings = template.settings || {};
+	this.template_id = template_id || 0;
 	
 	//Map
 	this.map = {nodes : [], zones : []};
@@ -43,7 +44,12 @@ var ge = module.exports = function (id, client, template) {
     	
     	//Given two random info cards at the start of the game.
 		player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
-    	player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
+
+    	
+    	//First player gets one extra
+		if(i === 0){
+			player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
+		}
 		
     	this.players.push(player);
     }
@@ -412,7 +418,9 @@ ge.prototype.command = function(client, c){
 
 ge.prototype.start = function(client){
     var g = state(this);
-    console.log("Sending start state to client.");
+    console.log("Sending start state to client "+this.clients[0].userid);
+    
+    g.userid = this.clients[0].userid;
     
     if(client){
     	client.emit('start_game', JSON.stringify(g));
@@ -462,7 +470,7 @@ ge.prototype.next_player = function(game) {
 
 ge.prototype.has_client = function(clientid){
 	for (var i = 0; i<this.clients.length; i++){
-		if (this.clients[i] === clientid) return true;
+		if (this.clients[i].userid === clientid) return true;
 	}
 	return false;
 }
@@ -476,7 +484,7 @@ ge.prototype.timer_tick = function(client, c) {
 ge.prototype.check_win = function(){
 	var zones = this.map.zones;
 	for(var i = 0; i < zones.length; i++){
-		if(zones[i].panic > 0){
+		if(zones[i].panic_level > 0){
 			return false;
 		}
 	}
@@ -485,11 +493,14 @@ ge.prototype.check_win = function(){
 
 ge.prototype.check_lose = function(){
 	var zones = this.map.zones;
+	console.log("Checking lose..");
 	for(var i = 0; i < zones.length; i++){
-		if(zones[i].panic < 50){
+		console.log("Zone "+i+": "+zones[i].panic);
+		if(zones[i].panic_level < 50){
 			return false;
 		}
 	}
+	console.log("All zones over 50 panic, lost");
 	return true;
 }
 

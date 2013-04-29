@@ -4,13 +4,13 @@ var socket = io.connect('http://localhost');
 
 socket.on('is_connected', function () {
     console.log('Connected');
-    var cookie = read_cookie('dp_user_id');
-    var gm = read_cookie('is_gm');
-    if (cookie !== null) {
-        socket.emit('dp_user_id', {id:cookie, gm:gm});
+    var id_cookie = read_cookie('dp_user_id');
+    var gm_cookie = read_cookie('is_gm');
+    if (id_cookie !== "undefined" || id_cookie !== null) {
+        socket.emit('dp_user_id', {id:id_cookie, gm:gm_cookie});
     }
     else {
-        socket.emit('dp_user_id', {gm:gm});
+        socket.emit('dp_user_id', {gm:gm_cookie});
     }
     
 });
@@ -23,6 +23,7 @@ socket.on('msg', function (msg) {
 socket.on('not_in_game', function(o){
     console.log("Client is not associated with a game");
     var tid = read_cookie("template_id");
+    create_cookie('dp_user_id', o.userid, 1);
     console.log("Creating game with template_id : "+tid+" from cookie");
     socket.emit('create_game', {template_id : tid});
 });
@@ -31,11 +32,15 @@ socket.on('error', function (e) {
     console.log(e);
 });
 
+socket.on('get_room_id', function(){
+	var room = read_cookie("room_id");
+	socket.emit("selected_room_id", room);
+});
+
 socket.on('start_game', function (data) {
 	console.log("Recieved starting state, initializing.");
     var d = JSON.parse(data);
     console.log(d);
-    create_cookie('dp_user_id', data.userid, 1);
     gco.init_game(d);
 });
 
@@ -68,71 +73,17 @@ socket.on('change', function (data) {
     	window.alert(d.event.name);
     }
     if (d.win) {
-    	window.alert("You won the game! Congratulations! Replay is saved to database.");
+    	console.log("WON");
+    	//window.alert("You won the game! Congratulations! Replay is saved to database.");
     	//Save to database
     }
     if (d.lose) {
-    	window.alert("You lost the game! Replay is saved to database.");
+    	console.log("LOST");
+    	//window.alert("You lost the game! Replay is saved to database.");
     	//Save to database
     }
     gco.draw();
     
-    /*
-    switch (d.type) {
-        case 'effect':
-            console.log("updating state");
-            gco.update_players(d.players);
-            gco.update_nodes(d.nodes);
-            gco.update_zones(d.zones);
-            gco.update_cards();
-            gco.draw();
-            break;
-        case 'moved_player':
-            gco.update_player(d.player);
-            console.log("Player has moved to node id: "+d.player.node);
-
-            break;
-		case 'decreased_panic':
-			gco.decrease_panic(d.zone);
-			console.log("Panic has changed in zone id: "+d.zone.id);
-
-			break;
-		case 'moved_people':
-			gco.moved_people(d.from_zone);
-			gco.moved_people(d.to_zone);
-			console.log("People have been moved from zone: "+d.from_zone.id + 
-				" to zone: "+d.to_zone.id);
-			
-			break;
-	    case 'next_turn':
-	        gco.turn = d.turn;
-            gco.active_player = d.player.id;
-            gco.update_player(d.player)
-            gco.draw();
-            gco.update_cards();
-	        break;
-	    
-	    case 'update_panic':
-	        gco.zones = d.zones;
-	        gco.start_timer(d.timer);
-	        gco.draw();
-	        break;
-	    
-	    //TODO implement this
-	    case 'added_information_center':
-	    	gco.nodes[gco.players[gco.active_player].node] = d.node;
-	    	gco.draw();
-	    	break;
-	    	
-	    case 'added_road_block':
-	    	gco.nodes[gco.players[gco.active_player].node] = d.node;
-	    	gco.draw();
-	    	break;
-	    	
-    } 
-    if(d.dec_action) gco.decrease_actions();
-    if(d.dec_4_actions) gco.decrease_4_actions();
-    */
 });
 
 
