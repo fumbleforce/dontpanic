@@ -80,7 +80,7 @@ var ge = module.exports = function (id, client, template) {
     this.information_centers = 0;
     this.road_blocks = 0;
     this.max_information_centers = 5;
-    this.max_road_blocks = 2;
+    this.max_road_blocks = 10;
 	this.cards_left = 10;
 	this.eventTurns = 3;
 	this.turnsSinceEvent = 0;
@@ -350,10 +350,32 @@ ge.prototype.command = function(client, c){
 
 			var p = players[this.active_player];
 			
-			if((this.road_blocks < this.max_road_blocks) && nodes[p.node].add_road_block(p, players)){
+			if((c.selected_node===p.node) && (this.road_blocks < this.max_road_blocks) && nodes[p.node].add_road_block(p, players)){
+				for (var i=0; i<zones.length; i++){
+					if ((!zones[i].isBlocked)&&((zones[i].nodes.indexOf(nodes[p.node].id))>=0)){
+						var allBlocked=true;
+						console.log("Going in zone"+i+":");
+						for (var j=0; j<zones[i].nodes.length; j++){
+							console.log("Node"+j+" blocked? "+nodes[zones[i].nodes[j]].has_road_block);
+							if (!nodes[zones[i].nodes[j]].has_road_block){
+								allBlocked=false;
+								break;
+							}
+								 
+						}
+						console.log("allBlocked:"+allBlocked);
+						if (allBlocked){
+							zones[i].isBlocked=true;
+							console.log("in AllBlocked:"+zones[i].isBlocked);
+						}
+					}
+				}
 				changed.nodes = [nodes[p.node]];
 				changed.players = [p];
 				this.road_blocks++;
+				for (var i=0; i<zones.length; i++){
+					console.log("Zone "+i+" blocked? "+zones[i].isBlocked);
+				}
 			}
 
 			break;
@@ -367,7 +389,17 @@ ge.prototype.command = function(client, c){
 				changed.players = [p];
 				this.road_blocks--;
 			}
-
+			//change isBlocked to false if needed
+			for (var i=0; i<zones.length; i++){
+				if ((zones[i].isBlocked)&&((zones[i].nodes.indexOf(nodes[p.node].id))>=0)){
+					zones[i].isBlocked=false;
+				}
+			}
+			
+			for (var i=0; i<zones.length; i++){
+				console.log("Zone "+i+" blocked? "+zones[i].isBlocked);
+			}
+			
 			break;		
 
 
@@ -828,6 +860,10 @@ ge.Node.prototype.add_road_block = function (player, players) {
 }
 ge.Node.prototype.can_add_road_block = function (player, players) {
 	console.log("Can add road block?");
+
+	if (player.node!=this.id){
+		return false;
+	}
 	if (this.has_road_block) {
 		console.log('error', "Already has road block");
 	    return false;
@@ -926,6 +962,7 @@ ge.Zone = function (z) {//(id, type, people, nodes, adjacent_zones, panic_level,
 	this.adjacent_zones = z.adjacent_zones;
 	this.panic_level = 0;// z.panic_level;//settes til 0 i starten??
 	this.centroid = z.centroid;//center (centroid) X and Y of zone polygon to put panic info
+	this.isBlocked = false; //if all nodes of zone are blocked, then zone is blocked from spreading panic
 	
 }
 ge.Zone.prototype.update_panic = function (panic_level) {
