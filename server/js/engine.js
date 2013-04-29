@@ -455,13 +455,8 @@ ge.prototype.command = function(client, c){
 			}
 			
 
+			
 			//fire a random event every Xth turn
-			if (this.turnsSinceEvent===this.eventTurns){
-			var randomEvent=Math.floor(Math.random()*this.events.length);
-			changed = effect(this.events[randomEvent], this);
-			changed.event = this.events[randomEvent];
-			this.turnsSinceEvent=0;
-			}
 			console.log("what is event blocked now?  " + this.eventblocked);
 			if (this.turnsSinceEvent>=this.eventTurns){
 			
