@@ -101,7 +101,7 @@ gco.ctx = gco.canvas.getContext("2d");
     Object map      The map object containing list of Zones and Nodes
 */
 gco.init_game = function (d) {
-	console.log("!!!***!!!***!!!***!!!***!!!***!!!***!!!***!!!***!!!***!!!***");
+	
     console.log("Game initiated.");
     gco.players = d.players;
     gco.zones = d.zones;
@@ -111,7 +111,7 @@ gco.init_game = function (d) {
     gco.construct_player_divs(gco.players);
     gco.setup_canvas();
     gco.set_canvas_listener();
-    gco.start_timer(d.timer);
+
     
     gco.draw();
     gco.update_cards();
@@ -127,22 +127,12 @@ gco.init_game = function (d) {
     
     Int dur         Duration of timer.
 */
-gco.start_timer = function(dur){
-    console.log("Timer Started.");
-    var left = dur,
-        lab = document.getElementById("timer-label");
-    var inter = setInterval(function(){
-        lab.innerHTML = "Panic Increase in: "+left;
-        left--;
-        if (left === -1) {
-            command('inc_panic', {});
-            clearInterval(inter);
-        }
-    }, 1000);
-    
-    
-}
 
+
+gco.update_timer = function(time){
+	var lab = document.getElementById("timer-label");
+    lab.innerHTML = "Panic Increase in: "+time;
+}
 
 /*  Set up Canvas
     

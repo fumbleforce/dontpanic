@@ -71,7 +71,8 @@ var ge = module.exports = function (id, client, template,template_id) {
 	//Local game related
 	this.active_player = 0;
 	this.turn = 0;
-	this.timer = 20;
+	this.time_step = 20;
+	this.timer_dur = 20;
     this.information_centers = 0;
     this.road_blocks = 0;
     this.max_information_centers = 5;
@@ -80,6 +81,7 @@ var ge = module.exports = function (id, client, template,template_id) {
 	this.eventTurns = 3;
 	this.turnsSinceEvent = 0;
 	this.eventblocked = false;
+	this.started=false;
 	
 	//Local
 	var SCALE= 90;
@@ -395,8 +397,8 @@ ge.prototype.command = function(client, c){
 					zones[i].update_panic(10);
 				}
 	        }
-	        this.timer += 20;
-	        
+	        this.timer_dur += this.time_step;
+	        this.start_timer();
 	        changed.timer = this.timer;
 	        changed.zones = zones;
 	        
@@ -482,7 +484,10 @@ ge.prototype.start = function(client){
     console.log("Sending start state to client "+this.clients[0].userid);
     
     g.userid = this.clients[0].userid;
-    
+    if(!this.started){
+    	this.start_timer();
+    	this.started=true;
+    }
     if(client){
     	client.emit('start_game', JSON.stringify(g));
     }
@@ -537,10 +542,23 @@ ge.prototype.has_client = function(clientid){
 }
 
 
-ge.prototype.timer_tick = function(client, c) {	
-	//TODO: all paniced zones get +5, unpaniced get +1, 
-	// Full panic spreads, and gives +5 to neighbours
+ge.prototype.start_timer = function() {	
+	var that = this;
+    that.timer = that.timer_dur;
+    
+    var inter = setInterval(function(){
+        
+        that.timer--;
+        if (that.timer === -1) {
+            that.command("", {type:'inc_panic'});
+            clearInterval(inter);
+        }
+        that.emit('change', JSON.stringify({timer:that.timer}));
+    }, 1000);
+    
+    
 }
+
 
 ge.prototype.check_win = function(){
 	var zones = this.map.zones;

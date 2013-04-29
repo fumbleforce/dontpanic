@@ -57,7 +57,7 @@ socket.on('change', function (data) {
         gco.update_nodes(d.nodes);
     }
     if (d.timer) {
-        gco.start_timer(d.timer);
+        gco.update_timer(d.timer);
     }
     if (d.turn) {
         gco.update_turn(d.turn, d.active_player);
@@ -103,5 +103,8 @@ function msg(m){
     socket.emit('msg', m);
 }
 
+function end_game(){
+	socket.emit("leave_game");
+}
 
 

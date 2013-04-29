@@ -70,8 +70,8 @@ server.get('/gm', function(request, response){
 */
 http.createServer(function (req, res) {
     console.log('Data request received');
-
-    
+	console.log("method: "+req.method);
+    console.log("url: "+req.url);
 	
 	if(req.method === "POST"){
 	
@@ -90,7 +90,7 @@ http.createServer(function (req, res) {
 	}
 	
 	else if (req.method === "GET") {
-		console.log(req.url);
+
 		if (req.url.indexOf("replays") !== -1) {
 			console.log("requesting replay");
 			
@@ -108,8 +108,16 @@ http.createServer(function (req, res) {
 				res.end('replays('+JSON.stringify(replays)+')');
 			});
 		}
-		
-		else {
+		else if (req.url.indexOf("game_master") !== -1) {
+			res.writeHead(200, {'Content-Type': 'text/plain'});
+			
+			var game_list = [];
+			for (var g in games){
+				game_list.push(JSON.stringify({id:games[g].id}));
+			}
+			res.end('game_master('+JSON.stringify(game_list)+')');
+		}
+		else if (req.url.indexOf("templates") !== -1) {
 	
 			res.writeHead(200, {'Content-Type': 'text/plain'});
 			db.get_all_templates(function(result) {
@@ -214,7 +222,7 @@ socket_listener.sockets.on('connection', function (client) {
     
     client.on('selected_room_id', function(room){
     	 games[room].join_game(client);
-    }
+    });
 
     client.on('join_game', function(c) {
         console.log('**SOCKET_LISTENER** received join command ' + c);
@@ -223,7 +231,8 @@ socket_listener.sockets.on('connection', function (client) {
     
     client.on('leave_game', function(c) {
         console.log('**SOCKET_LISTENER** received leave command ' + c);
-        engine.leave_game(client, c);
+        //TODO Save game replay
+        delete games[client.game_id];
     });
     
     client.on('game_command', function(c) {
