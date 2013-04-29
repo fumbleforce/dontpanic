@@ -12,6 +12,11 @@ var c_height = 1550,
     panic_info_size = 40,
     w_inc = 0;
 	player_colors = ["red","orange","yellow","chartreuse ","green","aqua","blue","purple"];
+	effect_zone_list = ["panic"];
+	
+	effect_people_list = ["decreasemoves1", "decreasemoves2", "decreasemoves2", "nextplayer", "stealaction", "tradecards", "moveanotherplayer", "blocknextevent"];
+	
+	
 	max_players = 7;
 	//set images
 	var residential_img = new Image();
@@ -109,7 +114,6 @@ var gco = {
 	next_node : 0,
 	next_zone : 0,
 	next_player : 0,
-	mode : "add node", // not in use
 	selected_node : -1,
 	selected_zone : -1,
 	selected_player : -1,
@@ -135,7 +139,7 @@ gco.ctx = gco.canvas.getContext("2d");
     List ps         List of player objects
     Object map      The map object containing list of Zones and Nodes
 */
-gco.init_game = function (d) {
+gco.init_game = function () {
     console.log("Game initiated");
 	
 
@@ -155,7 +159,7 @@ gco.init_game = function (d) {
 
 
 
-gco.export_to_database = function(){
+gco.export_to_database = function(){ // exports the info held by the gco to the database
 
 	gco.update_adjacent_zones();
 	
@@ -243,19 +247,7 @@ gco.export_to_database = function(){
 	
 	
 	$.post('http://127.0.0.1:8124/', JSON.stringify(game_template));
-/*/
-	   $.ajax({
-		  type: "POST",
-		  url: 'http://127.0.0.1:8124/',
-		  data: game_template,
-		  success: function(data) {
-            console.log("Received data: "+data);
-            console.log(data);
-        },
-		  dataType: "jsonp"
-	});
-/*/	
-	
+
 
 }
 
@@ -274,101 +266,9 @@ gco.setup_canvas = function(){
 }
 
 
-gco.reset = function(){
-    /*var p = gco.players[gco.active_player];
-    p.x = gco.nodes[p.node].x;
-    p.y = gco.nodes[p.node].y;*/
-    gco.update_players(gco.players);
-}
 
 
-/*  Update Player
-    
-    Called by the server when a player has been updated with new information. 
-    Replaces the local player object with an updated object from the server.
-    
-    Object p        The updated player object.
-*/
-gco.update_player = function(p){
-    gco.players[p.id] = p;
-    gco.players[p.id].x = gco.nodes[p.node].x;
-    gco.players[p.id].y = gco.nodes[p.node].y;
-}
-
-gco.update_players = function(ps){
-	var $con;
-    for(var i = 0; i < ps.length; i++) {
-        gco.update_player(ps[i]);
-     
-    }
-}
-
-gco.update_nodes = function(ns){
-    for(var i = 0; i < ns.length;i++){
-        gco.nodes[ns[i].id] = ns[i];
-    }
-}
-
-gco.update_zones = function(zs){
-    for(var i = 0; i < zs.length;i++){
-        gco.zones[zs[i].id] = zs[i];
-    }
-}
-
-gco.update_cards = function() {
-    var ps = gco.players,
-        $con,
-        c,
-        i,
-        cards,
-        button;
-        
-    console.log("Updating info cards..");
-    
-    for (i = 0; i < ps.length; i++){
-        cards = ps[i].info_cards;
-		
-		$con = $("#"+i+"_text");
-		$con.empty();
-		something = $("<p>"+ps[i].role+"</p>");
-		something.appendTo($con);
-		
-
-        $con = $("#"+i+"_cards");
-        $con.empty();
-        if ((cards.length)*110+75 > (parseInt($con.parent().parent().css('width')))) {
-            $con.parent().parent().css('width', ''+(parseInt($con.parent().parent().css('width'))+110)+'px');
-
-        }
-        for (c = 0; c < cards.length; c++){
-            button = $("<button id='"+i+"-"+c+"' class='info-card' onclick='gco.info_card_click(this.id)'>"+cards[c].name+ "</button>");
-            button.appendTo($con);
-			
-        }
-		
-    }
-}
-
-
-gco.info_card_click = function(id) {
-    var p = id.charAt(0),
-        c = id.charAt(2);
-    if(gco.active_player == p){
-		command('use_card', {player:p, card:c});
-	}
-}
-
-
-
-
-
-
-
-
-
-
-
-gco.player_draw = function(player, ctx){
+gco.player_draw = function(player, ctx){ // draw a player
     player.x = player.node.x;
     player.y = player.node.y;
 	
@@ -482,7 +382,7 @@ gco.roadblock_draw = function(node, ctx){
 	    ctx.stroke();
     }
 }
-gco.draw_connections = function(ctx){
+gco.draw_connections = function(ctx){ // draw the connections between the nodes
 	var nodes = gco.nodes;
 	ctx.strokeStyle = '#202020';
 	ctx.lineWidth = 5;
@@ -803,7 +703,7 @@ gco.add_player = function(){ // creates a player and adds it to the game.
 
 }
 
-gco.change_player = function()
+gco.change_player = function() //
 {
 	if(gco.selected_player == -1){
 		console.log("no player selected");
@@ -849,7 +749,7 @@ gco.create_connection = function(){ // creates a connection between the 2 select
 		
 	
 }
-gco.edit_zone = function(){
+gco.edit_zone = function(){ //edits the selected zone, might need more errorchecking
 	if(gco.selected_zone < 0){
 		console.log("no Zone selected");
 		return;
@@ -912,7 +812,7 @@ gco.del_selected_zone = function(){ // delete the selected zone, if none is sele
 		
 	}
 }
-gco.del_selected_player = function(){
+gco.del_selected_player = function(){ // deletes the selected player
 	if(gco.selected_player > -1){
 		
 		index = gco.selected_player;
@@ -1072,7 +972,7 @@ gco.create_zone = function(){ // checks if it is possible to create a zone, and 
 	
 }
 
-gco.event_add_effect = function(){
+gco.event_add_effect = function(){ // adds an effect to the event, see info_card_add_effect
 	ename = document.getElementById("effect_name").value;
 	edomain = document.getElementById("effect_domain").value;
 	etype = document.getElementById("effect_type").value;
@@ -1138,7 +1038,7 @@ gco.event_add_effect = function(){
 	
 	
 }
-gco.add_event = function() {
+gco.add_event = function() { // adds the event to the event container
 	
 	cname = document.getElementById("event_name").value;
 	cdesc = document.getElementById("event_desc").value;
@@ -1164,7 +1064,7 @@ gco.add_event = function() {
 	document.getElementById("event_show").selectedIndex = document.getElementById("event_show").options.length -1;
 	gco.show_event();
 }
-gco.add_info_card = function() {
+gco.add_info_card = function() { // adds and infocard to the cardcontainer
 	
 	cname = document.getElementById("card_name").value;
 	cdesc = document.getElementById("card_desc").value;
@@ -1186,16 +1086,11 @@ gco.add_info_card = function() {
 		effects : ceff
 	});
 	
-	
-	
-	
-	
-	
 	gco.update_ddbox(document.getElementById("card_show"), gco.info_cards, false);
 	document.getElementById("card_show").selectedIndex = document.getElementById("card_show").options.length -1;
 	gco.show_card();
 }
-gco.card_create_add_effect = function() {
+gco.card_create_add_effect = function() { // creates an effect and adds it to a card. Mostly the same as adding effects to a event, but wants to keep it like this in case there will be needed differences to the methods
 
 	
 	ename = document.getElementById("effect_name").value;
@@ -1203,10 +1098,6 @@ gco.card_create_add_effect = function() {
 	etype = document.getElementById("effect_type").value;
 	epanic = document.getElementById("effect_panic").value;
 	eaffects = document.getElementById("effect_affects").value;
-	
-	if(ename == "" || edomain == "" || etype == "" || epanic == "" || eaffects == ""){
-		//return;
-	}
 	
 	// errorcheck the input
 	
@@ -1275,7 +1166,7 @@ gco.card_create_remove_effect = function() { // removes the selected effect from
 }
 
 
-gco.update_ddbox = function(ddbox, list, name_same_as_value) { // updates a DropDownBox 
+gco.update_ddbox = function(ddbox, list, name_same_as_value) { // updates a DropDownBox so it ccontains the provided list, 
 
 	
 
@@ -1359,7 +1250,7 @@ gco.show_event = function(){ // show the info on the selected event. want to edi
 	document.getElementById("event_effects_label2").innerHTML = effects2;
 	
 }
-gco.event_move_to_edit = function(){
+gco.event_move_to_edit = function(){ // moves the selected event to edit
 	gco.selected_event = document.getElementById("event_show").value;
 	var event = gco.events[gco.selected_event];
 	
@@ -1370,7 +1261,7 @@ gco.event_move_to_edit = function(){
 	
 	gco.rdy_effects = event.effects;
 }
-gco.card_move_to_edit = function(){
+gco.card_move_to_edit = function(){ // moves the selected card to edit, 
 	gco.selected_card = document.getElementById("card_show").value;
 	var card = gco.info_cards[gco.selected_card];
 	
@@ -1431,10 +1322,10 @@ gco.effect_domain_change = function(){ // changes the effect creation to better 
 	
 	if(change == "zone"){
 		
-		list = ["panic"];
+		list = effect_zone_list;
 	}
 	else{
-		list = ["decreasemoves1", "decreasemoves2", "decreasemoves2", "nextplayer", "stealaction", "tradecards", "moveanotherplayer", "blocknextevent"];
+		list = effect_people_list;
 	}
 	gco.update_ddbox(ddbox, list, true);
 	
@@ -1457,9 +1348,8 @@ gco.set_canvas_listener = function(){
     canvas.addEventListener('selectstart', function(e) { e.preventDefault(); return false; }, false);
 
 	
-	//canvas.addEventListener('sw', gco.zone_box_update(), true); // end keylistener
-	
-	window.addEventListener('keydown',function(e) {
+
+	window.addEventListener('keydown',function(e) { // need to edit this so it wont check when canvas is unfocused
 		console.log("key" + e.keyCode);
 		
 		
@@ -1497,36 +1387,6 @@ gco.set_canvas_listener = function(){
 		
 		gco.zone_box_update();
        
-		/*
-		if (cst.selection) {
-            console.log("clearing selection");
-            cst.selection.x = nodes[cst.selection.node].x
-            cst.selection.y = nodes[cst.selection.node].y
-            cst.selection = undefined;
-            cst.dragging = false;
-            gco.draw();
-        }
-		/*
-		for (var i = 0; i < players.length; i++) {
-
-        	if (gco.player_contains(players[i], mx, my)) {
-        		console.log("Clicked on a player "+players[i].id);
-        		selected = players[i];
-        		//Check if player is active, so it can be moved
-        		if (i===gco.active_player){
-
-        			selected.x = nodes[players[i].node].x;
-        			selected.y = nodes[players[i].node].y;
-        			cst.dragoffx = mx - selected.x;
-        			cst.dragoffy = my - selected.y;
-        			cst.dragging = true;
-        			cst.selection = selected;
-        			gco.draw();
-        			return;
-        		}
-        	}
-        }
-		*/
 		
 		for (var g = 0; g < gco.players.length; g++){
 			if(gco.player_contains(players[g], mx, my)){
@@ -1629,9 +1489,5 @@ gco.set_canvas_listener = function(){
         }
         
     }, true);//end mouseup listener
-    
-
-	
-
 	
 }//end set canvas listener
