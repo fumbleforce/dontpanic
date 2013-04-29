@@ -471,8 +471,8 @@ ge.prototype.command = function(client, c){
 			
 				else{
 				var randomEvent=Math.floor(Math.random()*this.events.length);
-				changed = effect(this.events[randomEvent], this);
-				changed.event = this.events[randomEvent];
+				changed = effect(this.events[5], this);
+				changed.event = this.events[5];
 				this.turnsSinceEvent=0;
 				}
 			}
@@ -844,6 +844,7 @@ ge.Node.prototype.add_information_center = function (player) {
 	var able = this.can_add_information_center(player);
 	if (able){
 		this.has_information_center = true;
+		player.update_actions(-4);
 		return true;
 	}
 	return false;
@@ -871,6 +872,7 @@ ge.Node.prototype.add_road_block = function (player, players) {
 	var able = this.can_add_road_block(player, players);
 	if (able){
 		this.has_road_block = true;
+		player.update_actions(-1);
 		return true;
 	}
 	return false;	
@@ -908,9 +910,10 @@ ge.Node.prototype.can_add_road_block = function (player, players) {
 }
 
 ge.Node.prototype.remove_road_block = function (player, players) {
-	var able = this.can_add_road_block(player, players);
+	var able = this.can_remove_road_block(player, players);
 	if (able){
 		this.has_road_block = false;
+		player.update_actions(-1);
 		return true;
 	}
 	return false;
