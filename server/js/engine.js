@@ -398,7 +398,8 @@ ge.prototype.command = function(client, c){
 					zones[i].update_panic(10);
 				}
 	        }
-
+			
+			
 	        this.timer_dur += this.time_step;
 	        this.start_timer();
 
@@ -439,16 +440,11 @@ ge.prototype.command = function(client, c){
 
 			
 			//fire a random event every Xth turn
-			console.log("what is event blocked now?  " + this.eventblocked);
 			if (this.turnsSinceEvent>=this.eventTurns){
 			
 				if (this.eventblocked){
-				console.log("event to set to false 134456 " + this.eventblocked);
 				this.eventblocked = false;
 				this.turnsSinceEvent=0;
-				console.log("event to set to false " + this.eventblocked);
-			
-
 				}
 			
 				else{
