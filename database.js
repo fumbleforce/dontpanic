@@ -147,15 +147,12 @@ db.get_all_templates = function (next) {
 }
 
 db.get_all_replays = function (next) {
+//SELECT distinct replay_id FROM replay
 	connection.query('SELECT distinct replay_id FROM replay', function (err, rows, fields) {
 		if (err) throw err;
 		return next(rows);
 	});
 }
-
-//db.get_all_replays(function (result) {
-//	console.log(result);
-//});
 
 db.set_event = function(effect) {
 	connection.query('INSERT INTO event SET?', {effect: effect}, 
