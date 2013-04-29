@@ -302,10 +302,22 @@ gco.info_card_click = function(p, c) {
 	console.log(p);
 	console.log(c);
     if(gco.active_player === p){
+		
 		command('use_card', {card:c});
 	}
 }
 
+
+gco.sounds = function(){
+/*
+var snd = new Audio("/music/painstick.wav"); // buffers automatically when created
+snd.play();
+	
+var snd = new Audio("painstick.wav"); // buffers automatically when created
+if (player.changed){
+snd.play();
+}*/
+}
 
 
 
