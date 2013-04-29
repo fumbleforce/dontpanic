@@ -114,12 +114,14 @@ var gco = {
 	selected_zone : -1,
 	selected_player : -1,
 	selected_card : -1,
+	selected_event : -1,
 	connection : -1,
 	zone_container : [],
 	node_container : [],
 	effects : [],
 	info_cards : [],
-	rdy_effects :[]
+	rdy_effects :[],
+	events : []
 		  
 }
 gco.ctx = gco.canvas.getContext("2d");
@@ -135,7 +137,7 @@ gco.ctx = gco.canvas.getContext("2d");
 */
 gco.init_game = function (d) {
     console.log("Game initiated");
-	console.log("asdasdasdasdASasdasdasdasdASasdasdasdasdASasdasdasdasdASasdasdasdasdA");
+	
 
 
     
@@ -143,48 +145,8 @@ gco.init_game = function (d) {
     gco.set_canvas_listener();
 	
 
-	if(gco.info_cards.length == 0){
 	
-		gco.info_cards.push(newIcard = {
-					name:"Calm financial",
-					desc:"Calm financial23 districts",
-					effects: [{
-						name:"financ calm",
-						domain:'zone',
-						type:'panic',
-						panic:(-5),
-						affects:'largecity'
-					}]
-				});
-		gco.info_cards.push(newIcard = {
-					name:"Calm industry",
-					desc:"Calm industry2 districts",
-					effects: [{
-						name:"indus calm",
-						domain:'zone',
-						type:'panic',
-						panic:(-5),
-						affects:'industry'
-					}]
-				});
-		gco.info_cards.push(newIcard = {
-					name:"Calm residental",
-					desc:"Calm residental11 districts",
-					effects: [{
-						name:"resid calm",
-						domain:'zone',
-						type:'panic',
-						panic:(-5),
-						affects:'residential'
-					}]
-				});
-	
-	
-		
-	}
-	
-	gco.update_ddbox(document.getElementById("card_show"), gco.info_cards, false);
-	gco.show_card();
+
     gco.draw();
 
 
@@ -272,6 +234,9 @@ gco.export_to_database = function(){
 	}
 	for(var i = 0; i < gco.info_cards.length; i++){
 		game_template.info_cards.push(gco.info_cards[i]);
+	}
+	for(var i = 0; i < gco.events.length; i++){
+		game_template.events.push(gco.events[i]);
 	}
 
 	console.log(JSON.stringify(game_template));
@@ -1106,6 +1071,99 @@ gco.create_zone = function(){ // checks if it is possible to create a zone, and 
 	
 	
 }
+
+gco.event_add_effect = function(){
+	ename = document.getElementById("effect_name").value;
+	edomain = document.getElementById("effect_domain").value;
+	etype = document.getElementById("effect_type").value;
+	epanic = document.getElementById("effect_panic").value;
+	eaffects = document.getElementById("effect_affects").value;
+	
+	if(ename == "" || edomain == "" || etype == "" || epanic == "" || eaffects == ""){
+		//return;
+	}
+	
+	// errorcheck the input
+	
+	if(edomain == "zone") {
+		if(etype == "panic"){
+		
+			if(isNaN(epanic)){
+				
+				console.log("panic is NaN");
+				return;
+			}
+			else {
+				var types = document.getElementById("edit_zone_type");
+				var check = false;
+				for(var i = 0; i < types.options.length ; i++){
+					if(eaffects == types.options[i].value){
+						console.log("hit on " + types.options[i].value);
+						check = true;
+					}
+					
+				}
+				
+				if (!check){
+					return;
+				}
+			}
+		}
+		else {
+			console.log("Domain zone cant have any other types than event or panic");
+			return;
+		}
+	}
+	
+	
+	gco.rdy_effects.push( newEffect = {
+		name : ename,
+		domain : edomain,
+		type : etype,
+		panic : epanic,
+		affects : eaffects
+	});
+	
+	if(gco.events.length > 0){
+		gco.events[document.getElementById("event_show").value].effects.push(newEffect = {
+			name : ename,
+			domain : edomain,
+			type : etype,
+			panic : epanic,
+			affects : eaffects
+		});
+	}
+	
+	gco.update_ddbox(document.getElementById("event_effect"), gco.rdy_effects, false);
+	
+	
+}
+gco.add_event = function() {
+	
+	cname = document.getElementById("event_name").value;
+	cdesc = document.getElementById("event_desc").value;
+	ceff = gco.rdy_effects; 
+	
+	
+	
+	
+	if(ceff.lenght == 0 || cname == "" || cdesc == ""){
+		console.log("something is missing to create a new event");
+		return;
+	}
+
+	
+	gco.events.push(newEvent = {
+		
+		name : cname,
+		desc : cdesc,
+		effects : ceff
+	});
+
+	gco.update_ddbox(document.getElementById("event_show"), gco.events, false);
+	document.getElementById("event_show").selectedIndex = document.getElementById("event_show").options.length -1;
+	gco.show_event();
+}
 gco.add_info_card = function() {
 	
 	cname = document.getElementById("card_name").value;
@@ -1193,13 +1251,15 @@ gco.card_create_add_effect = function() {
 		affects : eaffects
 	});
 	
-	gco.info_cards[document.getElementById("card_show").value].effects.push(newEffect = {
-		name : ename,
-		domain : edomain,
-		type : etype,
-		panic : epanic,
-		affects : eaffects
-	});
+	if(gco.info_cards.length > 0){
+		gco.info_cards[document.getElementById("card_show").value].effects.push(newEffect = {
+			name : ename,
+			domain : edomain,
+			type : etype,
+			panic : epanic,
+			affects : eaffects
+		});
+	}
 	
 	gco.update_ddbox(document.getElementById("card_effect"), gco.rdy_effects, false);
 	
@@ -1251,8 +1311,8 @@ gco.zone_box_update = function(){ // to show what zone is selected during zone e
 	
 	document.getElementById("zone_id").innerHTML = gco.selected_zone;
 }
-
 gco.show_card = function(){ // show the info on the selected card. want to edit this later
+	
 	
 	var card = gco.info_cards[document.getElementById("card_show").value];
 	
@@ -1275,6 +1335,41 @@ gco.show_card = function(){ // show the info on the selected card. want to edit 
 	document.getElementById("card_effects_label2").innerHTML = effects2;
 	
 }
+gco.show_event = function(){ // show the info on the selected event. want to edit this later
+	
+	
+	var event = gco.events[document.getElementById("event_show").value];
+	
+	var effects = "";
+	var effects2 = "";
+	for(var i  = 0; i < event.effects.length;i++){
+		if(i < 4){
+			effects += event.effects[i].name + "<br>";
+		}
+		else if( i < 8){
+			effects2 += event.effects[i].name + "<br>";
+		}
+		else if(i == 8){
+			effects2 += "+more";
+		}
+	}
+	document.getElementById("event_name_label").innerHTML = event.name;
+	document.getElementById("event_desc_label").innerHTML = event.desc;
+	document.getElementById("event_effects_label").innerHTML = effects;
+	document.getElementById("event_effects_label2").innerHTML = effects2;
+	
+}
+gco.event_move_to_edit = function(){
+	gco.selected_event = document.getElementById("event_show").value;
+	var event = gco.events[gco.selected_event];
+	
+	document.getElementById("event_name").value = event.name;
+	document.getElementById("event_desc").value = event.desc;
+	
+	gco.update_ddbox(document.getElementById("event_effect"), event.effects, false);
+	
+	gco.rdy_effects = event.effects;
+}
 gco.card_move_to_edit = function(){
 	gco.selected_card = document.getElementById("card_show").value;
 	var card = gco.info_cards[gco.selected_card];
@@ -1285,6 +1380,23 @@ gco.card_move_to_edit = function(){
 	gco.update_ddbox(document.getElementById("card_effect"), card.effects, false);
 	
 	gco.rdy_effects = card.effects;
+}
+gco.delete_event = function(){ // delete selected event
+	
+	if(gco.selected_card != -1){
+		gco.info_cards.splice(gco.selected_card, 1);
+		gco.selected_card = -1;
+		document.getElementById("event_name").value = "";
+		document.getElementById("event_desc").value = "";
+		document.getElementById("event_name_label").innerHTML = "";
+		document.getElementById("event_desc_label").innerHTML = "";
+		document.getElementById("event_effects_label").innerHTML = "";
+		document.getElementById("event_effects_label2").innerHTML = "";
+		gco.update_ddbox(document.getElementById("event_show"), gco.events, false);
+		gco.update_ddbox(document.getElementById("event_effect"), [], false);
+		gco.rdy_effects = "";
+		gco.show_event();
+	}
 }
 gco.delete_card = function(){ // delete selected card
 	
@@ -1304,6 +1416,9 @@ gco.delete_card = function(){ // delete selected card
 	}
 }
 gco.edit_card = function(){
+	
+}
+gco.edit_event = function(){
 	
 }
 
@@ -1326,9 +1441,7 @@ gco.effect_domain_change = function(){ // changes the effect creation to better 
 	
 	
 }
-gco.effect_type_change = function() { // no function atm
-	
-}
+
 
 
 
