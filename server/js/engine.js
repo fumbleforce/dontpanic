@@ -393,12 +393,25 @@ ge.prototype.command = function(client, c){
 			
 	    case 'inc_panic':
 	        for (var i = 0; i < zones.length;i++) {
-				if (!zones[i].is_panic_zero()){
+	        	//update zones with 10 panic
+	        	if (!zones[i].is_panic_zero()){
 					zones[i].update_panic(10);
 				}
 	        }
+
 	        this.timer_dur += this.time_step;
 	        this.start_timer();
+
+	        for (var i = 0; i < zones.length;i++) {
+	        	//if zones has 50 panic, spread to adjacent zones
+	        	if (zones[i].panic_level==50&&(!zones[i].isBlocked)){
+	        		for (var j = 0; j < zones[i].adjacent_zones.length; j++){
+	        			zones[zones[i].adjacent_zones[j]].update_panic(5);
+	        		}
+	        	}
+	        	
+	        }
+
 	        changed.timer = this.timer;
 	        changed.zones = zones;
 	        
@@ -423,6 +436,7 @@ ge.prototype.command = function(client, c){
 				this.cards_left -= 1;
 			}
 			
+
 			
 			//fire a random event every Xth turn
 			console.log("what is event blocked now?  " + this.eventblocked);

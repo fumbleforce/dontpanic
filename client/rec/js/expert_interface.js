@@ -113,6 +113,7 @@ var gco = {
 	selected_node : -1,
 	selected_zone : -1,
 	selected_player : -1,
+	selected_card : -1,
 	connection : -1,
 	zone_container : [],
 	node_container : [],
@@ -178,9 +179,12 @@ gco.init_game = function (d) {
 					}]
 				});
 	
+	
+		
 	}
-	gco.update_ddbox(document.getElementById("card_show"), gco.info_cards);
-
+	
+	gco.update_ddbox(document.getElementById("card_show"), gco.info_cards, false);
+	gco.show_card();
     gco.draw();
 
 
@@ -243,8 +247,7 @@ gco.export_to_database = function(){
 			people : szone.people,
 			panic_level : szone.panic_level,
 			adjacent_zones : szone.zones, //find a way to calculate adjacent zones
-			centroid : szone.centroid,
-			color : 'tomato'
+			centroid : szone.centroid
 
 			});
 	}
@@ -1003,7 +1006,7 @@ gco.del_selected_node = function(){ // deletes the selected node, if none is sel
 		
 		gco.re_id();
 		gco.selected_node = -1;
-		gco.update_ddbox(document.getElementById("player_node"), gco.nodes);
+		gco.update_ddbox(document.getElementById("player_node"), gco.nodes, false);
 		gco.draw();
 	}
 }
@@ -1105,14 +1108,17 @@ gco.create_zone = function(){ // checks if it is possible to create a zone, and 
 }
 gco.add_info_card = function() {
 	
-	cname = "new card";
-	cdesc = "new card";
-	ceff = []; 
+	cname = document.getElementById("card_name").value;
+	cdesc = document.getElementById("card_desc").value;
+	ceff = gco.rdy_effects; 
 	
-	/*
+	
+	
+	
 	if(ceff.lenght == 0 || cname == "" || cdesc == ""){
+		console.log("something is missing to create a new card");
 		return;
-	}*/
+	}
 
 	
 	gco.info_cards.push(newCard = {
@@ -1120,14 +1126,15 @@ gco.add_info_card = function() {
 		name : cname,
 		desc : cdesc,
 		effects : ceff
-		});
+	});
 	
 	
 	
 	
 	
 	
-	gco.update_ddbox(document.getElementById("card_show"), gco.info_cards);
+	gco.update_ddbox(document.getElementById("card_show"), gco.info_cards, false);
+	document.getElementById("card_show").selectedIndex = document.getElementById("card_show").options.length -1;
 	gco.show_card();
 }
 gco.card_create_add_effect = function() {
@@ -1141,6 +1148,41 @@ gco.card_create_add_effect = function() {
 	
 	if(ename == "" || edomain == "" || etype == "" || epanic == "" || eaffects == ""){
 		//return;
+	}
+	
+	// errorcheck the input
+	
+	if(edomain == "zone") {
+		if(etype == "panic"){
+		
+			if(isNaN(epanic)){
+				
+				console.log("panic is NaN");
+				return;
+			}
+			else {
+				var types = document.getElementById("edit_zone_type");
+				var check = false;
+				for(var i = 0; i < types.options.length ; i++){
+					if(eaffects == types.options[i].value){
+						console.log("hit on " + types.options[i].value);
+						check = true;
+					}
+					
+				}
+				
+				if (!check){
+					return;
+				}
+			}
+		}
+		else {
+			console.log("Domain zone cant have any other types than event or panic");
+			return;
+		}
+	}
+	else if (edomain == "player") {
+		
 	}
 	
 	gco.rdy_effects.push( newEffect = {
@@ -1159,21 +1201,21 @@ gco.card_create_add_effect = function() {
 		affects : eaffects
 	});
 	
-	gco.update_ddbox(document.getElementById("card_effect"), gco.rdy_effects);
+	gco.update_ddbox(document.getElementById("card_effect"), gco.rdy_effects, false);
 	
 }
-gco.card_create_remove_effect = function() {
+gco.card_create_remove_effect = function() { // removes the selected effect from the selected card
 	
 	var index = document.getElementById("card_effect").value;
 
 	gco.rdy_effects.splice(index, 1);
 	
 
-	gco.update_ddbox(document.getElementById("card_effect"), gco.rdy_effects);
+	gco.update_ddbox(document.getElementById("card_effect"), gco.rdy_effects, false);
 }
 
 
-gco.update_ddbox = function(ddbox, list) {
+gco.update_ddbox = function(ddbox, list, name_same_as_value) { // updates a DropDownBox 
 
 	
 
@@ -1185,11 +1227,14 @@ gco.update_ddbox = function(ddbox, list) {
 	}
 	ddbox.options.length = list.lenght;
 	for( var i = 0; i < list.length; i++){
-		if(!list[i].name){
-			ddbox.options[i] = new Option(i ,i);
+		if(list[i].name){
+			ddbox.options[i] = new Option(list[i].name, i);
+		}
+		else if(name_same_as_value){
+			ddbox.options[i] = new Option(list[i], list[i]);
 		}
 		else{
-			ddbox.options[i] = new Option(list[i].name, i);
+			ddbox.options[i] = new Option(i, i);
 			
 		}
 	
@@ -1198,7 +1243,7 @@ gco.update_ddbox = function(ddbox, list) {
 	
 }
 
-gco.zone_box_update = function(){
+gco.zone_box_update = function(){ // to show what zone is selected during zone editing
 	if(gco.selected_zone < 0){
 		document.getElementById("zone_id").innerHTML = "no zone selected";
 		return;
@@ -1207,17 +1252,85 @@ gco.zone_box_update = function(){
 	document.getElementById("zone_id").innerHTML = gco.selected_zone;
 }
 
-gco.show_card = function(){
+gco.show_card = function(){ // show the info on the selected card. want to edit this later
+	
 	var card = gco.info_cards[document.getElementById("card_show").value];
+	
+	var effects = "";
+	var effects2 = "";
+	for(var i  = 0; i < card.effects.length;i++){
+		if(i < 4){
+			effects += card.effects[i].name + "<br>";
+		}
+		else if( i < 8){
+			effects2 += card.effects[i].name + "<br>";
+		}
+		else if(i == 8){
+			effects2 += "+more";
+		}
+	}
+	document.getElementById("card_name_label").innerHTML = card.name;
+	document.getElementById("card_desc_label").innerHTML = card.desc;
+	document.getElementById("card_effects_label").innerHTML = effects;
+	document.getElementById("card_effects_label2").innerHTML = effects2;
+	
+}
+gco.card_move_to_edit = function(){
+	gco.selected_card = document.getElementById("card_show").value;
+	var card = gco.info_cards[gco.selected_card];
 	
 	document.getElementById("card_name").value = card.name;
 	document.getElementById("card_desc").value = card.desc;
 	
-	gco.update_ddbox(document.getElementById("card_effect"), card.effects); 
+	gco.update_ddbox(document.getElementById("card_effect"), card.effects, false);
 	
 	gco.rdy_effects = card.effects;
+}
+gco.delete_card = function(){ // delete selected card
+	
+	if(gco.selected_card != -1){
+		gco.info_cards.splice(gco.selected_card, 1);
+		gco.selected_card = -1;
+		document.getElementById("card_name").value = "";
+		document.getElementById("card_desc").value = "";
+		document.getElementById("card_name_label").innerHTML = "";
+		document.getElementById("card_desc_label").innerHTML = "";
+		document.getElementById("card_effects_label").innerHTML = "";
+		document.getElementById("card_effects_label2").innerHTML = "";
+		gco.update_ddbox(document.getElementById("card_show"), gco.info_cards, false);
+		gco.update_ddbox(document.getElementById("card_effect"), [], false);
+		gco.rdy_effects = "";
+		gco.show_card();
+	}
+}
+gco.edit_card = function(){
 	
 }
+
+gco.effect_domain_change = function(){ // changes the effect creation to better match the effect domain
+
+	var ddbox = document.getElementById("effect_type");
+	
+	var change = document.getElementById("effect_domain").value
+	list = [];
+	
+	if(change == "zone"){
+		
+		list = ["panic"];
+	}
+	else{
+		list = ["decreasemoves1", "decreasemoves2", "decreasemoves2", "nextplayer", "stealaction", "tradecards", "moveanotherplayer", "blocknextevent"];
+	}
+	gco.update_ddbox(ddbox, list, true);
+	
+	
+	
+}
+gco.effect_type_change = function() { // no function atm
+	
+}
+
+
 
 
 gco.set_canvas_listener = function(){
@@ -1363,7 +1476,7 @@ gco.set_canvas_listener = function(){
 		gco.next_node++;
 		
 		gco.selected_node = gco.next_node -1;
-		gco.update_ddbox(document.getElementById("player_node"), gco.nodes);
+		gco.update_ddbox(document.getElementById("player_node"), gco.nodes, false);
         gco.draw();
         
     }, true);//end mousedown listener
