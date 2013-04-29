@@ -413,9 +413,19 @@ ge.prototype.command = function(client, c){
 			
 	    case 'inc_panic':
 	        for (var i = 0; i < zones.length;i++) {
-				if (!zones[i].is_panic_zero()){
+	        	//update zones with 10 panic
+	        	if (!zones[i].is_panic_zero()){
 					zones[i].update_panic(10);
 				}
+	        }
+	        for (var i = 0; i < zones.length;i++) {
+	        	//if zones has 50 panic, spread to adjacent zones
+	        	if (zones[i].panic_level==50&&(!zones[i].isBlocked)){
+	        		for (var j = 0; j < zones[i].adjacent_zones.length; j++){
+	        			zones[zones[i].adjacent_zones[j]].update_panic(5);
+	        		}
+	        	}
+	        	
 	        }
 	        this.timer += 20;
 	        
@@ -444,21 +454,21 @@ ge.prototype.command = function(client, c){
 			}
 			
 
-			/*//fire a random event every Xth turn
+			//fire a random event every Xth turn
 			if (this.turnsSinceEvent===this.eventTurns){
 			var randomEvent=Math.floor(Math.random()*this.events.length);
 			changed = effect(this.events[randomEvent], this);
 			changed.event = this.events[randomEvent];
 			this.turnsSinceEvent=0;
-			}*/
+			}
 			
 			//fire a random event every Xth turn
-			if (this.turnsSinceEvent===this.eventTurns){
-			var randomEvent=Math.floor(Math.random()*this.events.length);
-			changed = effect(this.events[12], this);
-			changed.event = this.events[12];
-			this.turnsSinceEvent=0;
-			}
+//			if (this.turnsSinceEvent===this.eventTurns){
+//			var randomEvent=Math.floor(Math.random()*this.events.length);
+//			changed = effect(this.events[12], this);
+//			changed.event = this.events[12];
+//			this.turnsSinceEvent=0;
+//			}
 			
 			
 			changed.players = [ap];
