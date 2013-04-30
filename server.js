@@ -92,11 +92,10 @@ http.createServer(function (req, res) {
 	else if (req.method === "GET") {
 
 		if (req.url.indexOf("replays") !== -1) {
-			console.log("requesting replay");
+			console.log("requesting replays");
 			
 			res.writeHead(200, {'Content-Type': 'text/plain'});
 			db.get_all_replays(function (result) {
-				console.log(result);
 				var	replays = [];
 				var temp;
 				for (var i = 0; i < result.length;i++){

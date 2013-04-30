@@ -154,6 +154,13 @@ db.get_all_replays = function (next) {
 	});
 }
 
+db.get_replay = function (replay_id, next) {
+	connection.query('SELECT command FROM replay WHERE replay_id = 1', function (err, rows, fields) {
+		if (err) throw err;
+		return next(rows);
+	});
+}
+
 db.set_event = function(effect) {
 	connection.query('INSERT INTO event SET?', {effect: effect}, 
 	function (err, rows, fields) {
