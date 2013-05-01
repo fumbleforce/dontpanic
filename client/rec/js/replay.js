@@ -1,8 +1,3 @@
-/*  Settings variables
-
-    Used for setting size of objects and 
-    positioning in drawing functions.
-*/
 var c_height = 1550,
     c_width = 1500,
     node_size = 50,
@@ -10,7 +5,13 @@ var c_height = 1550,
     info_center_size = 35,
     offset_distance = node_size*1,
     panic_info_size = 40,
-    w_inc = 0;
+    w_inc = 0,
+    
+    //replay holder
+    game_states = [],
+    //actions counter
+    actions = 0;
+    
 	//set images
 	var residential_img = new Image();
 	residential_img.src = "/img/residential.jpg";
@@ -79,6 +80,7 @@ var player_offsetX = [0,
     Only one instance of this object is created for each client.
     
 */
+
 var gco = {
     players : [],
     nodes : [],
@@ -91,6 +93,16 @@ var gco = {
 gco.ctx = gco.canvas.getContext("2d");
 
 
+
+/*  Settings variables
+
+    Used for setting size of objects and 
+    positioning in drawing functions.
+*/
+
+
+
+
 /*  Initialize Game
 
     Initializes the game by populating the Game Client Object,
@@ -99,9 +111,14 @@ gco.ctx = gco.canvas.getContext("2d");
     List ps         List of player objects
     Object map      The map object containing list of Zones and Nodes
 */
+
 gco.init_game = function (d) {
-	console.log("!!!***!!!***!!!***!!!***!!!***!!!***!!!***!!!***!!!***!!!***");
     console.log("Game initiated.");
+    
+	console.log("game state at pos " + game_states[0]);
+	console.log("game state at pos " + game_states[1]);
+
+	
     gco.players = d.players;
     gco.zones = d.zones;
     gco.nodes = d.nodes;
@@ -109,7 +126,6 @@ gco.init_game = function (d) {
     gco.active_player = d.active_player;
     gco.construct_player_divs(gco.players);
     gco.setup_canvas();
-    gco.set_canvas_listener();
     gco.start_timer(d.timer);
     
     gco.draw();
@@ -131,7 +147,7 @@ gco.start_timer = function(dur){
     var left = dur,
         lab = document.getElementById("timer-label");
     var inter = setInterval(function(){
-        lab.innerHTML = "Panic Increase in: "+left;
+        //lab.innerHTML = "Panic Increase in: "+left;
         
         left--;
         if (left === -1) {
@@ -689,149 +705,56 @@ gco.draw = function(){
     }
     
     if(players.length > 1){
-        document.getElementById("turn-label").innerHTML = "Turn: "+(gco.turn); 
+       /* document.getElementById("turn-label").innerHTML = "Turn: "+(gco.turn); 
         document.getElementById("player-turn-label").innerHTML = "Player "+(gco.active_player)+"'s turn";
-        document.getElementById("action-label").innerHTML = "Actions left: "+(players[gco.active_player].actions_left); 
+        document.getElementById("action-label").innerHTML = "Actions left: "+(players[gco.active_player].actions_left); */
     } 
     
 }// end draw
 
+function show_replay () {
 
-gco.set_canvas_listener = function(){
-    var canvas = gco.canvas,
-        cst = gco.cst,
-        draw = gco.draw,
-        nodes = gco.nodes,
-        players = gco.players,
-        zones = gco.zones;
-    
-    cst.moving_people = false;
-    cst.moving_from = null;
-    
-    canvas.addEventListener('selectstart', function(e) { e.preventDefault(); return false; }, false);
+    var id_cookie = read_cookie('replay_id');
+	
+	$.ajax({
+    	url: 'http://127.0.0.1:8124/show_replay',
+    	dataType: "jsonp",
+    	jsonpCallback: "start_replay",
+    	cache: false,
+    	timeout: 5000,
+    	success: function(data) {
+        	console.log("Received data: "+data);
+        	console.log(data);
+    	},
+    	error: function(jqXHR, textStatus, errorThrown) {
+   			alert('error ' + textStatus + " " + errorThrown);
+    	}
+	});
+}
 
-    canvas.addEventListener('mousedown', function(e) {
-        
-        var mx = e.offsetX,
-            my = e.offsetY,
-            selected;
-		
-		gco.update_status("");
-		gco.update_options([]);
-        cst.selected_zone = null;
-        cst.selected_node = null;
-        
-        if (cst.selection) {
-            console.log("clearing selection");
+function start_replay(d) {
+	game_states = d;
+	gco.init_game(game_states[0]);
+}
 
-            cst.selection.x = nodes[cst.selection.node].x
-            cst.selection.y = nodes[cst.selection.node].y
-            cst.selection = undefined;
-            cst.dragging = false;
-            gco.draw();
-        }
+function next_action () {
+	console.log("game states length"+game_states.length);
+	if (actions < game_states.length-1) {
+		actions++;
+		gco.init_game(game_states[actions]);
+		console.log("actions" + actions);
+	}
+	else {
+		alert("No more actions are available");
+	} 
+}
 
-        for (var i = 0; i < players.length; i++) {
-
-        	if (gco.player_contains(players[i], mx, my)) {
-        		gco.update_status("Clicked on player  "+i);
-        		selected = players[i];
-        		//Check if player is active, so it can be moved
-        		if (i===gco.active_player){
-
-        			selected.x = nodes[players[i].node].x;
-        			selected.y = nodes[players[i].node].y;
-        			cst.dragoffx = mx - selected.x;
-        			cst.dragoffy = my - selected.y;
-        			cst.dragging = true;
-        			cst.selection = selected;
-        			gco.draw();
-        			return;
-        		}
-        	}
-        }
-
-		for (var i = 0; i < nodes.length; i++) {
-
-        	if (gco.node_contains(nodes[i], mx, my)) {
-        		gco.update_status("Selected node "+i);
-        		cst.selected_node = i;
-				command('select_node', {node_id : cst.selected_node});
-        		gco.draw();
-        		return;
-           }
-        }
-		
-        for (var i = 0; i < zones.length; i++) {
-
-        	if (gco.zone_contains(zones[i], mx, my)) {
-        		console.log("Clicked on zone "+i);
-        		gco.update_status("Selected zone "+i);
-        		cst.selected_zone = i;
-        		//TODO for testing, we add 'decrease_panic' when selecting zones
-        		if(cst.moving_people){
-        			command('move_people', {zone_from: cst.moving_from, zone_to:i});
-        			gco.update_status("Moved people to zone "+i);
-        			cst.moving_from = null;
-        			cst.moving_people = false;
-        		}
-        		else{
-        			command('select_zone', {zone_id : cst.selected_zone});
-        		}
-        		gco.draw();
-        		return;
-           }
-        }
-
-        
-        
-        gco.draw();
-        
-        
-    }, true);//end mousedown listener
-  
-    canvas.addEventListener('mousemove', function(e) {
-        if (cst.dragging){
-            console.log("Mouse is dragging");
-            var mx = e.offsetX,
-                my = e.offsetY;
-            cst.selection.x = mx - cst.dragoffx;
-            cst.selection.y = my - cst.dragoffy;   
-            gco.draw();
-            gco.update_status("Dragging player "+cst.selection.id);
-        }
-    }, true);//end mousemove listener
-    
-    canvas.addEventListener('mouseup', function(e) {
-        var mx = e.offsetX,
-            my = e.offsetY;
-             
-        if (cst.dragging && cst.selection !== undefined) {
-            console.log("Mouse let go of player");
-            for (var i = 0; i < nodes.length; i++) {
-                if (gco.node_contains(nodes[i], mx, my)) {
-                    
-                    command('move_player', {
-                        player_id : cst.selection.id,
-                        node_id : i
-                    });
-                    gco.update_status("Moved player "+cst.selection.id);
-                    cst.selection = undefined;
-                    cst.dragging = false;
-                    gco.draw();
-                    
-                    return;
-                }
-            }
-            cst.selection.x = nodes[cst.selection.node].x
-            cst.selection.y = nodes[cst.selection.node].y
-            cst.selection = undefined;
-            cst.dragging = false;
-            gco.draw();
-        }
-        
-    }, true);//end mouseup listener
-    
-}//end set canvas listener
-
-
+function previous_action () {
+	if (actions >= 1) {
+		actions--;
+		gco.init_game(game_states[actions]);
+	}
+	else {
+		alert("No previous actions are available");
+	}
+}

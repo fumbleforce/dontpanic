@@ -154,6 +154,20 @@ db.get_all_replays = function (next) {
 	});
 }
 
+db.set_replay = function (replay_id, command_id, command) {
+	connection.query('INSERT INTO replay SET?' {replay_id: replay_id, command_id: command_id, command: command},
+	function(err, rows, fields) {
+	if (err) throw err;
+	console.log('successfully added replay command to database');
+}
+
+db.get_replay = function (replay_id, next) {
+	connection.query('SELECT command FROM replay WHERE replay_id = ' + replay_id, function (err, rows, fields) {
+		if (err) throw err;
+		return next(rows);
+	});
+}
+
 db.set_event = function(effect) {
 	connection.query('INSERT INTO event SET?', {effect: effect}, 
 	function (err, rows, fields) {
