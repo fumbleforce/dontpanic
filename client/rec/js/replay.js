@@ -1,36 +1,3 @@
-replay();
-
-function replay () {
-	var $md = $("#maindiv");
-	$md.html("");
-	console.log("heidu");
-	$.ajax({
-    	url: 'http://127.0.0.1:8124/replay',
-    	dataType: "jsonp",
-    	jsonpCallback: "replay",
-    	cache: false,
-    	timeout: 5000,
-    	success: function(data) {
-        	console.log("Received data: "+data);
-        	console.log(data);
-    	},
-    	error: function(jqXHR, textStatus, errorThrown) {
-   			alert('error ' + textStatus + " " + errorThrown);
-    	}
-	});
-
-
-function start_replay(d) {
-	//console.log("replay parsed??:" + JSON.parse(d));
-	gco.init_game(JSON.parse(d));
-}
-
-
-/*  Settings variables
-
-    Used for setting size of objects and 
-    positioning in drawing functions.
-*/
 var c_height = 1550,
     c_width = 1500,
     node_size = 50,
@@ -38,7 +5,13 @@ var c_height = 1550,
     info_center_size = 35,
     offset_distance = node_size*1,
     panic_info_size = 40,
-    w_inc = 0;
+    w_inc = 0,
+    
+    //replay holder
+    game_states = [],
+    //actions counter
+    actions = 0;
+    
 	//set images
 	var residential_img = new Image();
 	residential_img.src = "/img/residential.jpg";
@@ -107,6 +80,7 @@ var player_offsetX = [0,
     Only one instance of this object is created for each client.
     
 */
+
 var gco = {
     players : [],
     nodes : [],
@@ -119,6 +93,16 @@ var gco = {
 gco.ctx = gco.canvas.getContext("2d");
 
 
+
+/*  Settings variables
+
+    Used for setting size of objects and 
+    positioning in drawing functions.
+*/
+
+
+
+
 /*  Initialize Game
 
     Initializes the game by populating the Game Client Object,
@@ -127,9 +111,14 @@ gco.ctx = gco.canvas.getContext("2d");
     List ps         List of player objects
     Object map      The map object containing list of Zones and Nodes
 */
+
 gco.init_game = function (d) {
-	console.log("!!!***!!!***!!!***!!!***!!!***!!!***!!!***!!!***!!!***!!!***");
     console.log("Game initiated.");
+    
+	console.log("game state at pos " + game_states[0]);
+	console.log("game state at pos " + game_states[1]);
+
+	
     gco.players = d.players;
     gco.zones = d.zones;
     gco.nodes = d.nodes;
@@ -137,7 +126,6 @@ gco.init_game = function (d) {
     gco.active_player = d.active_player;
     gco.construct_player_divs(gco.players);
     gco.setup_canvas();
-    gco.set_canvas_listener();
     gco.start_timer(d.timer);
     
     gco.draw();
@@ -159,7 +147,7 @@ gco.start_timer = function(dur){
     var left = dur,
         lab = document.getElementById("timer-label");
     var inter = setInterval(function(){
-        lab.innerHTML = "Panic Increase in: "+left;
+        //lab.innerHTML = "Panic Increase in: "+left;
         
         left--;
         if (left === -1) {
@@ -717,11 +705,56 @@ gco.draw = function(){
     }
     
     if(players.length > 1){
-        document.getElementById("turn-label").innerHTML = "Turn: "+(gco.turn); 
+       /* document.getElementById("turn-label").innerHTML = "Turn: "+(gco.turn); 
         document.getElementById("player-turn-label").innerHTML = "Player "+(gco.active_player)+"'s turn";
-        document.getElementById("action-label").innerHTML = "Actions left: "+(players[gco.active_player].actions_left); 
+        document.getElementById("action-label").innerHTML = "Actions left: "+(players[gco.active_player].actions_left); */
     } 
     
 }// end draw
 
+function show_replay () {
 
+    var id_cookie = read_cookie('replay_id');
+	
+	$.ajax({
+    	url: 'http://127.0.0.1:8124/show_replay',
+    	dataType: "jsonp",
+    	jsonpCallback: "start_replay",
+    	cache: false,
+    	timeout: 5000,
+    	success: function(data) {
+        	console.log("Received data: "+data);
+        	console.log(data);
+    	},
+    	error: function(jqXHR, textStatus, errorThrown) {
+   			alert('error ' + textStatus + " " + errorThrown);
+    	}
+	});
+}
+
+function start_replay(d) {
+	game_states = d;
+	gco.init_game(game_states[0]);
+}
+
+function next_action () {
+	console.log("game states length"+game_states.length);
+	if (actions < game_states.length-1) {
+		actions++;
+		gco.init_game(game_states[actions]);
+		console.log("actions" + actions);
+	}
+	else {
+		alert("No more actions are available");
+	} 
+}
+
+function previous_action () {
+	if (actions >= 1) {
+		actions--;
+		gco.init_game(game_states[actions]);
+	}
+	else {
+		alert("No previous actions are available");
+	}
+}

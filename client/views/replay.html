@@ -4,7 +4,7 @@
 <head>
     <link rel="stylesheet" href="/css/styles.css" >
 </head> 
-<body>
+<body onload="show_replay()">
 <div class="content-table">
     
     <div class="title-row content-row">
@@ -17,8 +17,19 @@
 	
     <div class="content-row">
     	<div class="content-column"></div>
-        <div class="content-column" id="maindiv">
-			
+        <div class="content-column" id="maindiv">		   
+			<button onclick="previous_action()">Previous action</button>
+			<button onclick="next_action()">Next action</button>
+		</div>
+	
+		<div class="content-row">
+		<canvas id="viewport">
+			<p>Your browser is terrible</p>
+			<p>Get a good one here:</p>
+			<p><a href="http://www.mozilla.org/en-US/firefox/new/">Firefox</a></p>
+			<p><a href="https://www.google.com/intl/no/chrome/browser/">Chrome</a></p>
+		</canvas>
+	</div>
         </div>
         <div class="content-column"></div>
        

@@ -103,9 +103,26 @@ http.createServer(function (req, res) {
 					replays.push(JSON.stringify(temp));
 				}	
 				console.log("Sending list of replays");
-
 				res.end('replays('+JSON.stringify(replays)+')');
 			});
+		}
+		
+		else if (req.url.indexOf("show_replay") !== -1) {
+			console.log("requesting replay");
+			res.writeHead(200, {'Content-Type': 'text/plain'});
+			//skal være replay id
+			db.get_replay(2, function (result) {
+				var replay = [];
+				var temp;
+				for (var i = 0; i < result.length; i++) {
+					temp = result[i];
+					replay.push(JSON.parse(temp.command));
+				}
+				console.log("Sending replay states");
+				res.end('start_replay('+JSON.stringify(replay)+')');
+			});
+
+			
 		}
 		else if (req.url.indexOf("game_master") !== -1) {
 			res.writeHead(200, {'Content-Type': 'text/plain'});
