@@ -36,6 +36,11 @@ socket.on('get_room_id', function(){
 	socket.emit("selected_room_id", room);
 });
 
+socket.on('roadblock', function(){
+	roadblock_audio.play();
+
+});
+
 socket.on('start_game', function (data) {
 	console.log("Recieved starting state, initializing.");
     var d = JSON.parse(data);
@@ -69,7 +74,9 @@ socket.on('change', function (data) {
         gco.reset();
     }
     if (d.event) {
+		event_scream.play();
     	window.alert(d.event.name);
+		
     }
     if (d.win) {
     	console.log("WON");
@@ -91,6 +98,25 @@ socket.on('change', function (data) {
 function command(type, o){
     var c = o || {}
     c.type = type;
+	if (type == 'create_road_block'){
+		roadblock_audio.play();
+	}
+	else if (type == 'create_info_center'){
+		information_center_audio.play();
+	}
+		
+	else if (type == 'move_people'){
+		move_people_audio.play();
+	}	
+	
+	else if (type == 'remove_road_block'){
+		checkpoint_mixdown.play();
+	}	
+	
+	else if (type == 'decrease_panic'){
+		decrease_panic.play();
+	}
+		
     if (gco.cst.selected_node !== null) c.selected_node = gco.cst.selected_node;
     if (gco.cst.selected_zone !== null) c.selected_zone = gco.cst.selected_zone;
     var send = JSON.stringify(c);

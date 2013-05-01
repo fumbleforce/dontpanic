@@ -11,9 +11,20 @@ var c_height = 1550,
     offset_distance = node_size*1,
     panic_info_size = 40,
     w_inc = 0;
-	//set images
-	var snd = new Audio("/music/clocktickfastpain10sec.mp3"); // buffers automatically when created
 	
+	//Set sounds
+	var countdown = new Audio("/music/clocktickfastpain10sec.mp3"); // buffers automatically when created
+	var information_cards_audio = new Audio("/music/information_cards_police.mp3"); 
+	var roadblock_audio = new Audio("/music/roadblock_mixdown.mp3"); 
+	var information_center_audio = new Audio("/music/information_center_audio.mp3"); 
+	var move_people_audio = new Audio("/music/move_people_mixdown.mp3"); 
+	var event_scream = new Audio("/music/event_scream.mp3"); // buffers automatically when created
+	var checkpoint_mixdown = new Audio("/music/checkpoint_mixdown.mp3");
+	var decrease_panic = new Audio("/music/decrease_panic_mixdown.mp3");
+	var moving_player = new Audio("/music/moving_player.mp3");
+	
+	
+	//set images
 	var residential_img = new Image();
 	residential_img.src = "/img/residential.jpg";
 	var park_img = new Image();
@@ -135,7 +146,7 @@ gco.update_timer = function(time){
 	
 	
 	if (time===10){
-	snd.play();
+	countdown.play();
 	}
 	var lab = document.getElementById("timer-label");
     lab.innerHTML = "Panic Increase in: "+time;
@@ -250,6 +261,8 @@ gco.update_nodes = function(ns){
     for(var i = 0; i < ns.length;i++){
         gco.nodes[ns[i].id] = ns[i];
     }
+	
+
 }
 
 gco.update_zones = function(zs){
@@ -303,6 +316,7 @@ gco.info_card_click = function(p, c) {
     if(gco.active_player === p){
 		
 		command('use_card', {card:c});
+		information_cards_audio.play();
 	}
 }
 
@@ -326,7 +340,11 @@ gco.move_people = function(){
 		gco.update_status("Moving people from zone "+gco.cst.selected_zone+"...");
 		gco.cst.moving_people = true;
 		gco.cst.moving_from = gco.cst.selected_zone;
+		
+		
+		
 	}
+	
 }
 
 
@@ -473,6 +491,7 @@ gco.roadblock_draw = function(node, ctx){
 	    ctx.closePath();
 	    ctx.stroke();
     }
+	
 }
 
 gco.background_draw = function(ctx){
@@ -530,7 +549,7 @@ gco.zone_draw = function(zone, ctx){
 		ctx.drawImage(largecity_img, minx, miny);	
 	}
 	
-
+	
 	//ctx.fill();
 	//Draw transparent red corresponding to panic level
 	//ctx.fillStyle = "rgba(255,0,0,"+(0.2*zone.panic_level/10)+")";
@@ -803,8 +822,11 @@ gco.set_canvas_listener = function(){
             cst.selection.x = mx - cst.dragoffx;
             cst.selection.y = my - cst.dragoffy;   
             gco.draw();
+			moving_player.play();
             gco.update_status("Dragging player "+cst.selection.id);
+			
         }
+		
     }, true);//end mousemove listener
     
     canvas.addEventListener('mouseup', function(e) {
@@ -822,6 +844,7 @@ gco.set_canvas_listener = function(){
                     });
                     gco.update_status("Moved player "+cst.selection.id);
                     cst.selection = undefined;
+					moving_player.pause();
                     cst.dragging = false;
                     gco.draw();
                     

@@ -25,6 +25,8 @@ var ge = module.exports = function (id, client, template,template_id) {
 	this.events = template.events || [];
 	this.settings = template.settings || {};
 	this.template_id = template_id || 0;
+
+
 	
 	//Map
 	this.map = {nodes : [], zones : []};
@@ -228,6 +230,7 @@ ge.prototype.command = function(client, c){
 		zones = this.map.zones,
         players = this.players,
         changed = {none:true};
+
     
 	
     switch (c.type) {
@@ -352,6 +355,7 @@ ge.prototype.command = function(client, c){
 				}
 				changed.nodes = [nodes[p.node]];
 				changed.players = [p];
+				
 				this.road_blocks++;
 				for (var i=0; i<zones.length; i++){
 					console.log("Zone "+i+" blocked? "+zones[i].isBlocked);
@@ -451,6 +455,9 @@ ge.prototype.command = function(client, c){
 				var randomEvent=Math.floor(Math.random()*this.events.length);
 				changed = effect(this.events[randomEvent], this);
 				changed.event = this.events[randomEvent];
+				//var event_scream = new Audio("/event_scream.wav"); // buffers automatically when created
+
+				//event_scream.play();
 				this.turnsSinceEvent=0;
 				}
 			}
@@ -956,6 +963,7 @@ ge.Node.prototype.add_road_block = function (player, players) {
 	var able = this.can_add_road_block(player, players);
 	if (able){
 		this.has_road_block = true;
+		
 		return true;
 	}
 	return false;	
@@ -1048,6 +1056,7 @@ ge.Role = function (title, info, effect) {
 ge.Event = function (text, effect) {
 	this.text = text;
 	this.effect = effect;
+	
 }
 
 
