@@ -302,6 +302,7 @@ ge.prototype.command = function(client, c){
 					if (zones[c.zone_from].move_people(players[this.active_player], zones[c.zone_to], 5)) {
 						changed.zones=[zones[c.zone_to], zones[c.zone_from]];
 						changed.players = [players[this.active_player]];
+						break;
 					}
 				}
 			}
@@ -397,7 +398,12 @@ ge.prototype.command = function(client, c){
 	        for (var i = 0; i < zones.length;i++) {
 	        	//update zones with 10 panic
 	        	if (!zones[i].is_panic_zero()){
-					zones[i].update_panic(10);
+	        		if (zones[i].people<=10)
+	        			zones[i].update_panic(10);
+	        		else if (zones[i].people<=50)
+	        			zones[i].update_panic(15);
+	        		else
+	        			zones[i].update_panic(20);
 				}
 	        }
 			
@@ -451,8 +457,8 @@ ge.prototype.command = function(client, c){
 			
 				else{
 				var randomEvent=Math.floor(Math.random()*this.events.length);
-				changed = effect(this.events[5], this);
-				changed.event = this.events[5];
+				changed = effect(this.events[randomEvent], this);
+				changed.event = this.events[randomEvent];
 				this.turnsSinceEvent=0;
 				}
 			}
