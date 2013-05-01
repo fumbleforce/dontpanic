@@ -55,7 +55,7 @@ handleDisconnect(connection);
 */
 
 db.get_replay_id = function(next) {
-	connection.query('SELECT replay_id FROM replay ORDER DESC')
+	connection.query('SELECT replay_id FROM replay ORDER DESC',
 	function (err, rows, fields) {
 		if (err) throw err;
 		return next(rows[0]);
