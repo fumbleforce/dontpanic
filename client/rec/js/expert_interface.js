@@ -125,6 +125,7 @@ var gco = {
 	effects : [],
 	info_cards : [],
 	rdy_effects :[],
+	event_effects : [],
 	events : []
 		  
 }
@@ -140,20 +141,15 @@ gco.ctx = gco.canvas.getContext("2d");
     Object map      The map object containing list of Zones and Nodes
 */
 gco.init_game = function () {
-    console.log("Game initiated");
+    console.log("Expert interface initiated");
 	
 
 
     
     gco.setup_canvas();
     gco.set_canvas_listener();
-	
-
-	
 
     gco.draw();
-
-
 }
 
 
@@ -173,7 +169,9 @@ gco.export_to_database = function(){ // exports the info held by the gco to the 
 		info_cards : [],
 		events : [],
 		author : document.getElementById("template_author").value,
-		desc : document.getElementById("template_desc").value
+		desc : document.getElementById("template_desc").value,
+		timestep : document.getElementById("template_timestep").value,
+		event_step : document.getElementById("template_event_step").value
 		
 		
 	};
@@ -212,12 +210,12 @@ gco.export_to_database = function(){ // exports the info held by the gco to the 
 			type : szone.type,
 			people : szone.people,
 			panic_level : szone.panic_level,
-			adjacent_zones : szone.zones, //find a way to calculate adjacent zones
+			adjacent_zones : szone.zones, 
 			centroid : szone.centroid
 
 			});
 	}
-	// (id, user, node, color, role, actions_left)
+	
 	for(var i = 0; i < gco.players.length;i++){
 	
 		splayer = gco.players[i];
@@ -236,12 +234,9 @@ gco.export_to_database = function(){ // exports the info held by the gco to the 
 		
 		
 	}
-	for(var i = 0; i < gco.info_cards.length; i++){
-		game_template.info_cards.push(gco.info_cards[i]);
-	}
-	for(var i = 0; i < gco.events.length; i++){
-		game_template.events.push(gco.events[i]);
-	}
+	game_template.info_cards = gco.info_cards.slice(0);
+	game_template.events = gco.events.slice(0);
+
 
 	console.log(JSON.stringify(game_template));
 	
@@ -1017,7 +1012,7 @@ gco.event_add_effect = function(){ // adds an effect to the event, see info_card
 	}
 	
 	
-	gco.rdy_effects.push( newEffect = {
+	gco.event_effects.push( newEffect = {
 		name : ename,
 		domain : edomain,
 		type : etype,
@@ -1025,17 +1020,9 @@ gco.event_add_effect = function(){ // adds an effect to the event, see info_card
 		affects : eaffects
 	});
 	
-	if(gco.events.length > 0){
-		gco.events[document.getElementById("event_show").value].effects.push(newEffect = {
-			name : ename,
-			domain : edomain,
-			type : etype,
-			panic : epanic,
-			affects : eaffects
-		});
-	}
 	
-	gco.update_ddbox(document.getElementById("event_effect"), gco.rdy_effects, false);
+	
+	gco.update_ddbox(document.getElementById("event_effect"), gco.event_effects, false);
 	
 	
 }
@@ -1043,7 +1030,7 @@ gco.add_event = function() { // adds the event to the event container
 	
 	cname = document.getElementById("event_name").value;
 	cdesc = document.getElementById("event_desc").value;
-	ceff = gco.rdy_effects; 
+	ceff = gco.event_effects.slice(0); 
 	
 	
 	
@@ -1052,7 +1039,7 @@ gco.add_event = function() { // adds the event to the event container
 		console.log("something is missing to create a new event");
 		return;
 	}
-
+	
 	
 	gco.events.push(newEvent = {
 		
@@ -1062,14 +1049,14 @@ gco.add_event = function() { // adds the event to the event container
 	});
 
 	gco.update_ddbox(document.getElementById("event_show"), gco.events, false);
-	document.getElementById("event_show").selectedIndex = document.getElementById("event_show").options.length -1;
+	document.getElementById("event_show").selectedIndex = gco.events.length -1;
 	gco.show_event();
 }
 gco.add_info_card = function() { // adds and infocard to the cardcontainer
 	
 	cname = document.getElementById("card_name").value;
 	cdesc = document.getElementById("card_desc").value;
-	ceff = gco.rdy_effects; 
+	ceff = gco.rdy_effects.slice(0); 
 	
 	
 	
@@ -1088,7 +1075,7 @@ gco.add_info_card = function() { // adds and infocard to the cardcontainer
 	});
 	
 	gco.update_ddbox(document.getElementById("card_show"), gco.info_cards, false);
-	document.getElementById("card_show").selectedIndex = document.getElementById("card_show").options.length -1;
+	document.getElementById("card_show").selectedIndex = gco.info_cards.length -1;
 	gco.show_card();
 }
 gco.card_create_add_effect = function() { // creates an effect and adds it to a card. Mostly the same as adding effects to a event, but wants to keep it like this in case there will be needed differences to the methods
@@ -1147,18 +1134,19 @@ gco.card_create_add_effect = function() { // creates an effect and adds it to a 
 		affects : eaffects
 	});
 	
-	if(gco.info_cards.length > 0){
-		gco.info_cards[document.getElementById("card_show").value].effects.push(newEffect = {
-			name : ename,
-			domain : edomain,
-			type : etype,
-			panic : epanic,
-			affects : eaffects
-		});
-	}
+	
 	
 	gco.update_ddbox(document.getElementById("card_effect"), gco.rdy_effects, false);
 	
+}
+gco.event_create_remove_effect = function() { // removes the selected effect from the selected event
+	
+	var index = document.getElementById("event_effect").value;
+
+	gco.event_effects.splice(index, 1);
+	
+
+	gco.update_ddbox(document.getElementById("event_effect"), gco.event_effects, false);
 }
 gco.card_create_remove_effect = function() { // removes the selected effect from the selected card
 	
@@ -1169,6 +1157,8 @@ gco.card_create_remove_effect = function() { // removes the selected effect from
 
 	gco.update_ddbox(document.getElementById("card_effect"), gco.rdy_effects, false);
 }
+
+
 
 
 gco.update_ddbox = function(ddbox, list, name_same_as_value) { // updates a DropDownBox so it ccontains the provided list, 
@@ -1262,9 +1252,10 @@ gco.event_move_to_edit = function(){ // moves the selected event to edit
 	document.getElementById("event_name").value = event.name;
 	document.getElementById("event_desc").value = event.desc;
 	
+	
 	gco.update_ddbox(document.getElementById("event_effect"), event.effects, false);
 	
-	gco.rdy_effects = event.effects;
+	gco.event_effects = event.effects;
 }
 gco.card_move_to_edit = function(){ // moves the selected card to edit, 
 	gco.selected_card = document.getElementById("card_show").value;
@@ -1290,7 +1281,7 @@ gco.delete_event = function(){ // delete selected event
 		document.getElementById("event_effects_label2").innerHTML = "";
 		gco.update_ddbox(document.getElementById("event_show"), gco.events, false);
 		gco.update_ddbox(document.getElementById("event_effect"), [], false);
-		gco.rdy_effects = "";
+		gco.event_effects = "";
 		gco.show_event();
 	}
 }
@@ -1309,14 +1300,47 @@ gco.delete_card = function(){ // delete selected card
 		gco.update_ddbox(document.getElementById("card_effect"), [], false);
 		gco.rdy_effects = "";
 		gco.show_card();
+		
 	}
 }
 gco.edit_card = function(){
+	if(gco.selected_card == -1){
+		console.log("no card selected");
+		return;
+	}
+	var card = gco.info_cards[gco.selected_card];
 	
+	card.name = document.getElementById("card_name").value;
+	card.desc = document.getElementById("card_desc").value;
+	
+	
+	card.effects = gco.rdy_effects.slice(0);
+	
+	gco.update_ddbox(document.getElementById("card_show"), gco.info_cards, false);
+	document.getElementById("card_show").selectedIndex = gco.info_cards.indexOf(card);
+	gco.show_card();
 }
 gco.edit_event = function(){
+
+	if(gco.selected_event == -1){
+		console.log("no event selected");
+		return;
+	}
+	var event = gco.events[gco.selected_event];
 	
+	event.name = document.getElementById("event_name").value;
+	event.desc = document.getElementById("event_desc").value;
+	
+	event.effects = gco.event_effects.slice(0);
+	
+	
+	
+	gco.update_ddbox(document.getElementById("event_show"), gco.events, false);
+	document.getElementById("event_show").selectedIndex = gco.events.indexOf(event);
+	gco.show_event();
+
 }
+
 
 gco.effect_domain_change = function(){ // changes the effect creation to better match the effect domain
 
