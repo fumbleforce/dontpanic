@@ -161,6 +161,7 @@ gco.export_to_database = function(){ // exports the info held by the gco to the 
 	
 
 	var game_template = {
+		type : "template",
 		map : {
 			nodes : [],
 			zones : []

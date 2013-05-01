@@ -46,6 +46,9 @@ var ge = module.exports = function (id, client, template,template_id) {
 	var player;
 	var len = template.players.length;
 	
+	var command_id = 0;
+	var replay_id = {};
+	
     for(var i = 0; i < len; i++){
 		var tplayer = template.players[i]
 		player = new ge.Player(tplayer.id, tplayer.user, tplayer.node , tplayer.color, tplayer.role, tplayer.actions_left);
@@ -224,6 +227,7 @@ var ge = module.exports = function (id, client, template,template_id) {
     Executes in-game commands.
 */
 ge.prototype.command = function(client, c){
+	command_id++;
     var nodes = this.map.nodes,
 		zones = this.map.zones,
         players = this.players,
@@ -429,6 +433,9 @@ ge.prototype.command = function(client, c){
 		
 		
 		case 'end_turn':
+			
+			
+			
 		    
 		    var ap = players[this.active_player];
             ap.actions_left = ap.role === 'activist' ?  5 : 4;
@@ -471,6 +478,8 @@ ge.prototype.command = function(client, c){
         console.log("No matching command types");
             
     }
+	var stated = state(this);
+	this.emit('save_state' , JSON.stringify(stated));
     
     //Check for win
     changed.win = this.check_win();
@@ -787,6 +796,8 @@ function effect(card, g) {
 function state(g){
     return {
         type : 'state',
+		replay_id : g.replay_id,
+		command_id : g.command_id,
         zones : g.map.zones,
         nodes : g.map.nodes,
         players : g.players,
@@ -1079,7 +1090,7 @@ ge.Zone = function (z) {
 	this.people = z.people;
 	this.nodes = z.nodes;
 	this.adjacent_zones = z.adjacent_zones;
-	this.panic_level = 0;// z.panic_level;//settes til 0 i starten??
+	this.panic_level = z.panic_level;//settes til 0 i starten??
 	this.centroid = z.centroid;//center (centroid) X and Y of zone polygon to put panic info
 	this.isBlocked = false; //if all nodes of zone are blocked, then zone is blocked from spreading panic
 	

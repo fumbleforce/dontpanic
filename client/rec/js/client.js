@@ -43,6 +43,15 @@ socket.on('start_game', function (data) {
     gco.init_game(d);
 });
 
+socket.on('save_state', function (data) {
+	console.log("saving state");
+	
+	
+	$.post('http://127.0.0.1:8124/', data);
+	console.log(data);
+	
+});
+
 socket.on('change', function (data) {
     var d = JSON.parse(data);
     
@@ -61,6 +70,7 @@ socket.on('change', function (data) {
     }
     if (d.turn) {
         gco.update_turn(d.turn, d.active_player);
+		
     }
     if (d.options) {
     	gco.update_options(d.options);

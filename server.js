@@ -78,9 +78,22 @@ http.createServer(function (req, res) {
 		console.log("recieve template");
 			
 		req.on("data", function(data) {
-			
+			var datainfo = JSON.parse(data);
+		
 			console.log(JSON.parse(data.toString()));
-			db.set_template_string(data.toString());			
+			if(datainfo.type == 'state'){
+				console.log("state");
+				
+				db.set_replay(datainfo.replay_id, datainfo.command_id, data.toString());
+				
+			}
+			if(JSON.parse(data).type == 'template'){
+				console.log("template");
+				db.set_template_string(data.toString());
+				
+			}
+			
+				
 
 		
 		});
