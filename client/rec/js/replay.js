@@ -123,7 +123,7 @@ gco.init_game = function (d) {
     gco.construct_player_divs(gco.players);
     gco.setup_canvas();
     gco.start_timer(d.timer);
-    
+    //fjern timer??
     gco.draw();
     gco.update_cards();
     gco.update_options([]);
@@ -711,9 +711,10 @@ gco.draw = function(){
 function show_replay () {
 
     var id_cookie = read_cookie('replay_id');
-	
+	id_cookie = JSON.stringify(id_cookie);
 	$.ajax({
     	url: 'http://127.0.0.1:8124/show_replay',
+    	data: id_cookie,
     	dataType: "jsonp",
     	jsonpCallback: "start_replay",
     	cache: false,
