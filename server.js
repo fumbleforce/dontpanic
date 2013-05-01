@@ -128,7 +128,8 @@ http.createServer(function (req, res) {
 			console.log("requesting replay");
 			res.writeHead(200, {'Content-Type': 'text/plain'});
 			//skal være replay id
-			db.get_replay(2, function (result) {
+			console.log("cookie: " + req.data);
+			db.get_replay(0, function (result) {
 				var replay = [];
 				var temp;
 				for (var i = 0; i < result.length; i++) {

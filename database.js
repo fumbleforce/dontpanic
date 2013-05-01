@@ -53,13 +53,14 @@ handleDisconnect(connection);
 /*
 	Queries
 */
-db.get_replay_id = function() {
-	return replay_counter;
-}
 
-db.increase_replay_counter = function () {
-	replay_counter++;
-} 
+db.get_replay_id = function(next) {
+	connection.query('SELECT replay_id FROM replay ORDER DESC')
+	function (err, rows, fields) {
+		if (err) throw err;
+		return next(rows[0]);
+	});
+}
 
 db.test_query = function () {
 	connection.query('SELECT text AS solution FROM test WHERE ID = 1', 

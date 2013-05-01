@@ -1,20 +1,20 @@
 /**  Engine module
 
     This module will be a game "Class".
-<<<<<<< HEAD
     It is an instance of a game, and handles all game related logic.
     
     id			Integer				Game id from the server
     client		socket.io client	The client that created the game
     template	Object				Contains the map, players and settings configured as a template by an expert
 */
-var ge = module.exports = function (id, client, template,template_id) {
+var ge = module.exports = function (id, client, template,template_id, id_replay) {
 
 
 
 	console.log("Base template:");
 	console.log(template);
 	console.log("Populating....");
+	console.log("replay_id " + id_replay); 
 
 	
 	//Clients
@@ -47,6 +47,9 @@ var ge = module.exports = function (id, client, template,template_id) {
 	this.players = [];
 	var player;
 	var len = template.players.length;
+	
+	this.command_id = 0;
+	this.replay_id = id_replay;
 	
     for(var i = 0; i < len; i++){
 		var tplayer = template.players[i]
@@ -226,6 +229,7 @@ var ge = module.exports = function (id, client, template,template_id) {
     Executes in-game commands.
 */
 ge.prototype.command = function(client, c){
+	this.command_id++;
     var nodes = this.map.nodes,
 		zones = this.map.zones,
         players = this.players,
@@ -240,6 +244,8 @@ ge.prototype.command = function(client, c){
 		    	if(p.move_player(nodes[p.node], nodes[c.node_id]))
 		    		{changed.players = [p];}
             }
+            //must send player object even if not moved, to paint it correctly, apparently
+            changed.players = [p];
             break;
             
   		case 'select_node':
@@ -298,15 +304,18 @@ ge.prototype.command = function(client, c){
 			// TODO: find out how many people we can move, driver can move 10, regulars can only move 5
 			console.log("Trying to move people from zone: " + c.zone_from+
 				"to zone: " + c.zone_to);
-
-			
-			if (zones[c.zone_from].move_people(players[this.active_player], zones[c.zone_to], 5)) {
-				changed.zones=[zones[c.zone_to], zones[c.zone_from]];
-				changed.players = [players[this.active_player]];
+			//see if roads are blocked or not
+			for (var i = 0; i < zones[c.zone_from].nodes.length; i++){
+				//if one node is unblocked, can move people
+				if (zones[c.zone_to].nodes.indexOf(zones[c.zone_from].nodes[i])>-1&&(!nodes[zones[c.zone_from].nodes[i]].has_road_block)){
+					if (zones[c.zone_from].move_people(players[this.active_player], zones[c.zone_to], 5)) {
+						changed.zones=[zones[c.zone_to], zones[c.zone_from]];
+						changed.players = [players[this.active_player]];
+						break;
+					}
+				}
 			}
-			
-
-
+		
 			break;
 			
 
@@ -399,7 +408,12 @@ ge.prototype.command = function(client, c){
 	        for (var i = 0; i < zones.length;i++) {
 	        	//update zones with 10 panic
 	        	if (!zones[i].is_panic_zero()){
-					zones[i].update_panic(10);
+	        		if (zones[i].people<=10)
+	        			zones[i].update_panic(10);
+	        		else if (zones[i].people<=50)
+	        			zones[i].update_panic(15);
+	        		else
+	        			zones[i].update_panic(20);
 				}
 	        }
 			
@@ -425,6 +439,9 @@ ge.prototype.command = function(client, c){
 		
 		
 		case 'end_turn':
+			
+			
+			
 		    
 		    var ap = players[this.active_player];
             ap.actions_left = ap.role === 'activist' ?  5 : 4;
@@ -467,6 +484,8 @@ ge.prototype.command = function(client, c){
         console.log("No matching command types");
             
     }
+	var stated = state(this);
+	this.emit('save_state' , JSON.stringify(stated));
     
     //Check for win
     changed.win = this.check_win();
@@ -783,6 +802,8 @@ function effect(card, g) {
 function state(g){
     return {
         type : 'state',
+		replay_id : g.replay_id,
+		command_id : g.command_id,
         zones : g.map.zones,
         nodes : g.map.nodes,
         players : g.players,
@@ -885,6 +906,9 @@ ge.Player.prototype.can_move_player = function (node_from, node_to) {
 			console.log("True");
 		    return true;
 		}
+		else{
+			console.log("Not enough actions");
+		}
 		return false;
 	}
 	console.log("node does not connect");
@@ -933,6 +957,7 @@ ge.Node.prototype.add_information_center = function (player) {
 	var able = this.can_add_information_center(player);
 	if (able){
 		this.has_information_center = true;
+		player.update_actions(-4);
 		return true;
 	}
 	return false;
@@ -960,7 +985,7 @@ ge.Node.prototype.add_road_block = function (player, players) {
 	var able = this.can_add_road_block(player, players);
 	if (able){
 		this.has_road_block = true;
-		
+		player.update_actions(-1);
 		return true;
 	}
 	return false;	
@@ -997,9 +1022,10 @@ ge.Node.prototype.can_add_road_block = function (player, players) {
 
 }
 ge.Node.prototype.remove_road_block = function (player, players) {
-	var able = this.can_add_road_block(player, players);
+	var able = this.can_remove_road_block(player, players);
 	if (able){
 		this.has_road_block = false;
+		player.update_actions(-1);
 		return true;
 	}
 	return false;
@@ -1074,7 +1100,7 @@ ge.Zone = function (z) {
 	this.people = z.people;
 	this.nodes = z.nodes;
 	this.adjacent_zones = z.adjacent_zones;
-	this.panic_level = 0;// z.panic_level;//settes til 0 i starten??
+	this.panic_level = z.panic_level;//settes til 0 i starten??
 	this.centroid = z.centroid;//center (centroid) X and Y of zone polygon to put panic info
 	this.isBlocked = false; //if all nodes of zone are blocked, then zone is blocked from spreading panic
 	
@@ -1098,7 +1124,8 @@ ge.Zone.prototype.dec_panic = function(player, node) {
 	var able = this.can_dec_panic(player, node);
 	if(able){
 		if(player.role === 'crowd manager'){
-			this.update_panic(player.role.panic)
+			//this.update_panic(player.role.panic)
+			this.update_panic(-10);
 		}
 		else{
 			this.update_panic(-5);
@@ -1142,18 +1169,43 @@ ge.Zone.prototype.move_people = function (p, to_zone, num) {
 ge.Zone.prototype.can_move_people = function (p, to_zone, num) {
 	console.log("Can move people?");
 	if (this.people >= num){
+	if(this.adjacent_zones.indexOf(to_zone.id)>=0 ){
+	if(p.can_update_actions(-1)) {
+	console.log("True");
+	return true;
+	}
+
+	}
+	else{
+	console.log("Not an adjacent zone");
+	}
+	}
+	else {
+	console.log("There isnt that many people in this zone");
+	}
+	return false;
+	console.log("Can move people?");
+	if (this.people >= num){
 		if(this.adjacent_zones.indexOf(to_zone.id)>=0 ){
-			if(p.can_update_actions(-1)) {
-				console.log("True");
-				return true;
+				//1. find common nodes
+			console.log("IN? "+this.nodes.length);
+			for (var i = 0; i < this.nodes.length; i++){
+				console.log("IN!");
+				console.log(ge.Map.zones[to_zone].nodes.indexOf(this.nodes[i].id));
+				if (ge.zones[to_zone].nodes.indexOf(this.nodes[i])>-1&&(!this.nodes[i].isBlocked)){
+					return true;
+					//commonNodes.push(this.nodes[i]);
+				}
 			}
-			
+			console.log("Blocked!");
+
 		}
 		else{
 			console.log("Not an adjacent zone");
 		}
 	}
 	else {
+		//error 
 		console.log("There isnt that many people in this zone");
 	}
 	return false;
