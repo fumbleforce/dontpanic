@@ -246,11 +246,14 @@ socket_listener.sockets.on('connection', function (client) {
 			
 			console.log("Creating game object based on template..");
 			var g = new engine(client.userid, client, gametemplate, c.template_id, db.get_replay_id());
-			db.increase_replay_counter();
 			console.log("Created.");
 	    	games[g.id] = g;
 	    	client.game_id = g.id;
 	    	g.start(client);		
+	    	
+	    	db.get_replay_id(function (result) {
+				console.log("db max replay id: "+result);
+			});
 		});
     })
     
