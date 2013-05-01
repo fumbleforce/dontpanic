@@ -113,11 +113,7 @@ gco.ctx = gco.canvas.getContext("2d");
 */
 
 gco.init_game = function (d) {
-    console.log("Game initiated.");
-    
-	console.log("game state at pos " + game_states[0]);
-	console.log("game state at pos " + game_states[1]);
-
+    console.log("Replay state initiated.");
 	
     gco.players = d.players;
     gco.zones = d.zones;
@@ -705,9 +701,9 @@ gco.draw = function(){
     }
     
     if(players.length > 1){
-       /* document.getElementById("turn-label").innerHTML = "Turn: "+(gco.turn); 
+        document.getElementById("turn-label").innerHTML = "Turn: "+(gco.turn); 
         document.getElementById("player-turn-label").innerHTML = "Player "+(gco.active_player)+"'s turn";
-        document.getElementById("action-label").innerHTML = "Actions left: "+(players[gco.active_player].actions_left); */
+        document.getElementById("action-label").innerHTML = "Actions left: "+(players[gco.active_player].actions_left); 
     } 
     
 }// end draw

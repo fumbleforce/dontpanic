@@ -1,3 +1,5 @@
+var replay_counter = 0;
+
 var db = module.exports = function () {
 
 }
@@ -51,6 +53,13 @@ handleDisconnect(connection);
 /*
 	Queries
 */
+db.get_replay_id = function() {
+	return replay_counter;
+}
+
+db.increase_replay_counter = function () {
+	replay_counter++;
+} 
 
 db.test_query = function () {
 	connection.query('SELECT text AS solution FROM test WHERE ID = 1', 
