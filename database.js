@@ -55,13 +55,14 @@ handleDisconnect(connection);
 */
 
 db.get_replay_id = function(next) {
-	connection.query('SELECT replay_id FROM replay ORDER DESC',
+	connection.query('SELECT replay_id FROM replay ORDER BY replay_id DESC',
 	function (err, rows, fields) {
 		if (err) throw err;
-		return next(rows[0]);
+		return next(rows[0].replay_id);
 	});
 }
 
+console.log("hei");
 db.test_query = function () {
 	connection.query('SELECT text AS solution FROM test WHERE ID = 1', 
 	function(err, rows, fields) {
@@ -157,12 +158,12 @@ db.get_all_templates = function (next) {
 }
 
 db.get_all_replays = function (next) {
-//SELECT distinct replay_id FROM replay
 	connection.query('SELECT distinct replay_id FROM replay', function (err, rows, fields) {
 		if (err) throw err;
 		return next(rows);
 	});
 }
+
 
 db.set_replay = function (replay_id, command_id, command) {
 	connection.query('INSERT INTO replay SET?', {replay_id: replay_id, command_id: command_id, command: command},
