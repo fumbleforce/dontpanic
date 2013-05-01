@@ -246,7 +246,11 @@ socket_listener.sockets.on('connection', function (client) {
 			var	gametemplate = JSON.parse(result[0].json_string);
 			
 			console.log("Creating game object based on template..");
-			var g = new engine(client.userid, client, gametemplate, c.template_id, db.get_replay_id());
+
+			var g = new engine(client.userid, client, gametemplate, c.template_id, db.get_replay_id()+1);
+			
+
+
 			console.log("Created.");
 	    	games[g.id] = g;
 	    	client.game_id = g.id;
