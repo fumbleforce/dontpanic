@@ -1084,7 +1084,7 @@ ge.Zone = function (z) {
 	this.people = z.people;
 	this.nodes = z.nodes;
 	this.adjacent_zones = z.adjacent_zones;
-	this.panic_level = 0;// z.panic_level;//settes til 0 i starten??
+	this.panic_level = z.panic_level;//settes til 0 i starten??
 	this.centroid = z.centroid;//center (centroid) X and Y of zone polygon to put panic info
 	this.isBlocked = false; //if all nodes of zone are blocked, then zone is blocked from spreading panic
 	
