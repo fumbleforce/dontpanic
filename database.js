@@ -1,3 +1,5 @@
+var replay_counter = 0;
+
 var db = module.exports = function () {
 
 }
@@ -51,6 +53,13 @@ handleDisconnect(connection);
 /*
 	Queries
 */
+db.get_replay_id = function() {
+	return replay_counter;
+}
+
+db.increase_replay_counter = function () {
+	replay_counter++;
+} 
 
 db.test_query = function () {
 	connection.query('SELECT text AS solution FROM test WHERE ID = 1', 
@@ -149,6 +158,21 @@ db.get_all_templates = function (next) {
 db.get_all_replays = function (next) {
 //SELECT distinct replay_id FROM replay
 	connection.query('SELECT distinct replay_id FROM replay', function (err, rows, fields) {
+		if (err) throw err;
+		return next(rows);
+	});
+}
+
+db.set_replay = function (replay_id, command_id, command) {
+	connection.query('INSERT INTO replay SET?', {replay_id: replay_id, command_id: command_id, command: command},
+	function(err, rows, fields) {
+		if (err) throw err;
+		console.log('successfully added replay command to database');
+	});
+}
+
+db.get_replay = function (replay_id, next) {
+	connection.query('SELECT command FROM replay WHERE replay_id = ' + replay_id, function (err, rows, fields) {
 		if (err) throw err;
 		return next(rows);
 	});

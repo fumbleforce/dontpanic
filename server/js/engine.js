@@ -241,6 +241,8 @@ ge.prototype.command = function(client, c){
 		    	if(p.move_player(nodes[p.node], nodes[c.node_id]))
 		    		{changed.players = [p];}
             }
+            //must send player object even if not moved, to paint it correctly, apparently
+            changed.players = [p];
             break;
             
   		case 'select_node':
@@ -900,6 +902,9 @@ ge.Player.prototype.can_move_player = function (node_from, node_to) {
 			console.log("True");
 		    return true;
 		}
+		else{
+			console.log("Not enough actions");
+		}
 		return false;
 	}
 	console.log("node does not connect");
@@ -1114,7 +1119,8 @@ ge.Zone.prototype.dec_panic = function(player, node) {
 	var able = this.can_dec_panic(player, node);
 	if(able){
 		if(player.role === 'crowd manager'){
-			this.update_panic(player.role.panic)
+			//this.update_panic(player.role.panic)
+			this.update_panic(-10);
 		}
 		else{
 			this.update_panic(-5);

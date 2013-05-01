@@ -4,32 +4,77 @@
 <head>
     <link rel="stylesheet" href="/css/styles.css" >
 </head> 
-<body>
+
+<body onload="show_replay()">
 <div class="content-table">
     
-    <div class="title-row content-row">
-        <div class="content-column"></div>
-        <div class="content-column title-text">
-            Replay 
-        </div>
-        <div class="content-column"></div>
+    <div class="content-row"></div>
+        <div class="margin-row">
     </div>
-	
-    <div class="content-row">
-    	<div class="content-column"></div>
-        <div class="content-column" id="maindiv">
+    
+    <div class="content-row top-bar-row">
+        <div class="content-column">
+		</div>
+        <div class="content-column top-bar clearfix"></div>
+			<div class="top-bar-info">
 			
+				<div id="player-turn-label" class="info-label">Player 0's turn</div>
+		        <div id="turn-label" class="info-label">Turn: 0</div>
+		        <div id="action-label" class="info-label">Action points left: 4</div>
+		        <div id="timer-label" class="info-label">Panic Increase in: 00</div>
+		        <button onclick="previous_action()">Previous action</button>
+		    	<button onclick="next_action()">Next action</button>
+			</div>
+    	<div class="margin-row">
+    	</div>
+    	
+    	
+        <div class="information-row" clearfix">		   
+			
+				<div class="information-row clearfix">
+				
+					<div id="selection" class="info-container">
+		</div>
+	
+		<div id="status_label" class="info-container"></div>
+            </div>
         </div>
-        <div class="content-column"></div>
-       
+        <div id="event-column" class="content-column"></div>
+    </div>
+	<div class="content-row">
+		<div class="margin-row"></div>
+	</div>
+    <div class="content-row">
+        <div class="content-column">
+            <div id="left-sidebar" class="sidebar-left">
+               
+            </div>
+        </div>
+        
+        <div class="content-column">
+            <div class="column-wrap">
+            <canvas id="viewport">
+                <p>Your browser is terrible</p>
+                <p>Get a good one here:</p>
+                <p><a href="http://www.mozilla.org/en-US/firefox/new/">Firefox</a></p>
+                <p><a href="https://www.google.com/intl/no/chrome/browser/">Chrome</a></p>
+            </canvas>
+            </div>
+        </div>
+        <div class="content-column">
+            <div id="right-sidebar" class="sidebar-right">
+
+               
+            </div>
+        </div>
     </div>
 </div>
 
 <footer>A game by Group 10</footer>
-</body>
-</html>
 
-<script src="/js/client.js"></script>
+<script src="/js/cookies.js"></script>
+<script src="/js/jquery-1.9.1.min.js"></script>
 <script src="/js/replay.js"></script>
+
 </body>	
 </html>
