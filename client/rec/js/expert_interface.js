@@ -141,20 +141,15 @@ gco.ctx = gco.canvas.getContext("2d");
     Object map      The map object containing list of Zones and Nodes
 */
 gco.init_game = function () {
-    console.log("Game initiated");
+    console.log("Expert interface initiated");
 	
 
 
     
     gco.setup_canvas();
     gco.set_canvas_listener();
-	
-
-	
 
     gco.draw();
-
-
 }
 
 
@@ -174,7 +169,9 @@ gco.export_to_database = function(){ // exports the info held by the gco to the 
 		info_cards : [],
 		events : [],
 		author : document.getElementById("template_author").value,
-		desc : document.getElementById("template_desc").value
+		desc : document.getElementById("template_desc").value,
+		timestep : document.getElementById("template_timestep").value,
+		event_step : document.getElementById("template_event_step").value
 		
 		
 	};
@@ -213,12 +210,12 @@ gco.export_to_database = function(){ // exports the info held by the gco to the 
 			type : szone.type,
 			people : szone.people,
 			panic_level : szone.panic_level,
-			adjacent_zones : szone.zones, //find a way to calculate adjacent zones
+			adjacent_zones : szone.zones, 
 			centroid : szone.centroid
 
 			});
 	}
-	// (id, user, node, color, role, actions_left)
+	
 	for(var i = 0; i < gco.players.length;i++){
 	
 		splayer = gco.players[i];
@@ -237,12 +234,9 @@ gco.export_to_database = function(){ // exports the info held by the gco to the 
 		
 		
 	}
-	for(var i = 0; i < gco.info_cards.length; i++){
-		game_template.info_cards.push(gco.info_cards[i]);
-	}
-	for(var i = 0; i < gco.events.length; i++){
-		game_template.events.push(gco.events[i]);
-	}
+	game_template.info_cards = gco.info_cards.slice(0);
+	game_template.events = gco.events.slice(0);
+
 
 	console.log(JSON.stringify(game_template));
 	
