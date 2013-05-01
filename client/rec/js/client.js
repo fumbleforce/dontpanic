@@ -1,5 +1,6 @@
 
-var socket = io.connect('http://localhost');
+
+var socket = io.connect(remote_ip);
 
 socket.on('is_connected', function () {
     console.log('Connected');
@@ -52,7 +53,7 @@ socket.on('save_state', function (data) {
 	console.log("saving state");
 	
 	
-	$.post('http://127.0.0.1:8124/', data);
+	$.post(remote_ip+':8124/', data);
 	console.log(data);
 	
 });

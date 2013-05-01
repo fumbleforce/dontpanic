@@ -242,7 +242,7 @@ gco.export_to_database = function(){ // exports the info held by the gco to the 
 	console.log(JSON.stringify(game_template));
 	
 	
-	$.post('http://127.0.0.1:8124/', JSON.stringify(game_template));
+	$.post(remote_ip+':8124/', JSON.stringify(game_template));
 
 
 }
