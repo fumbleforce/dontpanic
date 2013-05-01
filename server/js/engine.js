@@ -8,13 +8,14 @@
     client		socket.io client	The client that created the game
     template	Object				Contains the map, players and settings configured as a template by an expert
 */
-var ge = module.exports = function (id, client, template,template_id) {
+var ge = module.exports = function (id, client, template,template_id, id_replay) {
 
 
 
 	console.log("Base template:");
 	console.log(template);
 	console.log("Populating....");
+	console.log("replay_id " + id_replay); 
 
 	
 	//Clients
@@ -46,8 +47,8 @@ var ge = module.exports = function (id, client, template,template_id) {
 	var player;
 	var len = template.players.length;
 	
-	var command_id = 0;
-	var replay_id = {};
+	this.command_id = 0;
+	this.replay_id = id_replay;
 	
     for(var i = 0; i < len; i++){
 		var tplayer = template.players[i]
@@ -227,7 +228,7 @@ var ge = module.exports = function (id, client, template,template_id) {
     Executes in-game commands.
 */
 ge.prototype.command = function(client, c){
-	command_id++;
+	this.command_id++;
     var nodes = this.map.nodes,
 		zones = this.map.zones,
         players = this.players,

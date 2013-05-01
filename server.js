@@ -75,7 +75,7 @@ http.createServer(function (req, res) {
 	
 	if(req.method === "POST"){
 	
-		console.log("recieve template");
+		console.log("recieved state or template");
 			
 		req.on("data", function(data) {
 			var datainfo = JSON.parse(data);
@@ -83,6 +83,9 @@ http.createServer(function (req, res) {
 			console.log(JSON.parse(data.toString()));
 			if(datainfo.type == 'state'){
 				console.log("state");
+				console.log("replay id: " + datainfo.replay_id);
+				
+				console.log("command id: " + datainfo.command_id);
 				
 				db.set_replay(datainfo.replay_id, datainfo.command_id, data.toString());
 				
@@ -241,7 +244,8 @@ socket_listener.sockets.on('connection', function (client) {
 			var	gametemplate = JSON.parse(result[0].json_string);
 			
 			console.log("Creating game object based on template..");
-			var g = new engine(client.userid, client, gametemplate, c.template_id);
+			var g = new engine(client.userid, client, gametemplate, c.template_id, db.get_replay_id());
+			db.increase_replay_counter();
 			console.log("Created.");
 	    	games[g.id] = g;
 	    	client.game_id = g.id;
