@@ -155,10 +155,11 @@ db.get_all_replays = function (next) {
 }
 
 db.set_replay = function (replay_id, command_id, command) {
-	connection.query('INSERT INTO replay SET?' {replay_id: replay_id, command_id: command_id, command: command},
+	connection.query('INSERT INTO replay SET?', {replay_id: replay_id, command_id: command_id, command: command},
 	function(err, rows, fields) {
-	if (err) throw err;
-	console.log('successfully added replay command to database');
+		if (err) throw err;
+		console.log('successfully added replay command to database');
+	});
 }
 
 db.get_replay = function (replay_id, next) {
