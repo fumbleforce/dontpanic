@@ -454,10 +454,7 @@ ge.prototype.command = function(client, c){
 				else{
 				var randomEvent=Math.floor(Math.random()*this.events.length);
 				changed = effect(this.events[randomEvent], this);
-				changed.event = this.events[randomEvent];
-				//var event_scream = new Audio("/event_scream.wav"); // buffers automatically when created
-
-				//event_scream.play();
+				changed.event = this.events[randomEvent];			
 				this.turnsSinceEvent=0;
 				}
 			}

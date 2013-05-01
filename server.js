@@ -76,12 +76,28 @@ http.createServer(function (req, res) {
 	
 	if(req.method === "POST"){
 	
-		console.log("recieve template");
+		console.log("recieved state or template");
 			
 		req.on("data", function(data) {
-			
+			var datainfo = JSON.parse(data);
+		
 			console.log(JSON.parse(data.toString()));
-			db.set_template_string(data.toString());			
+			if(datainfo.type == 'state'){
+				console.log("state");
+				console.log("replay id: " + datainfo.replay_id);
+				
+				console.log("command id: " + datainfo.command_id);
+				
+				db.set_replay(datainfo.replay_id, datainfo.command_id, data.toString());
+				
+			}
+			if(JSON.parse(data).type == 'template'){
+				console.log("template");
+				db.set_template_string(data.toString());
+				
+			}
+			
+				
 
 		
 		});
@@ -93,11 +109,10 @@ http.createServer(function (req, res) {
 	else if (req.method === "GET") {
 
 		if (req.url.indexOf("replays") !== -1) {
-			console.log("requesting replay");
+			console.log("requesting replays");
 			
 			res.writeHead(200, {'Content-Type': 'text/plain'});
 			db.get_all_replays(function (result) {
-				console.log(result);
 				var	replays = [];
 				var temp;
 				for (var i = 0; i < result.length;i++){
@@ -105,9 +120,26 @@ http.createServer(function (req, res) {
 					replays.push(JSON.stringify(temp));
 				}	
 				console.log("Sending list of replays");
-
 				res.end('replays('+JSON.stringify(replays)+')');
 			});
+		}
+		
+		else if (req.url.indexOf("show_replay") !== -1) {
+			console.log("requesting replay");
+			res.writeHead(200, {'Content-Type': 'text/plain'});
+			//skal være replay id
+			db.get_replay(2, function (result) {
+				var replay = [];
+				var temp;
+				for (var i = 0; i < result.length; i++) {
+					temp = result[i];
+					replay.push(JSON.parse(temp.command));
+				}
+				console.log("Sending replay states");
+				res.end('start_replay('+JSON.stringify(replay)+')');
+			});
+
+			
 		}
 		else if (req.url.indexOf("game_master") !== -1) {
 			res.writeHead(200, {'Content-Type': 'text/plain'});
@@ -213,7 +245,8 @@ socket_listener.sockets.on('connection', function (client) {
 			var	gametemplate = JSON.parse(result[0].json_string);
 			
 			console.log("Creating game object based on template..");
-			var g = new engine(client.userid, client, gametemplate, c.template_id);
+			var g = new engine(client.userid, client, gametemplate, c.template_id, db.get_replay_id());
+			db.increase_replay_counter();
 			console.log("Created.");
 	    	games[g.id] = g;
 	    	client.game_id = g.id;
