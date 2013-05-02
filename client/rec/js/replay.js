@@ -195,7 +195,7 @@ gco.construct_player_divs = function(players){
 		lim2 = 0;
 	}
 	for(i = 0; i<lim1; i++){
-		inner += "<div id='p"+i+"' class='sidebar-player'><h2>Player "+i+"</h2><br><div class='player-info'><p>"+ players[i].role.charAt(0).toUpperCase() + players[i].role.slice(1); +"</p><div id='"+i+"_text' class='role-info-label'>"+ role_desc[players[i].role] +"</div></div><div id='"+i+"_cards' class='card-container'></div></div>";
+		inner += "<div id='p"+i+"' class='sidebar-player'><h2>Player "+i+"</h2><br><div class='player-info'><p>"+ players[i].role +"</p><div id='"+i+"_text' class='role-info-label'>"+ role_desc[players[i].role] +"</div></div><div id='"+i+"_cards' class='card-container'></div></div>";
 	}
 	$l.html(inner);
 	inner = '';
