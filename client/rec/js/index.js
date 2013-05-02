@@ -38,6 +38,7 @@ function templates(d){
 			cont += "<div class='template-info'>"+ author + "</div>";	
 			cont += "</div></a>";
 		}
+		
 		$("#maindiv").html(cont);
 	}
 	else if (typeof d === 'object'){
@@ -91,13 +92,16 @@ function replays(d){
 		for (var i = 0; i < d.length; i++){
 			t = JSON.parse(d[i]);
 			info = JSON.parse(t.replay_id);
+			console.log("info: "+info)
+			console.log("t.replayid: "+t.replay_id);
 			console.log("Replay parsed:");
-			console.log(info);
 			desc = info.desc ? info.desc : "Default replay";
 			cont += "<a href='"+remote_ip+":8008/replay/' onclick='selected_replay("+t.id+")'><div class='template-entry clearfix'>";
 			cont += "<div class='template-info'>"+ t.replay_id + "</div>";	
 			cont += "<div class='template-info'>"+ desc + "</div>";	
 			cont += "</div></a>";
+			create_cookie("is_gm", false, 1);
+			create_cookie("replay_id", t.replay_id, 1);
 		}
 		$("#maindiv").html(cont);
 	}
@@ -108,6 +112,8 @@ function replays(d){
 		cont += "<div class='template-info'>"+ d.replay_id + "</div>";	
 		cont += "<div class='template-info'>"+ desc + "</div>";
 		cont += "</div></a>";
+		create_cookie("is_gm", false, 1);
+		create_cookie("replay_id", t.replay_id, 1);
 		$("#maindiv").html(cont);
 	}
 	else{
@@ -119,6 +125,7 @@ function selected_replay (replay_id) {
 	console.log("creating cookie for chosen replay: "+replay_id);
 	create_cookie("is_gm", false, 1);
 	create_cookie("replay_id", id, 1);
+	alert("cookiii");
 }	
 
 function game_manager(){

@@ -164,6 +164,12 @@ background-image: -webkit-gradient(
 {
 
 }
+.btn-replay-state
+{
+	float:left;
+    font-size:32px;
+    padding:7px;
+}
 .btn-end-turn
 {
     float:left;
