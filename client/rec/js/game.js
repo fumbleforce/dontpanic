@@ -52,6 +52,14 @@ var c_height = 1550,
 	var passer_by_img = new Image();
 	passer_by_img.src = "/img/passer_by.png";
 	
+	var role_desc = {
+	    'coordinator':'info',
+	    'passer by':'info',
+	    'crowd manager':'info',
+	    'operation expert':'info',
+	    'driver':'info',
+	
+	}
 
 /* TEMPORARY ZONE IMAGES
 
@@ -181,12 +189,12 @@ gco.construct_player_divs = function(players){
 		lim2 = 0;
 	}
 	for(i = 0; i<lim1; i++){
-		inner += "<div id='p"+i+"' class='sidebar-player'><h2>Player "+i+"</h2><br><div class='player-info'><p>This is a player information sidebar row</p><div id='"+i+"_text' class='role-info-label'>More info here.</div></div><div id='"+i+"_cards' class='card-container'></div></div>";
+		inner += "<div id='p"+i+"' class='sidebar-player'><h2>Player "+i+"</h2><br><div class='player-info'><p>"+ players[i].role +"</p><div id='"+i+"_text' class='role-info-label'>"+ role_desc[players[i].role] +"</div></div><div id='"+i+"_cards' class='card-container'></div></div>";
 	}
 	$l.html(inner);
 	inner = '';
 	for(i=lim1; i<lim2; i++){
-		inner += "<div id='p"+i+"' class='sidebar-player'><h2>Player "+i+"</h2><br><div class='player-info'><p>This is a player information sidebar row</p><div id='"+i+"_text' class='role-info-label'>More info here.</div></div><div id='"+i+"_cards' class='card-container'></div></div>";
+		inner += "<div id='p"+i+"' class='sidebar-player'><h2>Player "+i+"</h2><br><div class='player-info'><p>"+ players[i].role +"</p><div id='"+i+"_text' class='role-info-label'>"+ role_desc[players[i].role] +"</div></div><div id='"+i+"_cards' class='card-container'></div></div>";
 	}
 	$r.html(inner);
 }

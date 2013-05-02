@@ -26,7 +26,9 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
 	this.settings = template.settings || {};
 	this.template_id = template_id || 0;
 
-
+    //Replay
+    this.command_id = 0;
+	this.replay_id = id_replay;
 	
 	//Map
 	this.map = {nodes : [], zones : []};
@@ -48,23 +50,16 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
 	var player;
 	var len = template.players.length;
 	
-	this.command_id = 0;
-	this.replay_id = id_replay;
-	
     for(var i = 0; i < len; i++){
 		var tplayer = template.players[i]
 		player = new ge.Player(tplayer.id, tplayer.user, tplayer.node , tplayer.color, tplayer.role, tplayer.actions_left);
-    	
 
 		player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
-
     	
     	//First player gets one extra
 		if(i === 0){
 			player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
 		}
-
-		
     	this.players.push(player);
     }
 	
@@ -93,7 +88,9 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
 	var PADD = 50;
 
     //TODO Import from template	
-    this.events = [
+    this.events = template.events || [];
+    
+                /*[
                    {   id:0,
                 	   name:"Fire engulfs industrial complex! Workers in all districts gives into panic.\nPanic increased by 20 in all industrial districts",
                 	   effects: [{
@@ -203,7 +200,7 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
                     		panic:(10),
                     		affects:'residential'
                     	}]
-                    }/*,
+                    },
 					{   id:2,
                     	name:"WTF, DID THAT JUST HAPPEN?!",
                     	effects: [{
@@ -211,9 +208,9 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
                     		type:'blocknextevent'
                     		},]
 							
-                    },*/
+                    },
 
-            ];
+            ];*/
                 
                 
 	console.log("Finished populating engine object.");
