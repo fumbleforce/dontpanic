@@ -12,7 +12,7 @@ var http		= require('http'),
     games       = {},
     uuid        = require('node-uuid'),
     db			= require('./database.js');
-
+    conf        = require('./conf.js');
  	 /* Configuration of express server:
     
     Makes the ejs module handle all html files.
@@ -27,10 +27,10 @@ server.use(express.static(__dirname + '/client/rec'));
 server.use('/img', (__dirname + '/client/rec/img'));
 server.use('/music', (__dirname + '/client/rec/music'));
 server.set('view engine', 'html');
-server.set('port', process.env.PORT || 8008);
+server.set('port', process.env.PORT || conf.view_port);
 
 //The main server running the game client
-console.log('View server running at http://127.0.0.1:8008/');
+console.log('View server running at '+conf.remote_ip+':'+conf.view_port+'/');
 
 
 /*  Handle http requests	*/
@@ -172,8 +172,8 @@ http.createServer(function (req, res) {
 	}
 	
 
-}).listen(8124);
-console.log('Data server running at http://127.0.0.1:8124/');
+}).listen(conf.data_port);
+console.log('Data server running at '+conf.remote_ip+':'+conf.data_port+'/');
 
 
 /* Configure Socket.IO:

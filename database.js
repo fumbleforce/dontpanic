@@ -3,15 +3,15 @@ var replay_counter = 0;
 var db = module.exports = function () {
 
 }
-
+var conf        = require('./conf.js');
 var http = require('http');
 
 http.createServer(function (req, res) {
   res.writeHead(200, {'Content-Type': 'text/plain'});
   res.end('Hello World\n');
-}).listen(1337, '127.0.0.1');
+}).listen(conf.db_port, conf.remote_ip);
 
-console.log('Database server running at http://127.0.0.1:1337/');
+console.log('Database server running at '+conf.remote_ip+':'+conf.db_port+'/');
 
 
 var mysql = require('mysql');

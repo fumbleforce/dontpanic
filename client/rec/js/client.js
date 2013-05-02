@@ -53,7 +53,7 @@ socket.on('save_state', function (data) {
 	console.log("saving state");
 	
 	
-	$.post(remote_ip+':8124/', data);
+	$.post(remote_ip+':'+data_port+'/', data);
 	console.log(data);
 	
 });
