@@ -77,10 +77,10 @@ http.createServer(function (req, res) {
 	if(req.method === "POST"){
 	
 		console.log("recieved state or template");
-	
+			
 		req.on("data", function(data) {
 			var datainfo = JSON.parse(data);
-			console.log("cookie??"+datainfo);
+		
 			console.log(JSON.parse(data.toString()));
 			if(datainfo.type == 'state'){
 				console.log("state");
@@ -129,7 +129,7 @@ http.createServer(function (req, res) {
 			res.writeHead(200, {'Content-Type': 'text/plain'});
 			//skal være replay id
 			console.log("cookie: " + req.data);
-			db.get_replay(6, function (result) {
+			db.get_replay(0, function (result) {
 				var replay = [];
 				var temp;
 				for (var i = 0; i < result.length; i++) {
@@ -246,14 +246,15 @@ socket_listener.sockets.on('connection', function (client) {
 			var	gametemplate = JSON.parse(result[0].json_string);
 			
 			console.log("Creating game object based on template..");
-			
-			db.get_replay_id(function(result) {
+
+			db.get_replay_id(function (result) { 
 				var g = new engine(client.userid, client, gametemplate, c.template_id, result+1);
 				console.log("Created.");
 				console.log(typeof g);
 	    		games[g.id] = g;
 	    		client.game_id = g.id;
 	    		g.start(client);	
+
 			});
 		});
     })
@@ -281,7 +282,7 @@ socket_listener.sockets.on('connection', function (client) {
         if(client.game_id) games[client.game_id].command(client, parsed);
     });
 	
-	/*client.on('replay', function (c) {
+	client.on('replay', function (c) {
 		db.get_all_replays(function(result) {
 			
 			var r = new replay(result);
@@ -294,7 +295,13 @@ socket_listener.sockets.on('connection', function (client) {
 			}
 			res.end('replays('+JSON.stringify(replays)+')');
 		});
-	})*/
+	})
+	
+	client.on('next_command', function (c) {
+		db.get_command(c.replay_id, c.command_id, function(result) {
+			
+		});
+	})
 
     client.on('disconnect', function () {
         console.log('**SOCKET_LISTENER** client ' + client.userid + ' disconnected.');

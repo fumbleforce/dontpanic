@@ -157,7 +157,7 @@ gco.start_timer = function(dur){
         
         left--;
         if (left === -1) {
-            //command('inc_panic', {});
+            command('inc_panic', {});
             clearInterval(inter);
         }
     }, 1000);
@@ -716,7 +716,6 @@ gco.draw = function(){
 
 function show_replay () {
     var id_cookie = read_cookie('replay_id');
-    console.log("cookii i replayjs:"+id_cookie);
 	id_cookie = JSON.stringify(id_cookie);
 	$.ajax({
     	url: 'http://127.0.0.1:8124/show_replay',
@@ -733,8 +732,6 @@ function show_replay () {
    			alert('error ' + textStatus + " " + errorThrown);
     	}
 	});
-	//console.log("finnes den?"+id_cookie);
-	//$.post('http://127.0.0.1:8124/', JSON.stringify(id_cookie));
 }
 
 function start_replay(d) {

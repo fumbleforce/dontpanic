@@ -62,6 +62,7 @@ db.get_replay_id = function(next) {
 	});
 }
 
+console.log("hei");
 db.test_query = function () {
 	connection.query('SELECT text AS solution FROM test WHERE ID = 1', 
 	function(err, rows, fields) {
