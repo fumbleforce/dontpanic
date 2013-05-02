@@ -9,13 +9,20 @@
 */
 var ge = module.exports = function (id, client, template,template_id, id_replay) {
 
-
+    
 
 	console.log("Base template:");
 	console.log(template);
 	console.log("Populating....");
 	console.log("replay_id " + id_replay); 
 
+	
+	if(!template.map.nodes) return "No nodes in template!";
+	if(!template.map.zones) return "No zones in template!";
+	if(!template.players) return "No nodes in template!";
+	if(!template.events) return "No events in template!";
+	if(!template.info_cards) return "No info cards in template!";
+	
 	
 	//Clients
 	this.clients = [client];
@@ -32,9 +39,7 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
 	
 	//Map
 	this.map = {nodes : [], zones : []};
-	if(!template.map.nodes) console.log("No nodes in template!");
-	if(!template.map.zones) console.log("No zones in template!");
-	if(!template.players) console.log("No nodes in template!");
+	
 	
 	for(var i = 0;i<template.map.nodes.length; i++){
 		this.map.nodes.push(new ge.Node(template.map.nodes[i]));

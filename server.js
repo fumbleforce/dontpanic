@@ -250,6 +250,7 @@ socket_listener.sockets.on('connection', function (client) {
 			db.get_replay_id(function(result) {
 				var g = new engine(client.userid, client, gametemplate, c.template_id, result+1);
 				console.log("Created.");
+				console.log(typeof g);
 	    		games[g.id] = g;
 	    		client.game_id = g.id;
 	    		g.start(client);	
