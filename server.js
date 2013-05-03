@@ -296,12 +296,6 @@ socket_listener.sockets.on('connection', function (client) {
 			res.end('replays('+JSON.stringify(replays)+')');
 		});
 	})
-	
-	client.on('next_command', function (c) {
-		db.get_command(c.replay_id, c.command_id, function(result) {
-			
-		});
-	})
 
     client.on('disconnect', function () {
         console.log('**SOCKET_LISTENER** client ' + client.userid + ' disconnected.');

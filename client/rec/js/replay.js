@@ -225,7 +225,7 @@ gco.update_options = function(o){
 	var $s = $('#selection'),
 		inner = '';
 		
-	inner += "<button class='btn' onclick='command("+'"'+"end_turn"+'"'+");'>Next Turn</button>";
+
 	
 	for (var i=0; i<o.length;i++){
 		switch(o[i]){

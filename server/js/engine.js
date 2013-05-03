@@ -410,19 +410,28 @@ ge.prototype.command = function(client, c){
 	        for (var i = 0; i < zones.length;i++) {
 	        	//update zones with 10 panic
 	        	if (!zones[i].is_panic_zero()){
-	        		if (zones[i].people<=10)
+					
+	        		if (zones[i].people<=10){
+					
+						
 	        			zones[i].update_panic(10);
-	        		else if (zones[i].people<=50)
+					}
+	        		else if (zones[i].people<=50){
+					
+						
 	        			zones[i].update_panic(15);
-	        		else
+					}
+	        		else {
+						
 	        			zones[i].update_panic(20);
+					}
 				}
 	        }
 			
 			
 	        this.timer_dur += this.time_step;
 	        this.start_timer();
-
+			
 	        for (var i = 0; i < zones.length;i++) {
 	        	//if zones has 50 panic, spread to adjacent zones
 	        	if (zones[i].panic_level==50&&(!zones[i].isBlocked)){
@@ -1102,7 +1111,7 @@ ge.Zone = function (z) {
 	this.people = z.people;
 	this.nodes = z.nodes;
 	this.adjacent_zones = z.adjacent_zones;
-	this.panic_level = z.panic_level;//settes til 0 i starten??
+	this.panic_level = parseInt(z.panic_level);//settes til 0 i starten??
 	this.centroid = z.centroid;//center (centroid) X and Y of zone polygon to put panic info
 	this.isBlocked = false; //if all nodes of zone are blocked, then zone is blocked from spreading panic
 	
