@@ -172,7 +172,7 @@ gco.export_to_database = function(){ // exports the info held by the gco to the 
 		author : document.getElementById("template_author").value,
 		desc : document.getElementById("template_desc").value,
 		timestep : document.getElementById("template_timestep").value,
-		event_step : document.getElementById("template_event_step").value
+		eventstep : document.getElementById("template_event_step").value
 		
 		
 	};
@@ -237,6 +237,52 @@ gco.export_to_database = function(){ // exports the info held by the gco to the 
 	}
 	game_template.info_cards = gco.info_cards.slice(0);
 	game_template.events = gco.events.slice(0);
+	
+	if(gco.nodes.length == 0){
+		console.log("no nodes added");
+		window.alert("There are no nodes added to the template, finish the map before trying to export to database");
+		return;
+	}
+	if(gco.zones.length){
+		console.log("no zones added");
+		window.alert("There are no zones added to the template, finish the map before trying to export to database");
+		return;
+	}
+	if(gco.players.length == 0){
+		console.log("no players added");
+		window.alert("There are no players added to the template, add some players before trying to export to database");
+		return;
+	}
+	if(gco.info_cards.length == 0){
+		console.log("no info cards added");
+		window.alert("There are no info cards added, add some info cards before trying to export to database");
+		return;
+	}
+	if(gco.events.length == 0){
+		console.log("no events added");
+		window.alert("There are no events added, add some events before trying to export to database");
+		return;
+	}
+	if(game_template.author == ""){
+		console.log("no author");
+		window.alert("There is no author added to the template, add the authors name before trying to export to database");
+		return;
+	}
+	if(game_template.desc == ""){
+		console.log("no desc");
+		window.alert("There is no map description added, describe the map before trying to export to database");
+		return;
+	}
+	if(isNaN(game_template.timestep)){
+		console.log("NaN timstep");
+		window.alert("The time for panic increase is not a number, add a real number before trying to export to database");
+		return;
+	}
+	if(isNaN(game_template.eventstep)){
+		console.log("NaN eventstep");
+		window.alert("The turns before events is not a number, add a real number before trying to export to database");
+		return;
+	}
 
 
 	console.log(JSON.stringify(game_template));
@@ -990,21 +1036,8 @@ gco.event_add_effect = function(){ // adds an effect to the event, see info_card
 				console.log("panic is NaN");
 				return;
 			}
-			else {
-				var types = document.getElementById("edit_zone_type");
-				var check = false;
-				for(var i = 0; i < types.options.length ; i++){
-					if(eaffects == types.options[i].value){
-						console.log("hit on " + types.options[i].value);
-						check = true;
-					}
-					
-				}
-				
-				if (!check){
-					return;
-				}
-			}
+			
+		
 		}
 		else {
 			console.log("Domain zone cant have any other types than event or panic");
@@ -1102,21 +1135,7 @@ gco.card_create_add_effect = function() { // creates an effect and adds it to a 
 				console.log("panic is NaN");
 				return;
 			}
-			else {
-				var types = document.getElementById("edit_zone_type");
-				var check = false;
-				for(var i = 0; i < types.options.length ; i++){
-					if(eaffects == types.options[i].value){
-						console.log("hit on " + types.options[i].value);
-						check = true;
-					}
-					
-				}
-				
-				if (!check){
-					return;
-				}
-			}
+			
 		}
 		else {
 			console.log("Domain zone cant have any other types than event or panic");
@@ -1206,18 +1225,20 @@ gco.show_card = function(){ // show the info on the selected card. want to edit 
 	var effects = "";
 	var effects2 = "";
 	for(var i  = 0; i < card.effects.length;i++){
+		var name = card.effects[i].name;
 		if(i < 4){
-			effects += card.effects[i].name + "<br>";
+			
+			effects += gco.cut_to_size(name) + "<br>";
 		}
 		else if( i < 8){
-			effects2 += card.effects[i].name + "<br>";
+			effects2 += gco.cut_to_size(name) + "<br>";
 		}
 		else if(i == 8){
 			effects2 += "+more";
 		}
 	}
-	document.getElementById("card_name_label").innerHTML = card.name;
-	document.getElementById("card_desc_label").innerHTML = card.desc;
+	document.getElementById("card_name_label").innerHTML = gco.cut_to_size(card.name, 150);
+	document.getElementById("card_desc_label").innerHTML = gco.cut_to_size(card.desc, 150);
 	document.getElementById("card_effects_label").innerHTML = effects;
 	document.getElementById("card_effects_label2").innerHTML = effects2;
 	
@@ -1230,18 +1251,20 @@ gco.show_event = function(){ // show the info on the selected event. want to edi
 	var effects = "";
 	var effects2 = "";
 	for(var i  = 0; i < event.effects.length;i++){
+		var name = event.effects[i].name;
 		if(i < 4){
-			effects += event.effects[i].name + "<br>";
+
+			effects += gco.cut_to_size(name) + "<br>";
 		}
 		else if( i < 8){
-			effects2 += event.effects[i].name + "<br>";
+			effects2 += gco.cut_to_size(name) + "<br>";
 		}
 		else if(i == 8){
 			effects2 += "+more";
 		}
 	}
-	document.getElementById("event_name_label").innerHTML = event.name;
-	document.getElementById("event_desc_label").innerHTML = event.desc;
+	document.getElementById("event_name_label").innerHTML = gco.cut_to_size(event.name, 150);
+	document.getElementById("event_desc_label").innerHTML = gco.cut_to_size(event.desc, 150);
 	document.getElementById("event_effects_label").innerHTML = effects;
 	document.getElementById("event_effects_label2").innerHTML = effects2;
 	
@@ -1521,3 +1544,30 @@ gco.set_canvas_listener = function(){
     }, true);//end mouseup listener
 	
 }//end set canvas listener
+
+String.prototype.width = function() {
+	var font = '12px arial',
+			
+		o = $('<div>' + this + '</div>')
+				.css({'position': 'absolute', 'float': 'left', 'white-space': 'nowrap', 'visibility': 'hidden', 'font': font})
+				.appendTo($('body')),
+		w = o.width();
+
+	o.remove();
+
+	return w;
+}
+gco.cut_to_size = function(string, maxwidth){
+	var highestwidth = (maxwidth > 50) ? maxwidth : 50;
+	var stringwidth = string.width();
+	console.log(string + " " + stringwidth);
+	if(stringwidth > highestwidth){
+		
+		console.log(stringwidth + ", " + highestwidth);
+		console.log(((stringwidth - highestwidth)/3));
+		console.log(string.length);
+		string = string.slice(0, parseInt(string.length -((stringwidth - highestwidth)/9)));
+		return gco.cut_to_size(string, maxwidth);
+	}
+	return string;
+}
