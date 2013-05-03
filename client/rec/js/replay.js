@@ -123,7 +123,7 @@ gco.ctx = gco.canvas.getContext("2d");
 */
 
 gco.init_game = function (d) {
-    console.log("Replay state initiated.");
+    console.log("Replay state displayed.");
 	
     gco.players = d.players;
     gco.zones = d.zones;
@@ -133,7 +133,6 @@ gco.init_game = function (d) {
     gco.construct_player_divs(gco.players);
     gco.setup_canvas();
     gco.start_timer(d.timer);
-    //fjern timer??
     gco.draw();
     gco.update_cards();
     gco.update_options([]);
@@ -157,7 +156,8 @@ gco.start_timer = function(dur){
         
         left--;
         if (left === -1) {
-            command('inc_panic', {});
+        //can not send commands in a replay
+        //command('inc_panic', {});
             clearInterval(inter);
         }
     }, 1000);
@@ -714,12 +714,11 @@ gco.draw = function(){
     
 }// end draw
 
-function show_replay () {
+function show_replay() {
     var id_cookie = read_cookie('replay_id');
-	id_cookie = JSON.stringify(id_cookie);
 	$.ajax({
-    	url: 'http://127.0.0.1:8124/show_replay',
-    	data: id_cookie,
+    	url: remote_ip+':8124/show_replay',
+    	data: {replay_id: id_cookie},
     	dataType: "jsonp",
     	jsonpCallback: "start_replay",
     	cache: false,
@@ -740,7 +739,6 @@ function start_replay(d) {
 }
 
 function next_action () {
-	console.log("game states length"+game_states.length);
 	if (actions < game_states.length-1) {
 		actions++;
 		gco.init_game(game_states[actions]);
