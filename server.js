@@ -129,7 +129,7 @@ http.createServer(function (req, res) {
 			res.writeHead(200, {'Content-Type': 'text/plain'});
 			//skal være replay id
 			console.log("cookie: " + req.data);
-			db.get_replay(0, function (result) {
+			db.get_replay(6, function (result) {
 				var replay = [];
 				var temp;
 				for (var i = 0; i < result.length; i++) {
@@ -294,12 +294,6 @@ socket_listener.sockets.on('connection', function (client) {
 				replays.push(JSON.stringify(temp));
 			}
 			res.end('replays('+JSON.stringify(replays)+')');
-		});
-	})
-	
-	client.on('next_command', function (c) {
-		db.get_command(c.replay_id, c.command_id, function(result) {
-			
 		});
 	})
 
