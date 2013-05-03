@@ -498,7 +498,7 @@ ge.prototype.command = function(client, c){
             
     }
 	var stated = state(this);
-	this.emit('save_state' , JSON.stringify(stated));
+	//this.emit('save_state' , JSON.stringify(stated));
     
     //Check for win
     changed.win = this.check_win();
