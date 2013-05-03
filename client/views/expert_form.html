@@ -5,12 +5,12 @@
     <link rel="stylesheet" href="css/styles.css" >
 </head>
 
-<body>
+<body onLoad="gco.init_game();">
 <div class="content-table">
 	
-	<div class="content-row">
-		<div class="content-column">
-		<div class="content-column top-bar clearfix">
+	<div class="expert-row">
+		<div class="expert-column">
+		<div class="expert-column top-bar clearfix">
 			<div id="top_text_expert" class="info-label">
 				Expert interface form
 			</div>
@@ -20,17 +20,18 @@
 	</div>
 	
 
-	<div class="content-row">
+	<div class="expert-row">
 		
 		
-		<div class="content-column">
+		
 			
 			
 			
-			<div class="sidebar-textform">
-				<div class="content-column">
-					<div class="content-row">
-						<div id="1_player_info_label" class="info-label-form"> 
+			<div class="expert-textcell" name="create_effect_textcell">
+			
+				<div class="expert-column">
+					<div class="expert-row">
+						<div id="create_effect_label_form" class="info-label-form"  style='width:240px;'> 
 							Create a new effect:
 							<br>
 							A created effect will be added to 
@@ -42,23 +43,23 @@
 					</div>
 				</div>
 				
-				<div class="content-column">
-					<div class="content-row">
+				<div class="expert-column">
+					<div class="expert-row">
 						
-						<div class="content-row">
-							<div class="content-column">
+						<div class="expert-row">
+							<div class="expert-column">
 								Name:
 							</div>
-							<div class="content-column">
+							<div class="expert-column">
 								<input id="effect_name" type="text" name="something">
 							</div>
 						</div>
-						<div class="content-row">
-							<div class="content-column">
+						<div class="expert-row">
+							<div class="expert-column">
 								Domain:
 							</div>
-							<div class="content-column">
-								<select id="effect_domain" onChange="gco.effect_domain_change()">
+							<div class="expert-column">
+								<select id="effect_domain" onChange="gco.effect_domain_change()" style='width:180px;'>
 									<option value="zone">zone</option>
 									<option value="player">player</option>
 									
@@ -68,12 +69,12 @@
 						</div>
 							
 						
-						<div class="content-row">
-							<div class="content-column">
+						<div class="expert-row">
+							<div class="expert-column">
 								Type:
 							</div>
-							<div id="node_column" class="content-column">
-								<select id="effect_type">
+							<div id="node_column" class="expert-column">
+								<select id="effect_type" style='width:180px;'>
 									<option value="panic">panic</option>
 									
 									
@@ -83,29 +84,34 @@
 						</div>
 						
 					</div>
-					<div class="content-row">
+					<div class="expert-row">
 						<button class="button" id="card_add_effect" onClick="gco.card_create_add_effect()">Add Effect(Card)</button>
 						<button class="button" id="event_add_effect" onClick="gco.event_add_effect()">Add Effect(Event)</button>
 						
 					</div>
 					
 				</div>
-				<div class="content-column">
-					<div class="content-row">
-						<div class="content-row">
-							<div class="content-column">
+				<div class="expert-column">
+					<div class="expert-row">
+						<div class="expert-row">
+							<div class="expert-column">
 								Panic:
 							</div>
-							<div class="content-column">
+							<div class="expert-column">
 								<input id="effect_panic" type="text" name="something">
 							</div>
 						</div>
-						<div class="content-row">
-							<div class="content-column">
+						<div class="expert-row">
+							<div class="expert-column">
 								Affects:
 							</div>
-							<div class="content-column">
-								<input id="effect_affects" type="text" name="something">
+							<div class="expert-column">
+								<select id="effect_affects">
+									<option value="residential">residential</option>
+									<option value="park">park</option>
+									<option value="industry">industry</option>
+									<option value="largecity">largecity</option>
+								</select>
 							</div>
 						</div>
 						
@@ -113,9 +119,13 @@
 				</div>
 				
 			</div>
-			<div class="sidebar-textform">
-				<div class="content-column">
-					<div class="content-row">
+			
+			
+			<div class="expert-row">
+				<div class="expert-column">
+					<div class="expert-textcell" name="create_event_textcell">
+				<div class="expert-column">
+					<div class="expert-row">
 						<div id="event_info_label" class="info-label-form">
 							Create/Edit a Event:
 							
@@ -125,24 +135,24 @@
 					
 				</div>
 				
-				<div class="content-column">
-					<div class="content-row">
+				<div class="expert-column">
+					<div class="expert-row">
 						
-						<div class="content-row">
-							<div class="content-column">
+						<div class="expert-row">
+							<div class="expert-column">
 								Name:
 							</div>
-							<div class="content-column">
-								<input id="event_name" type="text" name="something">
+							<div class="expert-column">
+								<input id="event_name" type="text" name="something" style='width:180px;'>
 							</div>
 						</div>
 							
-						<div class="content-row">
-							<div class="content-column">
+						<div class="expert-row">
+							<div class="expert-column">
 								Desc:
 							</div>
-							<div class="content-column">
-								<input id="event_desc" type="text" name="something">
+							<div class="expert-column">
+								<input id="event_desc" type="text" name="something" style='width:180px;'>
 							</div>
 						</div>
 						
@@ -150,23 +160,23 @@
 						
 						
 					</div>
-					<div class="content-row">
+					<div class="expert-row">
 						<button class="button" onclick="gco.add_event();">Create Event</button>
 						<button class="button" onclick="gco.edit_event();">Edit Event</button>
 						<button class="button" onclick="gco.delete_event();">Delete Event</button>
 					</div>
 					
 				</div>
-				<div class="content-column">
+				<div class="expert-column">
 					
-					<div class="content-row">
+					<div class="expert-row">
 						
 						
-						<div class="content-column">
+						<div class="expert-column">
 							Effect:
 						</div>
-						<div id="node_column" class="content-column">
-							<select id="event_effect">
+						<div class="expert-column">
+							<select id="event_effect" style='width:180px;'>
 								<option value="-1">none added</option>
 								
 							</select>
@@ -174,11 +184,11 @@
 					
 						
 					</div>
-					<div class="content-row">
-						<div class="content-column">
+					<div class="expert-row">
+						<div class="expert-column">
 							
 						</div>
-						<div id="event_show_column" class="content-column">
+						<div id="event_show_column" class="expert-column">
 							
 							<button class="button" id="event_remove_effect" onClick="gco.event_create_remove_effect()">Remove Effect</button>
 						</div>
@@ -186,63 +196,69 @@
 				</div>
 				
 			</div>
-			<div class="sidebar-textform">
-				<div class="content-column">
-					<div class="content-row">
-						<div id="show_event_info_label" class="info-label-form">
-							Show an Event
+				</div>
+			
+				<div class="expert-column">
+					<div class="expert-textcell" name="show_event_textcell">
+						<div class="expert-column">
 							
-						</div>
-						
-					</div>
-					<div class="content-row">
-						<div class="content-column">
-							Show Event:
-						</div>
-						<div class="content-row">
-							<div class="content-column">
-								<select id="event_show" onChange="gco.show_event()">
-									<option value="-1">none added</option>
-									
-								</select>							
+							<div class="expert-row">
+								<div class="expert-column">
+									Show Event:
+								</div>
+								<div class="expert-row">
+									<div class="expert-column">
+										<select id="event_show" onChange="gco.show_event()" style='width:180px;'>
+											<option value="-1">none added</option>
+											
+										</select>							
+									</div>
+								</div>
+								<div class="expert-row">
+									<button class="button" onclick="gco.event_move_to_edit();">Move To Edit</button>
+								</div>
 							</div>
 						</div>
-						<div class="content-row">
-							<button class="button" onclick="gco.event_move_to_edit();">Move To Edit</button>
+						<div class="expert-column">
+							<div class="expert-row">
+								Name:
+								<div id="event_name_label" type="info_label" style='width:180px;'></div>
+								
+							</div>
+							<div class="expert-row">
+								Desc:
+								<div id="event_desc_label" type="info_label" style='width:180px;'></div>
+								
+							</div>
+			
+							
+						</div>
+						<div class="expert-column">
+							
+							Effects:
+							<div id="event_effects_label" type="info_label" style='width:100px;'></div>
+			
+						</div>
+						<div class="expert-column">
+							
+							
+							<div id="event_effects_label2" type="info_label" style='width:100px;'></div>
+
+							
 						</div>
 					</div>
+			
 				</div>
-				<div class="content-column">
-					<div class="content-row">
-						Name:
-						<div id="event_name_label" type="info_label"></div>
-						
-					</div>
-					<div class="content-row">
-						Desc:
-						<div id="event_desc_label" type="info_label"></div>
-						
-					</div>
-	
-					
-				</div>
-				<div class="content-column">
-					
-					Effects:
-					<div id="event_effects_label" type="info_label"></div>
-	
-				</div>
-				<div class="content-column">
-					
-					
-					<div id="event_effects_label2" type="info_label"></div>
-
-					
-				</div>
+				
 			</div>
-			<div class="sidebar-textform">
-				<div class="content-column">
-					<div class="content-row">
+			
+			<div class="expert-row">
+			
+				<div class="expert-column">
+				
+					<div class="expert-textcell" name="create_infocard_textcell">
+				<div class="expert-column">
+					<div class="expert-row">
 						<div id="1_player_info_label" class="info-label-form">
 							Create/Edit a informationcard:
 							
@@ -252,23 +268,23 @@
 					
 				</div>
 				
-				<div class="content-column">
-					<div class="content-row">
+				<div class="expert-column">
+					<div class="expert-row">
 						
-						<div class="content-row">
-							<div class="content-column">
+						<div class="expert-row">
+							<div class="expert-column">
 								Name:
 							</div>
-							<div class="content-column">
+							<div class="expert-column">
 								<input id="card_name" type="text" name="something">
 							</div>
 						</div>
 							
-						<div class="content-row">
-							<div class="content-column">
+						<div class="expert-row">
+							<div class="expert-column">
 								Desc:
 							</div>
-							<div class="content-column">
+							<div class="expert-column">
 								<input id="card_desc" type="text" name="something">
 							</div>
 						</div>
@@ -277,23 +293,23 @@
 						
 						
 					</div>
-					<div class="content-row">
+					<div class="expert-row">
 						<button class="button" onclick="gco.add_info_card();">Create ICard</button>
 						<button class="button" onclick="gco.edit_card();">Edit ICard</button>
 						<button class="button" onclick="gco.delete_card();">Delete ICard</button>
 					</div>
 					
 				</div>
-				<div class="content-column">
+				<div class="expert-column">
 					
-					<div class="content-row">
+					<div class="expert-row">
 						
 						
-						<div class="content-column">
+						<div class="expert-column">
 							Effect:
 						</div>
-						<div id="node_column" class="content-column">
-							<select id="card_effect">
+						<div id="node_column" class="expert-column">
+							<select id="card_effect" style='width:180px;'>
 								<option value="-1">none added</option>
 								
 							</select>
@@ -301,11 +317,11 @@
 					
 						
 					</div>
-					<div class="content-row">
-						<div class="content-column">
+					<div class="expert-row">
+						<div class="expert-column">
 							
 						</div>
-						<div id="card_show_column" class="content-column">
+						<div id="card_show_column" class="expert-column">
 							
 							<button class="button" id="card_remove_effect" onClick="gco.card_create_remove_effect()">Remove Effect</button>
 						</div>
@@ -313,84 +329,87 @@
 				</div>
 				
 			</div>
-			<div class="sidebar-textform">
-				<div class="content-column">
-					<div class="content-row">
-						<div id="1_player_info_label" class="info-label-form">
-							Show an informationcard
+				</div>
+				
+				
+				<div class="expert-column">
+					<div class="expert-textcell" name="show_infocard_textcell">
+				
+						<div class="expert-column">
 							
-						</div>
-						
-					</div>
-					<div class="content-row">
-						<div class="content-column">
-							Show Card:
-						</div>
-						<div class="content-row">
-							<div id="card_show_column" class="content-column">
-								<select id="card_show" onChange="gco.show_card()">
-									<option value="-1">none added</option>
-									
-								</select>							
+							<div class="expert-row">
+								<div class="expert-column">
+									Show Card:
+								</div>
+								<div class="expert-row">
+									<div id="card_show_column" class="expert-column">
+										<select id="card_show" onChange="gco.show_card()" style='width:180px;'>
+											<option value="-1">none added</option>
+											
+										</select>							
+									</div>
+								</div>
+								<div class="expert-row">
+									<button class="button" onclick="gco.card_move_to_edit();">Move To Edit</button>
+								</div>
 							</div>
 						</div>
-						<div class="content-row">
-							<button class="button" onclick="gco.card_move_to_edit();">Move To Edit</button>
+						<div class="expert-column">
+							<div class="expert-row">
+								Name:
+								<div id="card_name_label" type="info_label" style='width:180px;'></div>
+								
+							</div>
+							<div class="expert-row">
+								Desc:
+								<div id="card_desc_label" type="info_label" style='width:180px;'></div>
+								
+							</div>
+							
+							
+							
+						</div>
+						<div class="expert-column">
+							
+							Effects:
+							<div id="card_effects_label" type="info_label" style='width:100px;'></div>
+							
+							
+							
+							
+							
+						</div>
+						<div class="expert-column">
+							
+							
+							<div id="card_effects_label2" type="info_label" style='width:100px;'></div>
+							
+							
+							
+							
+							
 						</div>
 					</div>
-				</div>
-				<div class="content-column">
-					<div class="content-row">
-						Name:
-						<div id="card_name_label" type="info_label"></div>
-						
-					</div>
-					<div class="content-row">
-						Desc:
-						<div id="card_desc_label" type="info_label"></div>
-						
-					</div>
-					
-					
-					
-				</div>
-				<div class="content-column">
-					
-					Effects:
-					<div id="card_effects_label" type="info_label"></div>
-					
-					
-					
-					
-					
-				</div>
-				<div class="content-column">
-					
-					
-					<div id="card_effects_label2" type="info_label"></div>
-					
-					
-					
-					
-					
+			
 				</div>
 			</div>
-			<div class="sidebar-textform">
-				<div class="content-column">
-					<div class="content-row">
+			
+			<div class="expert-textcell" name="create_player_textcell">
+				<div class="expert-column">
+					<div class="expert-row">
 						<div id="1_player_info_label" class="info-label-form"> Create a new player:<br>if nothing typed it will be set to a default value</div>
 						
 					</div>
 				</div>
 				
-				<div class="content-column">
-					<div class="content-row">
+				<div class="expert-column">
+					<div class="expert-row">
 						
-						<div class="content-row">
-							<div class="content-column">
+						<div class="expert-row">
+							<div class="expert-column">
 								Role:
 							</div>
-							<div id="player_role_column" class="content-column">
+							<div id="player_role_column" class="expert-column">
 								<select id="player_role">
 									<option value="coordinator">coordinator</option>
 									<option value="crowd manager">crowd manager</option>
@@ -404,11 +423,11 @@
 						</div>
 							
 						
-						<div class="content-row">
-							<div class="content-column">
+						<div class="expert-row">
+							<div class="expert-column">
 								Startnode:
 							</div>
-							<div id="node_column" class="content-column">
+							<div id="node_column" class="expert-column">
 								<select id="player_node">
 									<option value="-1">none added</option>
 									
@@ -417,7 +436,7 @@
 						</div>
 						
 					</div>
-					<div class="content-row">
+					<div class="expert-row">
 						<button class="button" onclick="gco.add_player();">Add Player</button>
 						<button class="button" onclick="gco.change_player();">Change selected player</button>
 						<button class="button" onclick="gco.del_selected_player();">Delete Player</button>
@@ -427,9 +446,9 @@
 			</div>
 			
 			
-			<div class="sidebar-textform">
-				<div class="content-column">
-					<div class="content-row">
+			<div class="expert-textcell" name="edit_zone_textcell">
+				<div class="expert-column">
+					<div class="expert-row">
 						<div id="1_player_info_label" class="info-label-form"> 
 							Zone changing:
 							<br>
@@ -439,24 +458,24 @@
 					</div>
 				</div>
 				
-				<div class="content-column">
-					<div class="content-row">
+				<div class="expert-column">
+					<div class="expert-row">
 						
-						<div class="content-row">
-							<div class="content-column">
+						<div class="expert-row">
+							<div class="expert-column">
 								Name:
 							</div>
-							<div class="content-column">
+							<div class="expert-column">
 								<div id="zone_id" type="info_label">no zone selected</div>
 							</div>
 						</div>
 							
 						
-						<div class="content-row">
-							<div class="content-column">
+						<div class="expert-row">
+							<div class="expert-column">
 								Type:
 							</div>
-							<div id="content_column" class="content-column">
+							<div id="content_column" class="expert-column">
 								<select id="edit_zone_type">
 									<option value="residential">residential</option>
 									<option value="industry">industry</option>
@@ -467,33 +486,33 @@
 							</div>
 						</div>
 						
-						<div class="content-row">
-							<div class="content-column">
+						<div class="expert-row">
+							<div class="expert-column">
 								People:
 							</div>
-							<div id="content_column" class="content-column">
+							<div id="content_column" class="expert-column">
 								<input type="text" id="zone_people" value="0">
 							</div>
 						</div>
-						<div class="content-row">
-							<div class="content-column">
+						<div class="expert-row">
+							<div class="expert-column">
 								Panic:
 							</div>
-							<div id="content_column" class="content-column">
+							<div id="content_column" class="expert-column">
 								<input type="text" id="zone_panic" value="0">
 							</div>
 						</div>
 					</div>
-					<div class="content-row">
+					<div class="expert-row">
 						<button class="button" onclick="gco.edit_zone();">Change</button>
 					</div>
 					
 				</div>
 			</div>
 			
-			<div class="sidebar-textform">
-				<div class="content-column">
-					<div class="content-row">
+			<div class="expert-textcell" name="misc_info_textcell">
+				<div class="expert-column">
+					<div class="expert-row">
 						<div id="show_event_info_label" class="info-label-form">
 							Misc info about the Template
 							
@@ -502,13 +521,13 @@
 					</div>
 					
 				</div>
-				<div class="content-column">
-					<div class="content-row">
+				<div class="expert-column">
+					<div class="expert-row">
 						
 						Author:
 						<input id="template_author" type="text">
 					</div>
-					<div class="content-row">
+					<div class="expert-row">
 						Map Description: 
 						<input id="template_desc" type="text">
 						
@@ -516,14 +535,14 @@
 	
 					
 				</div>
-				<div class="content-column">
+				<div class="expert-column">
 					
-					<div class="content-row">
+					<div class="expert-row">
 						
 						Turns before events:
 						<input id="template_event_step" type="text">
 					</div>
-					<div class="content-row">
+					<div class="expert-row">
 						Time before panic inc: 
 						<input id="template_timestep" type="text">
 						
@@ -531,7 +550,7 @@
 					
 	
 				</div>
-				<div class="content-column">
+				<div class="expert-column">
 					
 					
 					<div id="event_effects_label2" type="info_label"></div>
@@ -543,23 +562,25 @@
 		
 			
 			
-		</div>
+		
+		
+		
 	</div>
 
 
-	<div class="content-row">
+	<div class="expert-row">
 		<button class="button" onclick="gco.export_to_database();">Export To Database</button>
 	</div>
-	<div class="content-row">
-		<button class="button" onclick="gco.init_game();">Start!</button>
-		<button class="button" onclick="gco.del_selected_node();">Delete node</button>
-		<button class="button" onclick="gco.node_connection();">Start node connection</button>
-		<button class="button" onclick="gco.add_zone_nodes();">Add zone node</button>
+	<div class="expert-row">
+		
+		<button class="button" onclick="gco.del_selected_node();">Delete node (D)</button>
+		<button class="button" onclick="gco.node_connection();">Start node connection (C)</button>
+		<button class="button" onclick="gco.add_zone_nodes();">Add zone node (A)</button>
 		<button class="button" onclick="gco.clear_zone_nodes();">Clear zone nodes</button>
-		<button class="button" onclick="gco.create_zone();">Create zone</button>
-		<button class="button" onclick="gco.del_selected_zone();">Delete zone</button>
+		<button class="button" onclick="gco.create_zone();">Create zone (Z)</button>
+		<button class="button" onclick="gco.del_selected_zone();">Delete zone (D)</button>
 	</div>
-	<div class="content-row">
+	<div class="expert-row">
 		<canvas id="viewport">
 			<p>Your browser is terrible</p>
 			<p>Get a good one here:</p>

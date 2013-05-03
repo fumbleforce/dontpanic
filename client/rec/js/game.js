@@ -107,6 +107,7 @@ gco.ctx = gco.canvas.getContext("2d");
     Object map      The map object containing list of Zones and Nodes
 */
 gco.init_game = function (d) {
+	
     console.log("Game initiated.");
     set_lang(read_cookie("chosen_lang"));
     gco.players = d.players;

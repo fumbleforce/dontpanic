@@ -70,6 +70,29 @@ p
     width:33%;
     vertical-align:top;
 }
+.expert-column
+{
+	display:table-cell;
+    height:auto;
+    width:50%;
+    vertical-align:top;
+}
+.expert-row
+{
+	display:table-row;
+    width:1500px;
+    height:auto;
+}
+.expert-textcell
+{
+	background:grey;
+    width:730px;
+    height: 100px;
+    right:0px;
+    margin-bottom:30px;
+    padding:10px;
+    border-radius:30px;
+}
 #selection
 {
 	width:60%;
