@@ -609,7 +609,7 @@ ge.prototype.check_lose = function(){
 	var zones = this.map.zones;
 	console.log("Checking lose..");
 	for(var i = 0; i < zones.length; i++){
-		console.log("Zone "+i+": "+zones[i].panic);
+		console.log("Zone "+i+": "+zones[i].panic_level);
 		if(zones[i].panic_level < 50){
 			return false;
 		}

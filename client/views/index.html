@@ -41,10 +41,10 @@ autostart="true" />
     <div class="content-row">
     	<div class="content-column"></div>
         <div class="content-column" id="maindiv">
-			<button class="indexbtn" onclick="play()">Play</button>
-       		<a href="/expert" ><button class="indexbtn">Expert Interface</button></a>
-       		<button onclick="game_manager()" class="indexbtn">Game Master</button>
-       		<button class="indexbtn" onclick="replay()" >Replay</button>
+			<button id="play-btn" class="indexbtn" onclick="play()">Play</button>
+       		<a href="/expert" ><button id="expert-btn" class="indexbtn">Expert Interface</button></a>
+       		<button onclick="game_manager()" id="gm-btn" class="indexbtn">Game Master</button>
+       		<button class="indexbtn" id="replay-btn" onclick="replay()" >Replay</button>
         </div>
         <div class="content-column"></div>
        
@@ -61,6 +61,7 @@ autostart="true" />
 
 <footer>A game by Group 10</footer>
 
+<script src="/js/lang.js"></script>
 <script src="/js/conf.js"></script>
 <script src="/js/cookies.js"></script>
 <script src="/js/jquery-1.9.1.min.js"></script>

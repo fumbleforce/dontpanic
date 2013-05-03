@@ -190,7 +190,12 @@ function selected_game(id){
 
 
 
-
+$(function(){
+	$("#play-btn").html(speak("play"));
+	$("#expert-btn").html(speak("expert-interface"));
+	$("#gm-btn").html(speak("game-master"));
+	$("#replay-btn").html(speak("replay"));
+});
 
 
 
