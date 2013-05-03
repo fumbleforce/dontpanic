@@ -15,22 +15,17 @@
     <div class="content-row top-bar-row">
         <div class="content-column">
 		</div>
-        <div class="content-column top-bar clearfix"></div>
+        <div class="content-column top-bar clearfix">
 			<div class="top-bar-info">
 			
 				<div id="player-turn-label" class="info-label">Player 0's turn</div>
 		        <div id="turn-label" class="info-label">Turn: 0</div>
 		        <div id="action-label" class="info-label">Action points left: 4</div>
 		        <div id="timer-label" class="info-label">Panic Increase in: 00</div>
-		        <button onclick="previous_action()">Previous action</button>
-		    	<button onclick="next_action()">Next action</button>
 			</div>
-    	<div class="margin-row">
-    	</div>
-    	
-    	
-        <div class="information-row" clearfix">		   
-			
+			<div class="information-row" clearfix">		   
+			   <button class="btn-end-turn" onclick="previous_action()">Previous action</button>
+				<button class="btn-end-turn" onclick="next_action()">Next action</button>
 				<div class="information-row clearfix">
 				
 					<div id="selection" class="info-container">
@@ -41,6 +36,16 @@
         </div>
         <div id="event-column" class="content-column"></div>
     </div>
+			</div>
+		     <div class="content-column">
+		     
+			</div>
+			
+    	<div class="margin-row">
+    	</div>
+    	
+    	
+        
 	<div class="content-row">
 		<div class="margin-row"></div>
 	</div>
