@@ -156,17 +156,18 @@ var lang = {
 
 
 
-var speak = function(label){
+function speak(label){
 	var w = lang[chosen_lang][label];
 	if (!w || w === 'undefined' || w === undefined) {
 		w = lang['en'][label];
 		if (!w || w === 'undefined' || w === undefined) {
 			return "Label not defined";
+		}
 	}
 	return w;
 }
 
-var set_lang = function(l){
+function set_lang(l){
 	if(supported_lang.indexOf(l) === -1){
 		chosen_lang = 'en';
 	}
