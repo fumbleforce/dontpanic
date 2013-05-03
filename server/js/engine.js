@@ -271,7 +271,6 @@ ge.prototype.command = function(client, c){
   			var z = zones[c.zone_id],
   				options = [],
   				p = players[this.active_player];
-  				
   			if(z.can_move_people_from(p, 5)) {
 				options.push('people');
   			}
@@ -304,13 +303,16 @@ ge.prototype.command = function(client, c){
 			
 		case 'move_people':
 			// TODO: find out how many people we can move, driver can move 10, regulars can only move 5
-			console.log("Trying to move people from zone: " + c.zone_from+
+			var movePeople = 5;
+			if (players[this.active_player].role=="driver"){
+				movePeople = 10;}
+			console.log([players[this.active_player]].role+" is trying to move "+movePeople+" people from zone: " + c.zone_from+
 				"to zone: " + c.zone_to);
 			//see if roads are blocked or not
 			for (var i = 0; i < zones[c.zone_from].nodes.length; i++){
 				//if one node is unblocked, can move people
 				if (zones[c.zone_to].nodes.indexOf(zones[c.zone_from].nodes[i])>-1&&(!nodes[zones[c.zone_from].nodes[i]].has_road_block)){
-					if (zones[c.zone_from].move_people(players[this.active_player], zones[c.zone_to], 5)) {
+					if (zones[c.zone_from].move_people(players[this.active_player], zones[c.zone_to], movePeople)) {
 						changed.zones=[zones[c.zone_to], zones[c.zone_from]];
 						changed.players = [players[this.active_player]];
 						break;
@@ -496,7 +498,7 @@ ge.prototype.command = function(client, c){
             
     }
 	var stated = state(this);
-	this.emit('save_state' , JSON.stringify(stated));
+	//this.emit('save_state' , JSON.stringify(stated));
     
     //Check for win
     changed.win = this.check_win();
@@ -1013,17 +1015,19 @@ ge.Node.prototype.can_add_road_block = function (player, players) {
 	    return false;
 	}
 	
-	var another_player = false;
-	for (var i = 0; i < players.length; i++) {
-		if ((players[i].node===player.node)&&(!(i===player.id))) {
-			another_player = true;
+	if (!(player.role=='operation expert')){
+		var another_player = false;
+		for (var i = 0; i < players.length; i++) {
+			if ((players[i].node===player.node)&&(!(i===player.id))) {
+				another_player = true;
+			}
+		}
+		if (!another_player){
+			console.log("Player "+player+" failed to add road block, no other players on node!");
+			return false
 		}
 	}
-	if (!another_player){
-		console.log("Player "+player+" failed to add road block, no other players on node!");
-		return false
-	}
-	
+
 	if(player.can_update_actions(-1) ){
 		console.log("True");
 		return true;
@@ -1048,16 +1052,19 @@ ge.Node.prototype.can_remove_road_block = function (player, players) {
 	    return false;
 	}
 	
-	var another_player = false;
-	for (var i = 0; i < players.length; i++) {
-		if ((players[i].node===player.node)&&(!(i===player.id))) {
-			another_player = true;
+	if (!(player.role=='operation expert')){
+		var another_player = false;
+		for (var i = 0; i < players.length; i++) {
+			if ((players[i].node===player.node)&&(!(i===player.id))) {
+				another_player = true;
+			}
+		}
+		if (!another_player){
+			console.log("No other players on node");
+			return false
 		}
 	}
-	if (!another_player){
-		console.log("No other players on node");
-		return false
-	}
+
 	if(player.can_update_actions(-1) ){
 		console.log("Can remove road block");
 		return true;
@@ -1168,10 +1175,10 @@ ge.Zone.prototype.can_dec_panic = function(player, node) {
 
 
 ge.Zone.prototype.move_people = function (p, to_zone, num) {
-	var able = this.can_move_people(p, to_zone, num);
-	if(able){
-		this.people -= num;
-		to_zone.people += num;
+	var peopleMoved = this.can_move_people(p, to_zone, num);
+	if(peopleMoved==5||peopleMoved==10){
+		this.people -= peopleMoved;
+		to_zone.people += peopleMoved;
 		p.update_actions(-1);
 		return true;
 	}
@@ -1179,36 +1186,16 @@ ge.Zone.prototype.move_people = function (p, to_zone, num) {
 }
 ge.Zone.prototype.can_move_people = function (p, to_zone, num) {
 	console.log("Can move people?");
+	//if driver wants to move 5, but there is only 5, change driver's move-variable to 5
+	if (this.people==5)
+		num=5;
 	if (this.people >= num){
-	if(this.adjacent_zones.indexOf(to_zone.id)>=0 ){
-	if(p.can_update_actions(-1)) {
-	console.log("True");
-	return true;
-	}
-
-	}
-	else{
-	console.log("Not an adjacent zone");
-	}
-	}
-	else {
-	console.log("There isnt that many people in this zone");
-	}
-	return false;
-	console.log("Can move people?");
-	if (this.people >= num){
+		//player can only move to adjacent zones
 		if(this.adjacent_zones.indexOf(to_zone.id)>=0 ){
-				//1. find common nodes
-			console.log("IN? "+this.nodes.length);
-			for (var i = 0; i < this.nodes.length; i++){
-				console.log("IN!");
-				console.log(ge.Map.zones[to_zone].nodes.indexOf(this.nodes[i].id));
-				if (ge.zones[to_zone].nodes.indexOf(this.nodes[i])>-1&&(!this.nodes[i].isBlocked)){
-					return true;
-					//commonNodes.push(this.nodes[i]);
-				}
+			if(p.can_update_actions(-1)) {
+				console.log("True");
+				return num;
 			}
-			console.log("Blocked!");
 
 		}
 		else{
@@ -1216,13 +1203,39 @@ ge.Zone.prototype.can_move_people = function (p, to_zone, num) {
 		}
 	}
 	else {
-		//error 
 		console.log("There isnt that many people in this zone");
 	}
-	return false;
+	return 0;
+//	console.log("Can move people?");
+//	if (this.people >= num){
+//		if(this.adjacent_zones.indexOf(to_zone.id)>=0 ){
+//			//1. find common nodes
+//			console.log("IN? "+this.nodes.length);
+//			for (var i = 0; i < this.nodes.length; i++){
+//				console.log("IN!");
+//				console.log(ge.Map.zones[to_zone].nodes.indexOf(this.nodes[i].id));
+//				if (ge.zones[to_zone].nodes.indexOf(this.nodes[i])>-1&&(!this.nodes[i].isBlocked)){
+//					return true;
+//					//commonNodes.push(this.nodes[i]);
+//				}
+//			}
+//			console.log("Blocked!");
+//
+//		}
+//		else{
+//			console.log("Not an adjacent zone");
+//		}
+//	}
+//	else {
+//		//error 
+//		console.log("There isnt that many people in this zone");
+//	}
+//	return false;
 }
 ge.Zone.prototype.can_move_people_from = function (p, num){
 	console.log("Can move from this zone?");
+	if (this.people==5)
+		num=5;
 	if (this.people >= num){
 		if(this.nodes.indexOf(p.node)>=0 ){
 			if(p.can_update_actions(-1)) {
