@@ -81,7 +81,7 @@ http.createServer(function (req, res) {
 		req.on("data", function(data) {
 			var datainfo = JSON.parse(data);
 		
-			console.log(JSON.parse(data.toString()));
+
 			if(datainfo.type == 'state'){
 				console.log("state");
 				console.log("replay id: " + datainfo.replay_id);
@@ -271,6 +271,7 @@ socket_listener.sockets.on('connection', function (client) {
     client.on('leave_game', function(c) {
         console.log('**SOCKET_LISTENER** received leave command ' + c);
         //TODO Save game replay
+        games[client.game_id].delete_game();
         delete games[client.game_id];
     });
     
@@ -279,7 +280,11 @@ socket_listener.sockets.on('connection', function (client) {
         console.log('**SOCKET_LISTENER** Received:');
         var parsed = JSON.parse(c);
         
-        if(client.game_id) games[client.game_id].command(client, parsed);
+        if(client.game_id){
+        	var g = games[client.game_id];
+		    g.command(client, parsed);
+		    db.set_replay(g.replay_id, g.command_id, JSON.stringify(g.state()));
+		}
     });
 	
 	client.on('replay', function (c) {

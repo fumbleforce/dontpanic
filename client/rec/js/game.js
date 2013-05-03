@@ -108,6 +108,7 @@ gco.ctx = gco.canvas.getContext("2d");
 */
 gco.init_game = function (d) {
     console.log("Game initiated.");
+    set_lang(read_cookie("chosen_lang"));
     gco.players = d.players;
     gco.zones = d.zones;
     gco.nodes = d.nodes;
@@ -115,13 +116,11 @@ gco.init_game = function (d) {
     gco.active_player = d.active_player;
     gco.construct_player_divs(gco.players);
     gco.setup_canvas();
-    gco.set_canvas_listener();
-
-    
+    gco.set_canvas_listener();    
     gco.draw();
     gco.update_cards();
     gco.update_options([]);
-    gco.translate_labels();
+    translate_page();
 
 }
 
@@ -141,8 +140,8 @@ gco.update_timer = function(time){
 	if (time===10){
 	countdown.play();
 	}
-	var $lab = $("timer-label");
-    $lab.html(speak("timer-label")+time);
+	
+    $("#timer-label").html(speak("timer-label")+time);
 }
 
 
@@ -175,12 +174,12 @@ gco.construct_player_divs = function(players){
 		lim2 = 0;
 	}
 	for(i = 0; i<lim1; i++){
-		inner += "<div id='p"+i+"' class='sidebar-player'><h2>Player "+i+"</h2><br><div class='player-info'><p>"+ [players[i].role] +"</p><div id='"+i+"_text' class='role-info-label'>"+ speak("role_desc")[players[i].role] +"</div></div><div id='"+i+"_cards' class='card-container'></div></div>";
+		inner += "<div id='p"+i+"' class='sidebar-player'><h2>"+speak("player")+i+"</h2><br><div class='player-info'><p>"+ speak("role_name")[players[i].role] +"</p><div id='"+i+"_text' class='role-info-label'>"+ speak("role_desc")[players[i].role] +"</div></div><div id='"+i+"_cards' class='card-container'></div></div>";
 	}
 	$l.html(inner);
 	inner = '';
 	for(i=lim1; i<lim2; i++){
-		inner += "<div id='p"+i+"' class='sidebar-player'><h2>Player "+i+"</h2><br><div class='player-info'><p>"+ [players[i].role] +"</p><div id='"+i+"_text' class='role-info-label'>"+ speak("role_desc")[players[i].role] +"</div></div><div id='"+i+"_cards' class='card-container'></div></div>";
+		inner += "<div id='p"+i+"' class='sidebar-player'><h2>"+speak("player")+i+"</h2><br><div class='player-info'><p>"+ speak("role_name")[players[i].role] +"</p><div id='"+i+"_text' class='role-info-label'>"+ speak("role_desc")[players[i].role] +"</div></div><div id='"+i+"_cards' class='card-container'></div></div>";
 	}
 	$r.html(inner);
 }
@@ -705,7 +704,7 @@ gco.draw = function(){
     if(players.length > 1){
         $("#turn-label").html(speak("turn-label")+(gco.turn)); 
         $("#player-turn-label").html(speak("player-turn-label")[0]+(gco.active_player)+"'"+speak("player-turn-label")[1]);
-        $("#action-label").html(speak("action label")+(players[gco.active_player].actions_left)); 
+        $("#action-label").html(speak("action-label")+(players[gco.active_player].actions_left)); 
     } 
     
 }// end draw
@@ -854,10 +853,9 @@ gco.set_canvas_listener = function(){
 
 
 
-gco.translate_labels = function(){
-	$("#end-game-label").html(speak("end-game-label");
-
-
+var translate_page = function(){
+	$("#end-game-label").html(speak("end-game-label"));
+	$("footer").html(speak("footer"));
 }
 
 

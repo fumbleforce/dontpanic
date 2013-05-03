@@ -111,7 +111,7 @@ function replays(d){
 		$("#maindiv").html(cont);
 	}
 	else{
-		alert("No replays are available!");
+		alert(speak("no-avail-replay"));
 	}
 }
 
@@ -154,7 +154,7 @@ function game_master(d){
 			
 			console.log("Room parsed:");
 			console.log(t);
-			desc = t.desc ? t.desc : "Default template";
+			desc = t.desc ? t.desc : speak("default-template");
 
 			cont += "<a href='"+remote_ip+":8008/game/' onclick='selected_game("+t.id+")'><div class='template-entry clearfix'>";
 			cont += "<div class='template-info'>"+ t.id + "</div>";	
@@ -178,7 +178,7 @@ function game_master(d){
 		$("#maindiv").html(cont);
 	}*/
 	else{
-		alert("No rooms are active!");
+		alert(speak("no-active-rooms"));
 	}
 
 
@@ -190,13 +190,15 @@ function selected_game(id){
 
 
 
-$(function(){
+function translate_page(){
 	$("#play-btn").html(speak("play"));
 	$("#expert-btn").html(speak("expert-interface"));
 	$("#gm-btn").html(speak("game-master"));
 	$("#replay-btn").html(speak("replay"));
-});
-
+	$("footer").html(speak("footer"));
+	$("#title-text").html(speak("title"));
+}
+translate_page();
 
 
 

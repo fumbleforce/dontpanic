@@ -21,7 +21,10 @@ type="audio/mpeg"
 autostart="true" />
     </div>
 
-
+<div style="position:absolute; top:0;left:0;width:auto;height:auto;">
+<button class="btn" onclick="set_lang('en');translate_page();">English</button>
+<button class="btn" onclick="set_lang('no');translate_page()">Norwegian</button>
+</div>
 
 
 <div class="content-table">
@@ -32,7 +35,7 @@ autostart="true" />
     
     <div class="title-row content-row">
         <div class="content-column"></div>
-        <div class="content-column title-text">
+        <div id="title-text" class="content-column title-text">
             DON'T PANIC
         </div>
         <div class="content-column"></div>

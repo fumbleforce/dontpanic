@@ -16,6 +16,13 @@
 			type="audio/mpeg"
 			autostart="true" />
 			</div>
+			
+<div style="position:absolute; top:0;left:0;width:auto;height:auto;">
+<button class="btn" onclick="set_lang('en');translate_page();">English</button>
+<button class="btn" onclick="set_lang('no');translate_page()">Norwegian</button>
+</div>
+
+
 <div class="content-table">
     <div class="content-row">
         <div class="margin-row"></div>
@@ -23,16 +30,16 @@
     
     <div class="content-row top-bar-row">
         <div class="content-column">
-        	<a href="/"><button id="end-game-label" class="btn" onclick="end_game()">End Game</button></a>
+        	<a href="/"><button id="end-game-label" class="btn" onclick="end_game()"></button></a>
 		</div>
 		
         <div class="content-column top-bar clearfix">
         	<div class="top-bar-info">
 		        
-		        <div id="player-turn-label" class="info-label">Player 0's turn</div>
-		        <div id="turn-label" class="info-label">Turn: 0</div>
-		        <div id="action-label" class="info-label">Action points left: 4</div>
-		        <div id="timer-label" class="info-label">Panic Increase in: 00</div>
+		        <div id="player-turn-label" class="info-label"></div>
+		        <div id="turn-label" class="info-label"></div>
+		        <div id="action-label" class="info-label"></div>
+		        <div id="timer-label" class="info-label"></div>
             </div>
             <div class="margin-row">
             	

@@ -87,6 +87,7 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
 	this.turnsSinceEvent = 0;
 	this.eventblocked = false;
 	this.started=false;
+	this.ended=false;
 	
 	//Local
 	var SCALE= 90;
@@ -232,6 +233,9 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
 */
 ge.prototype.command = function(client, c){
 	this.command_id++;
+	
+	if(this.ended) return;
+	
     var nodes = this.map.nodes,
 		zones = this.map.zones,
         players = this.players,
@@ -495,14 +499,13 @@ ge.prototype.command = function(client, c){
         console.log("No matching command types");
             
     }
-	var stated = state(this);
-	this.emit('save_state' , JSON.stringify(stated));
-    
+
     //Check for win
     changed.win = this.check_win();
     
     //Check for lose
     changed.lose = this.check_lose();
+    if(changed.lose || changed.win) this.ended = true;
     
     if(changed.players || changed.nodes || changed.zones || changed.turn || changed.event || changed.win || changed.lose){
         changed.none = false;
@@ -552,6 +555,9 @@ ge.prototype.save_state = function(client, c) {
 }
 
 ge.prototype.delete_game = function(client, c) {
+	this.ended = true;
+	this.stop_timer();
+	delete this;
 }
 
 ge.prototype.join_game = function(client) {
@@ -570,6 +576,20 @@ ge.prototype.emit = function(type, o){
 	}
 }
 
+ge.prototype.state = function(){
+	var g = this;
+    return {
+        type : 'state',
+		replay_id : g.replay_id,
+		command_id : g.command_id,
+        zones : g.map.zones,
+        nodes : g.map.nodes,
+        players : g.players,
+        turn : g.turn,
+        timer : g.timer,
+        active_player : g.active_player
+    };
+}
 
 
 
@@ -590,6 +610,7 @@ ge.prototype.start_timer = function() {
 	var that = this;
     that.timer = that.timer_dur;
     
+    if(!this.ended){
     var inter = setInterval(function(){
         
         that.timer--;
@@ -597,10 +618,15 @@ ge.prototype.start_timer = function() {
             that.command("", {type:'inc_panic'});
             clearInterval(inter);
         }
+        
         that.emit('change', JSON.stringify({timer:that.timer}));
     }, 1000);
-    
-    
+    }
+}
+
+ge.prototype.stop_timer = function(){
+	clearInterval(this.inter);
+
 }
 
 
