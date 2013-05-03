@@ -1013,17 +1013,19 @@ ge.Node.prototype.can_add_road_block = function (player, players) {
 	    return false;
 	}
 	
-	var another_player = false;
-	for (var i = 0; i < players.length; i++) {
-		if ((players[i].node===player.node)&&(!(i===player.id))) {
-			another_player = true;
+	if (!(player.role=='operation expert')){
+		var another_player = false;
+		for (var i = 0; i < players.length; i++) {
+			if ((players[i].node===player.node)&&(!(i===player.id))) {
+				another_player = true;
+			}
+		}
+		if (!another_player){
+			console.log("Player "+player+" failed to add road block, no other players on node!");
+			return false
 		}
 	}
-	if (!another_player){
-		console.log("Player "+player+" failed to add road block, no other players on node!");
-		return false
-	}
-	
+
 	if(player.can_update_actions(-1) ){
 		console.log("True");
 		return true;
@@ -1048,16 +1050,19 @@ ge.Node.prototype.can_remove_road_block = function (player, players) {
 	    return false;
 	}
 	
-	var another_player = false;
-	for (var i = 0; i < players.length; i++) {
-		if ((players[i].node===player.node)&&(!(i===player.id))) {
-			another_player = true;
+	if (!(player.role=='operation expert')){
+		var another_player = false;
+		for (var i = 0; i < players.length; i++) {
+			if ((players[i].node===player.node)&&(!(i===player.id))) {
+				another_player = true;
+			}
+		}
+		if (!another_player){
+			console.log("No other players on node");
+			return false
 		}
 	}
-	if (!another_player){
-		console.log("No other players on node");
-		return false
-	}
+
 	if(player.can_update_actions(-1) ){
 		console.log("Can remove road block");
 		return true;
@@ -1180,35 +1185,11 @@ ge.Zone.prototype.move_people = function (p, to_zone, num) {
 ge.Zone.prototype.can_move_people = function (p, to_zone, num) {
 	console.log("Can move people?");
 	if (this.people >= num){
-	if(this.adjacent_zones.indexOf(to_zone.id)>=0 ){
-	if(p.can_update_actions(-1)) {
-	console.log("True");
-	return true;
-	}
-
-	}
-	else{
-	console.log("Not an adjacent zone");
-	}
-	}
-	else {
-	console.log("There isnt that many people in this zone");
-	}
-	return false;
-	console.log("Can move people?");
-	if (this.people >= num){
 		if(this.adjacent_zones.indexOf(to_zone.id)>=0 ){
-				//1. find common nodes
-			console.log("IN? "+this.nodes.length);
-			for (var i = 0; i < this.nodes.length; i++){
-				console.log("IN!");
-				console.log(ge.Map.zones[to_zone].nodes.indexOf(this.nodes[i].id));
-				if (ge.zones[to_zone].nodes.indexOf(this.nodes[i])>-1&&(!this.nodes[i].isBlocked)){
-					return true;
-					//commonNodes.push(this.nodes[i]);
-				}
+			if(p.can_update_actions(-1)) {
+				console.log("True");
+				return true;
 			}
-			console.log("Blocked!");
 
 		}
 		else{
@@ -1216,9 +1197,33 @@ ge.Zone.prototype.can_move_people = function (p, to_zone, num) {
 		}
 	}
 	else {
-		//error 
 		console.log("There isnt that many people in this zone");
 	}
+	return false;
+//	console.log("Can move people?");
+//	if (this.people >= num){
+//		if(this.adjacent_zones.indexOf(to_zone.id)>=0 ){
+//			//1. find common nodes
+//			console.log("IN? "+this.nodes.length);
+//			for (var i = 0; i < this.nodes.length; i++){
+//				console.log("IN!");
+//				console.log(ge.Map.zones[to_zone].nodes.indexOf(this.nodes[i].id));
+//				if (ge.zones[to_zone].nodes.indexOf(this.nodes[i])>-1&&(!this.nodes[i].isBlocked)){
+//					return true;
+//					//commonNodes.push(this.nodes[i]);
+//				}
+//			}
+//			console.log("Blocked!");
+//
+//		}
+//		else{
+//			console.log("Not an adjacent zone");
+//		}
+//	}
+//	else {
+//		//error 
+//		console.log("There isnt that many people in this zone");
+//	}
 	return false;
 }
 ge.Zone.prototype.can_move_people_from = function (p, num){
