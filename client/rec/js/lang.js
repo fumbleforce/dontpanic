@@ -28,15 +28,11 @@ var lang = {
 		
 		// Game related
 		'role_desc' : {
-			'coordinator':'info',
-			'passer by':'info',
-			'crowd manager':'info',
-			'operation expert':'info',
-			'driver':'info',
+			'crowd manager':'The Crowd Manager can decrease panic by 10 instead of 5',
+			'operation expert':'The Operation Expert can build and remove roadblocks alone',
+			'driver':'The Driver can move 10 people between zones instead of 5',
 		},
 		'role_name' : {
-			'coordinator':'Coordinator',
-			'passer by':'Passer By',
 			'crowd manager':'Crowd Manager',
 			'operation expert':'Operation Expert',
 			'driver':'Driver',

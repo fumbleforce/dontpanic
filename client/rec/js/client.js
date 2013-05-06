@@ -73,7 +73,6 @@ socket.on('change', function (data) {
         gco.update_nodes(d.nodes);
     }
     if (d.timer) {
-    	console.log("Updating timer: "+d.timer);
         gco.update_timer(d.timer);
     }
     if (d.turn) {
@@ -98,7 +97,7 @@ socket.on('change', function (data) {
     }
     if (d.lose) {
     	console.log("LOST");
-    	window.alert("You lost the game! Replay is saved to database.");
+    	//window.alert("You lost the game! Replay is saved to database.");
     	//Save to database
     }
     gco.draw();
