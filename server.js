@@ -13,13 +13,13 @@ var http		= require('http'),
     uuid        = require('node-uuid'),
     db			= require('./database.js');
 
- 	 /* Configuration of express server:
-    
-    Makes the ejs module handle all html files.
-    Sets port to 8008.
-    Directs all view-requests to the views folder.
-    All static files are served from the rec folder
-	*/
+ /* Configuration of express server:
+
+Makes the ejs module handle all html files.
+Sets port to 8008.
+Directs all view-requests to the views folder.
+All static files are served from the rec folder
+*/
 
 server.engine('.html', require('ejs').__express);
 server.set('views', __dirname + '/client/views');
@@ -186,12 +186,8 @@ var socket_listener = require('socket.io').listen(ioserver, {log:false});
 
 
 /*  Handle client interaction through socket.io:
-    
-    TODO Clients are given a custom ID .
-    TODO Starts a game session with the client.
+
     Listens for commands and sends them to the game engine.
-    TODO Listens for disconnects and ends the game associated with the disconnected player.
-    TODO Handles game manager
 */   
 socket_listener.sockets.on('connection', function (client) {
 
@@ -285,7 +281,7 @@ socket_listener.sockets.on('connection', function (client) {
         if(client.game_id){
         	var g = games[client.game_id];
 		    g.command(client, parsed);
-		    db.set_replay(g.replay_id, g.command_id, JSON.stringify(g.state()));
+		    db.set_replay(g.replay_id, g.state_id, JSON.stringify(g.state()));
 		}
     });
 
@@ -313,10 +309,12 @@ socket_listener.sockets.on('connection', function (client) {
 });// end onConnection
 
 
-/*	Find Existing Game
-
-	Finds an existing game by searching through 
-	the client ids of active games.
+/**
+* Finds an existing game by searching through 
+* the client ids of active games.
+*
+* @method find_game
+* @param {String} userid Id of the user to seach for
 */
 function find_game(userid){
 	for(var g in games){

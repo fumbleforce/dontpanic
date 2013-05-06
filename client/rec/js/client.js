@@ -1,5 +1,13 @@
+/**
+* Handles all communication with the server, and calls update functions on changes.
+* 
+* @module Client
+* @class Client
+*/
 
 
+/*	Socket IO setup
+*/
 var socket = io.connect(remote_ip);
 
 socket.on('is_connected', function () {
@@ -106,7 +114,24 @@ socket.on('change', function (data) {
 
 
 
-
+/**
+* Sends in-game commands to the server, and plays audo based on the type of command.<br><br>
+* Availavble commands:<br><br>
+* Decrease panic - type:"dec_panic"<br>
+* Move player - type:"move_player", o:{player_id, node_id}<br>
+* Select node - type:"select_node", o:{node_id}<br>
+* Select zone - type:"select_zone", o:{zone_id}<br>
+* Move People - type:"move_people", o:{zone_from, zone_to}<br>
+* Create Info center - type:"create_info_center", o:{}<br>
+* Create road block - type:"create_road_block", o:{}<br>
+* Remove road block - type:"remove_road_block", o:{}<br>
+* Use card - type:"use_card", o:{card}<br>
+* End turn - type:"end_turn", o:{}<br>
+*
+* @method command
+* @param {String} type The type of command to be sent
+* @param {object} o Contains all relevant data for the command
+*/
 function command(type, o){
     var c = o || {}
     c.type = type;
@@ -136,11 +161,22 @@ function command(type, o){
     socket.emit('game_command', send);
 }
 
+/**
+* Sends a message to the server
+*
+* @method msg
+* @param {String} m Message to be sent
+*/
 function msg(m){
     console.log('Sending message "' + c + '"');
     socket.emit('msg', m);
 }
 
+/**
+* Sends the "leave game" command that shuts down the game.
+*
+* @method end_game
+*/
 function end_game(){
 	socket.emit("leave_game");
 }

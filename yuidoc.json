@@ -1,8 +1,8 @@
 {
 	"name": "The Don't Panic dosumentation",
-	"description": "The Don't Panic board game, implemented in Node.js"
-	"version":"1.0"
-	"url": "https://github.com/jorgeer/dontpanic"
+	"description": "The Don't Panic board game, implemented in Node.js",
+	"version":"1.0",
+	"url": "https://github.com/jorgeer/dontpanic",
 	"options": {
 		"outdir": "./YUI_docs"
 	}
