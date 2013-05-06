@@ -12,7 +12,7 @@ var c_height = 1550,
     panic_info_size = 40,
     w_inc = 0;
 	player_colors = ["red","orange","yellow","chartreuse ","green","aqua","blue","purple"];
-	effect_zone_list = ["panic"];
+	effect_zone_list = ["panic, event"];
 	
 	effect_people_list = ["decreasemoves1", "decreasemoves2", "decreasemoves3", "increasemoves",  "nextplayer", "stealaction", "blocknextevent"];
 	
@@ -1560,12 +1560,10 @@ String.prototype.width = function() {
 gco.cut_to_size = function(string, maxwidth){
 	var highestwidth = (maxwidth > 50) ? maxwidth : 50;
 	var stringwidth = string.width();
-	console.log(string + " " + stringwidth);
+	
 	if(stringwidth > highestwidth){
 		
-		console.log(stringwidth + ", " + highestwidth);
-		console.log(((stringwidth - highestwidth)/3));
-		console.log(string.length);
+		
 		string = string.slice(0, parseInt(string.length -((stringwidth - highestwidth)/9)));
 		return gco.cut_to_size(string, maxwidth);
 	}
