@@ -339,7 +339,7 @@ ge.prototype.command = function(client, c){
 
 
 
-
+			this.used_info_card=false;
 		    var ap = players[this.active_player];
             ap.actions_left = ap.role === 'activist' ?  5 : 4;
             
