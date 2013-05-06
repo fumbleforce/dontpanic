@@ -1,8 +1,8 @@
-/*  Settings variables
+/**  Settings variables
 
     Used for setting size of objects and 
     positioning in drawing functions.
-*/
+**/
 var c_height = 1550,
     c_width = 1500,
     node_size = 50,
@@ -64,14 +64,7 @@ var c_height = 1550,
 	passer_by_img.src = "/img/passer_by.png";
 	
 
-/* TEMPORARY ZONE IMAGES
 
-industry - http://oi50.tinypic.com/2ccur05.jpg
-largecity - http://oi45.tinypic.com/pn28l.jpg
-park - http://oi46.tinypic.com/11jtevr.jpg
-residential - http://oi50.tinypic.com/96b7ud.jpg
- 
-*/
 
 var player_offsetX = [0, 
                       Math.cos(315*(Math.PI/180))*offset_distance,
@@ -94,15 +87,17 @@ var player_offsetX = [0,
 
 
 
-/*  Game Client Object
 
-    All game-related objects and functions are encapsulated 
-    in the "gco" (game client object) object, to avoid polluting
-    the global namespace.
-    
-    Only one instance of this object is created for each client.
-    
-*/
+/**
+Game Client Object
+All game-related objects and functions are encapsulated 
+in the "gco" (game client object) object, to avoid polluting
+the global namespace.
+
+@class gco
+
+
+**/
 var gco = {
     players : [],
     nodes : [],
@@ -138,9 +133,13 @@ gco.ctx = gco.canvas.getContext("2d");
     Initializes the game by populating the Game Client Object,
     adding listeners to the objects and starting the timer.
     
-    List ps         List of player objects
-    Object map      The map object containing list of Zones and Nodes
+
 */
+
+/**
+method that initiates the game canvas, and creates some default events and information cards
+
+**/
 gco.init_game = function () {
     console.log("Expert interface initiated");
 	
@@ -492,12 +491,14 @@ gco.export_to_database = function(){ // exports the info held by the gco to the 
 }
 
 
-/*  Set up Canvas
-    
-    Configures the height and width of the canvas 
-    according to the settings variables.
+/**  
+Setup canvas 
+Configures the height and width of the canvas 
+according to the settings variables.
 
-*/
+@method setup_canvas
+
+**/
 gco.setup_canvas = function(){
     gco.canvas.width = c_width;
     gco.canvas.height = c_height;
@@ -507,7 +508,15 @@ gco.setup_canvas = function(){
 
 
 
+/**
+Draws a player
 
+@method player_draw
+@param Player player
+	The player that shall be drawn on the canvas.
+@param Context ctx
+	The canvas context.
+**/
 gco.player_draw = function(player, ctx){ // draw a player
     player.x = player.node.x;
     player.y = player.node.y;
@@ -556,6 +565,15 @@ gco.player_draw = function(player, ctx){ // draw a player
 	ctx.restore();
 }
 
+/**
+Draws a node
+
+@method node_draw
+@param Node node
+	The node that shall be drawn on the canvas.
+@param Context ctx
+	The canvas context.
+**/
 gco.node_draw = function(node, ctx){ //draws a node with the provided context
     ctx.fillStyle = 'white';
 	if((gco.selected_node == node.id) || (gco.connection == node.id)){
@@ -599,8 +617,17 @@ gco.node_draw = function(node, ctx){ //draws a node with the provided context
     
 }
 
+/**
+Draws a roadblock
 
-gco.roadblock_draw = function(node, ctx){
+@method roadblock_draw
+@param Node node
+	The node that has a roadblock that shall be drawn
+@param Context ctx
+	The canvas context
+
+**/
+gco.roadblock_draw = function(node, ctx){ // draws a roadblock, is not used atm, but kept if roadblocks should be implemented to the expert interface in the future
 	ctx.strokeStyle = '#202020';
 	ctx.lineWidth = 34;
 	var nodes = gco.nodes;
@@ -608,20 +635,21 @@ gco.roadblock_draw = function(node, ctx){
 	for (var i = 0; i < node.connects_to.length; i++){
 		ctx.beginPath();
 	    ctx.moveTo(node.x, node.y);
-	    //TODO maybe: 50% road block to another node with road block (50+50=100), 
-	    // but only 10% when neighbor does not have r b (looks better...?)
-	    // for now: just draw 50% block
-	    //if (nodes[node.connects_to[i]].has_road_block){
-	    	ctx.lineTo(((nodes[node.connects_to[i]].x)+node.x)/2, ((nodes[node.connects_to[i]].y)+node.y)/2);
-	    //}
-	    //else{
-	    //	ctx.lineTo(((nodes[node.connects_to[i]].x)+node.x)/10, ((nodes[node.connects_to[i]].y)+node.y)/10);
-	    //}
+	    
+	    ctx.lineTo(((nodes[node.connects_to[i]].x)+node.x)/2, ((nodes[node.connects_to[i]].y)+node.y)/2);
+	  
 	    
 	    ctx.closePath();
 	    ctx.stroke();
     }
 }
+/**
+Draws a line between connected nodes to prove that there is a connection between the nodes
+
+@method draw_connections
+@param Context ctx
+	The canvas context
+**/
 gco.draw_connections = function(ctx){ // draw the connections between the nodes
 	var nodes = gco.nodes;
 	ctx.strokeStyle = '#202020';
@@ -642,11 +670,26 @@ gco.draw_connections = function(ctx){ // draw the connections between the nodes
 		}
 	}	
 }
+/**
+Draws the background of the canvas
+
+@method background_draw
+@param Context ctx
+	The canvas context
+**/
 gco.background_draw = function(ctx){ // draws the background
     ctx.fillStyle="grey";
     ctx.fillRect(0,0, c_width, c_height);
 }
+/**
+Draws a zone
 
+@method zone_draw
+@param Zone zone
+	The zone that shall be drawn on the canvas
+@param Context ctx
+	The canvas context
+**/
 gco.zone_draw = function(zone, ctx){ // draws a zone with the provided context
 
 	ctx.save();
@@ -764,7 +807,18 @@ gco.zone_draw = function(zone, ctx){ // draws a zone with the provided context
 }
 
 
+/**
+A method to check if a point on the canvas contains the provided player
 
+@method player_contains
+@param Player p
+	The player that might be in the clicked point
+@param Integer mx
+	The x coordinate of the clicked point
+@param Integer my
+	The y coordinate of the clicked point
+@return Boolean True if the player is in the point, else false
+**/
 gco.player_contains = function(p, mx, my) { //checks if the clicked area contains a player
     var pn = gco.nodes[p.node.id];
     return (mx<=(pn.x+player_offsetX[p.id]+player_size))&&
@@ -772,14 +826,36 @@ gco.player_contains = function(p, mx, my) { //checks if the clicked area contain
         (my<=(pn.y+player_offsetY[p.id]+player_size))&&
         (my>=(pn.y+player_offsetY[p.id]-player_size));
 }
+/**
+A method to check if a point on the canvas contains the provided node
 
+@method node_contains
+@param Node node
+	The node that might be in the clicked point
+@param Integer mx
+	The x coordinate of the clicked point
+@param Integer my
+	The y coordinate of the clicked point
+@return Boolean True if the node is in the point, else false
+**/
 gco.node_contains = function(node, mx, my) { // checks if the clicked area containts a node
     return (mx<=(node.x+node_size))&&
         (mx>=(node.x-node_size))&&
         (my<=(node.y+node_size))&&
         (my>=(node.y-node_size));
 }
+/**
+A method to check if a point on the canvas contains the provided zone
 
+@method node_contains
+@param Zone z
+	The zone that might be in the clicked point
+@param Integer mx
+	The x coordinate of the clicked point
+@param Integer my
+	The y coordinate of the clicked point
+@return Boolean True if the zone is in the point, else false
+**/
 gco.zone_contains = function(z, mx, my){ // checks if the clicked area contains a zone
     var n = z.nodes;
     var nodes = gco.nodes;
@@ -798,6 +874,11 @@ gco.zone_contains = function(z, mx, my){ // checks if the clicked area contains 
     return r;
 }
 
+/**
+The Draw method
+It iterates over everything in the gco object and draws it by using the other draw_xxxxxx methods 
+@method draw
+**/
 gco.draw = function(){ //Draws everything
 
 	
@@ -888,7 +969,12 @@ gco.draw = function(){ //Draws everything
     
 }// end draw
 
+/**
+Creates a player object and adds it to the game
+It will not add a player if some info that is needed is missing or if the game already has reached its maximum number if players
 
+@method add_player
+**/
 gco.add_player = function(){ // creates a player and adds it to the game.
 	
 	var player_role = document.getElementById("player_role").value;
@@ -918,9 +1004,12 @@ gco.add_player = function(){ // creates a player and adds it to the game.
 	gco.draw();
 
 }
+/**
+Changes a selected player to fit the values in the form, if no player is selected then nothing will be changed
+@method change_player
+**/
+gco.change_player = function(){ //changes a selected player
 
-gco.change_player = function() //changes a selected player
-{
 	if(gco.selected_player == -1){
 		console.log("no player selected");
 		return;
@@ -946,6 +1035,10 @@ gco.change_player = function() //changes a selected player
 	gco.draw();
 	
 }
+/**
+Creates a connection between the 2 selected nodes
+@method create_connection
+**/
 gco.create_connection = function(){ // creates a connection between the 2 selected nodes
 	if((gco.connection > -1) && (gco.selected_node > -1) && (gco.connection != gco.selected_node) && 
 			(gco.nodes[gco.connection].connects_to.indexOf(gco.nodes[gco.selected_node]) < 0)){
@@ -965,6 +1058,10 @@ gco.create_connection = function(){ // creates a connection between the 2 select
 		
 	
 }
+/**
+Edits the selected zone so it contains the values provided by the expert form
+@method edit_zone
+**/
 gco.edit_zone = function(){ //edits the selected zone, might need more errorchecking
 	if(gco.selected_zone < 0){
 		console.log("no Zone selected");
@@ -974,19 +1071,34 @@ gco.edit_zone = function(){ //edits the selected zone, might need more errorchec
 	var zone = gco.zones[gco.selected_zone];
 	console.log("editing zone");
 	zone.type = document.getElementById("edit_zone_type").value;
-	zone.people = document.getElementById("zone_people").value;
-	zone.panic_level = document.getElementById("zone_panic").value;
+	newpeople = document.getElementById("zone_people").value;
+	newpanic_level = document.getElementById("zone_panic").value;
+	if(isNaN(newpeople) || isNaN(newpanic_level)){
+		console.log("either people or panic level was NaN");
+		return;
+	}
+	zone.people = newpeople;
+	zone.panic_level = newpanic_level;
 	
 	gco.draw();
 	
 	
 }
+/**
+Saves the selected node to use in the create_connection function
+@method node_connection
+**/
 gco.node_connection = function(){ // saves the selected node fot connection purposes
 
 	gco.connection = gco.selected_node; 
 	gco.draw();
 	
 }
+
+/**
+Adds a node to the zone node container so that it later can be used to create a zone
+@method add_zone_nodes
+**/
 gco.add_zone_nodes = function(){ // adds a node to a container so it later can be used to create a zone
 
 	
@@ -1006,11 +1118,19 @@ gco.add_zone_nodes = function(){ // adds a node to a container so it later can b
 	}
 	gco.draw();
 }
-gco.clear_zone_nodes = function() { // clears the selected nodes for science!
+/**
+Clears the zone node container
+@method clear_zone_nodes
+**/
+gco.clear_zone_nodes = function() { // clears the selected nodes 
 	
 	gco.node_container = [];
 	gco.draw();
 }
+/**
+Deletes the selected zone, if no zone is selected none will be removed
+@method del_selected_zone
+**/
 gco.del_selected_zone = function(){ // delete the selected zone, if none is selected nothing will be removed
 
 	if(gco.selected_zone > -1){
@@ -1028,6 +1148,10 @@ gco.del_selected_zone = function(){ // delete the selected zone, if none is sele
 		
 	}
 }
+/**
+Deletes the selected player, if no player is selected none will be removed
+@method del_selected_player
+**/
 gco.del_selected_player = function(){ // deletes the selected player
 	if(gco.selected_player > -1){
 		
@@ -1042,7 +1166,10 @@ gco.del_selected_player = function(){ // deletes the selected player
 		gco.draw();
 	}
 }
-
+/**
+Deletes the selected node, if no node is selected none will be removed
+@method del_selected_node
+**/
 gco.del_selected_node = function(){ // deletes the selected node, if none is selected nothing will be removed
 			
 			// will not delete if node is a part of a zone
@@ -1091,7 +1218,11 @@ gco.del_selected_node = function(){ // deletes the selected node, if none is sel
 		gco.draw();
 	}
 }
-
+/**
+Re Id 
+remakes all the ID's of the zones, nodes and players so they all start from id 0
+@method re_id
+**/
 gco.re_id = function(){ // redo all id's of the nodes, to make it look better
 	for(gco.next_node = 0; gco.next_node < gco.nodes.length; gco.next_node++){
 		gco.nodes[gco.next_node].id = gco.next_node;
@@ -1103,7 +1234,11 @@ gco.re_id = function(){ // redo all id's of the nodes, to make it look better
 		gco.players[gco.next_player].id = gco.next_player;
 	}
 }
-gco.update_adjacent_zones = function () {
+/**
+Iterates over all the zones to figure out which ones are adjacent
+@method update_adjacent_zones
+**/
+gco.update_adjacent_zones = function () { //iterates over all the zones to figure out which ones are adjacent
 
 	console.log("update adjacent zones " + gco.zones.length );
 	
@@ -1113,6 +1248,12 @@ gco.update_adjacent_zones = function () {
 		gco.calculate_adjacent_zones(gco.zones[d]);
 	}
 }
+/**
+Calculates the adjacent zones of a provided zone
+@method calculate_adjacent_zones
+@param Zone zone
+	The zone that will be checked for adjacent zones
+**/
 gco.calculate_adjacent_zones = function (zone){ //calculates the adjecent zones
 
 	//console.log("trying to calculate adjacent zones");
@@ -1142,7 +1283,11 @@ gco.calculate_adjacent_zones = function (zone){ //calculates the adjecent zones
 		}
 	}
 }
-
+/**
+Create zone 
+Creates a zone if there is enought nodes in the zone node container and they are all connected
+@method create_zone
+**/
 gco.create_zone = function(){ // checks if it is possible to create a zone, and creates one if possible.
 	nodes = gco.node_container;
 	
@@ -1187,7 +1332,11 @@ gco.create_zone = function(){ // checks if it is possible to create a zone, and 
 	
 	
 }
-
+/**
+Add an effect to an event
+Reads the expert form and puts the values together to make an effect and then puts it in an event
+@method event_add_effect
+**/
 gco.event_add_effect = function(){ // adds an effect to the event, see info_card_add_effect
 	ename = document.getElementById("effect_name").value;
 	edomain = document.getElementById("effect_domain").value;
@@ -1234,6 +1383,11 @@ gco.event_add_effect = function(){ // adds an effect to the event, see info_card
 	
 	
 }
+/**
+Add event
+Checks if the event meets the demands to be a event, if so then it adds it to the gco's event container
+@method add_event
+**/
 gco.add_event = function() { // adds the event to the event container
 	
 	cname = document.getElementById("event_name").value;
@@ -1260,6 +1414,11 @@ gco.add_event = function() { // adds the event to the event container
 	document.getElementById("event_show").selectedIndex = gco.events.length -1;
 	gco.show_event();
 }
+/**
+Add info card
+Checks if the card meets the demands to be a info card, if so then it adds it to the gco's info card container
+@method add_info_card
+**/
 gco.add_info_card = function() { // adds and infocard to the cardcontainer
 	
 	cname = document.getElementById("card_name").value;
@@ -1286,6 +1445,11 @@ gco.add_info_card = function() { // adds and infocard to the cardcontainer
 	document.getElementById("card_show").selectedIndex = gco.info_cards.length -1;
 	gco.show_card();
 }
+/**
+Add an effect to a info card
+Reads the expert form and puts the values together to make an effect and then puts it in a info card
+@method card_create_add_effect
+**/
 gco.card_create_add_effect = function() { // creates an effect and adds it to a card. Mostly the same as adding effects to a event, but wants to keep it like this in case there will be needed differences to the methods
 
 	
@@ -1333,6 +1497,10 @@ gco.card_create_add_effect = function() { // creates an effect and adds it to a 
 	gco.update_ddbox(document.getElementById("card_effect"), gco.rdy_effects, false);
 	
 }
+/**
+Removes the selected effect from the selected event
+@method event_create_remove_effect
+**/
 gco.event_create_remove_effect = function() { // removes the selected effect from the selected event
 	
 	var index = document.getElementById("event_effect").value;
@@ -1342,6 +1510,10 @@ gco.event_create_remove_effect = function() { // removes the selected effect fro
 
 	gco.update_ddbox(document.getElementById("event_effect"), gco.event_effects, false);
 }
+/**
+Removes the selected effect from the selected info card
+@method card_create_remove_effect
+**/
 gco.card_create_remove_effect = function() { // removes the selected effect from the selected card
 	
 	var index = document.getElementById("card_effect").value;
@@ -1353,9 +1525,17 @@ gco.card_create_remove_effect = function() { // removes the selected effect from
 }
 
 
-
-
-gco.update_ddbox = function(ddbox, list, name_same_as_value) { // updates a DropDownBox so it ccontains the provided list, 
+/**
+Updates a dropdownbox so it contains the provided list
+@method update_ddbox
+@param DropDownBox ddbox
+	The ddbox to be updated
+@param ArrayList list
+	The list to be put in the ddbox
+@param Boolean name_same_as_value
+	A boolean to tell if the ddbox should show the name of the elements in the list if true, else it shows the index of the element
+**/
+gco.update_ddbox = function(ddbox, list, name_same_as_value) { // updates a DropDownBox so it contains the provided list, 
 
 	
 
@@ -1382,7 +1562,10 @@ gco.update_ddbox = function(ddbox, list, name_same_as_value) { // updates a Drop
 	
 	
 }
-
+/**
+Zone box update is used to update the label in the zone edit to the selected zone so its easier to know which zone you are editing
+@method zone_box_udate
+**/
 gco.zone_box_update = function(){ // to show what zone is selected during zone editing
 	if(gco.selected_zone < 0){
 		document.getElementById("zone_id").innerHTML = "no zone selected";
@@ -1391,6 +1574,10 @@ gco.zone_box_update = function(){ // to show what zone is selected during zone e
 	
 	document.getElementById("zone_id").innerHTML = gco.selected_zone;
 }
+/**
+Show card fills in the values of a card into labels so it can show the name, desc and the effects the card containts
+@method show_card
+**/
 gco.show_card = function(){ // show the info on the selected card. want to edit this later
 	
 	
@@ -1411,13 +1598,17 @@ gco.show_card = function(){ // show the info on the selected card. want to edit 
 			effects2 += "+more";
 		}
 	}
-	document.getElementById("card_name_label").innerHTML = gco.cut_to_size(card.name, 130);
-	document.getElementById("card_desc_label").innerHTML = gco.cut_to_size(card.desc, 130);
+	document.getElementById("card_name_label").innerHTML = gco.cut_to_size(card.name, 100);
+	document.getElementById("card_desc_label").innerHTML = gco.cut_to_size(card.desc, 100);
 	document.getElementById("card_effects_label").innerHTML = effects;
 	document.getElementById("card_effects_label2").innerHTML = effects2;
 	
 }
-gco.show_event = function(){ // show the info on the selected event. want to edit this later
+/**
+Show event fills in the values of a event into labels so it can show the name, desc and the effects the card contains
+@method show_event
+**/
+gco.show_event = function(){ // show the info on the selected event. 
 	
 	
 	var event = gco.events[document.getElementById("event_show").value];
@@ -1437,12 +1628,16 @@ gco.show_event = function(){ // show the info on the selected event. want to edi
 			effects2 += "+more";
 		}
 	}
-	document.getElementById("event_name_label").innerHTML = gco.cut_to_size(event.name, 130);
-	document.getElementById("event_desc_label").innerHTML = gco.cut_to_size(event.desc, 130);
+	document.getElementById("event_name_label").innerHTML = gco.cut_to_size(event.name, 100);
+	document.getElementById("event_desc_label").innerHTML = gco.cut_to_size(event.desc, 100);
 	document.getElementById("event_effects_label").innerHTML = effects;
 	document.getElementById("event_effects_label2").innerHTML = effects2;
 	
 }
+/**
+Move to edit moves the selected event to the event create form so that it can be edited or duplicated
+@method event_move_to_edit
+**/
 gco.event_move_to_edit = function(){ // moves the selected event to edit
 	gco.selected_event = document.getElementById("event_show").value;
 	var event = gco.events[gco.selected_event];
@@ -1455,6 +1650,10 @@ gco.event_move_to_edit = function(){ // moves the selected event to edit
 	
 	gco.event_effects = event.effects;
 }
+/**
+Move to edit moves the selected infocard to the card create form so that it can be edited or duplicated
+@method card_move_to_edit
+**/
 gco.card_move_to_edit = function(){ // moves the selected card to edit, 
 	gco.selected_card = document.getElementById("card_show").value;
 	var card = gco.info_cards[gco.selected_card];
@@ -1466,11 +1665,15 @@ gco.card_move_to_edit = function(){ // moves the selected card to edit,
 	
 	gco.rdy_effects = card.effects;
 }
+/**
+Delete event deletes the selected event from the event list
+@method delete_event
+**/
 gco.delete_event = function(){ // delete selected event
 	
-	if(gco.selected_card != -1){
-		gco.info_cards.splice(gco.selected_card, 1);
-		gco.selected_card = -1;
+	if(document.getElementById("event_show").value != -1){
+		gco.events.splice(document.getElementById("event_show").value, 1);
+		gco.selected_event = -1;
 		document.getElementById("event_name").value = "";
 		document.getElementById("event_desc").value = "";
 		document.getElementById("event_name_label").innerHTML = "";
@@ -1483,10 +1686,14 @@ gco.delete_event = function(){ // delete selected event
 		gco.show_event();
 	}
 }
+/**
+Delete card deletes the selected card from the info card list
+@method delete_card
+**/
 gco.delete_card = function(){ // delete selected card
 	
-	if(gco.selected_card != -1){
-		gco.info_cards.splice(gco.selected_card, 1);
+	if(document.getElementById("card_show").value != -1){
+		gco.info_cards.splice(document.getElementById("card_show").value, 1);
 		gco.selected_card = -1;
 		document.getElementById("card_name").value = "";
 		document.getElementById("card_desc").value = "";
@@ -1501,6 +1708,10 @@ gco.delete_card = function(){ // delete selected card
 		
 	}
 }
+/**
+Edit card takes the selected card and changes its values to the values in the card create form
+@method edit_card
+**/
 gco.edit_card = function(){
 	if(gco.selected_card == -1){
 		console.log("no card selected");
@@ -1518,6 +1729,10 @@ gco.edit_card = function(){
 	document.getElementById("card_show").selectedIndex = gco.info_cards.indexOf(card);
 	gco.show_card();
 }
+/**
+Edit event takes teh selected event and changes its values to teh values in the event create form 
+@method edit_event
+**/
 gco.edit_event = function(){
 
 	if(gco.selected_event == -1){
@@ -1538,8 +1753,10 @@ gco.edit_event = function(){
 	gco.show_event();
 
 }
-
-
+/**
+Domain change changes the values in the effect type ddbox so it only shows allowed values
+@method effect_domain_change
+**/
 gco.effect_domain_change = function(){ // changes the effect creation to better match the effect domain
 
 	var ddbox = document.getElementById("effect_type");
@@ -1560,10 +1777,10 @@ gco.effect_domain_change = function(){ // changes the effect creation to better 
 	
 }
 
-
-
-
-
+/**
+Set canvas listeners sets the mouse listeners for the canvas and the keylistener for the window
+@method set_canvas_listener
+**/
 gco.set_canvas_listener = function(){
     var canvas = gco.canvas,
         cst = gco.cst,
@@ -1722,7 +1939,12 @@ gco.set_canvas_listener = function(){
     }, true);//end mouseup listener
 	
 }//end set canvas listener
-
+/**
+The width metod calculates the width of a sting in pixels
+@method width
+@return Integer width
+	The width of the string in pixels
+**/
 String.prototype.width = function() { // function to calculate the length of a string in pixels
 	var font = '12px arial',
 			
@@ -1735,6 +1957,16 @@ String.prototype.width = function() { // function to calculate the length of a s
 
 	return w;
 }
+/**
+Cut to size cuts down a string in length untill it is below a provided amount of pixels 
+@method cut_to_size
+@param String string 
+	The string that should be cut to size  
+@param Integer maxwidth 
+	The with that the string should be cut to or lover than, default 50, optional 
+@return String string
+	The string after its been cut to size
+**/
 gco.cut_to_size = function(string, maxwidth){ // function to cut down string to a spesific(default 50) width of pixels
 	var highestwidth = (maxwidth > 50) ? maxwidth : 50;
 	var stringwidth = string.width();
@@ -1747,6 +1979,11 @@ gco.cut_to_size = function(string, maxwidth){ // function to cut down string to 
 	}
 	return string;
 }
+/**
+Toggle hotkeys sets the boolean gco.hotkeys to either true or false depending on its previous value and then changes the text on 
+the buttons so it either hides the hotkeybuttons or no.
+@mehtod toggle_hotkeys
+**/
 gco.toggle_hotkeys = function(){ // toggle hotkeys on or off
 	if(gco.hotkeys){
 		gco.hotkeys = false;
