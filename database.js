@@ -55,6 +55,39 @@ function handleDisconnect(connection) {
 }
 
 handleDisconnect(connection);
+
+/*
+	Checking if the tables for the database exists, if they dont, they will be made and a 
+	a default gametemplate will be put in the database
+*/
+
+db.set_up_database = function () {
+	connection.query('show tables like "gametemplate"', function (err, rows, fields) {
+		if (err) throw err;
+		if (rows[0] === undefined) {
+			console.log("gametemplate does not exist, creating table");
+			connection.query('CREATE TABLE `gametemplate` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `json_string` longtext COLLATE latin1_danish_ci NOT NULL,\n  PRIMARY KEY (`id`)\n) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=latin1 COLLATE=latin1_danish_ci');
+			console.log("putting in default game template");
+			
+			//default gametemplate
+			//db.set_template_string("gametemplate");
+		}
+		else {
+			console.log("gametemplate exists");
+		}
+	}); 
+	connection.query('show tables like "replay"', function (err, rows, fields) {
+		if (err) throw err;
+		if (rows[0] === undefined) {
+			console.log("replay does not exist, creating table");
+			connection.query('CREATE TABLE `replay` (\n  `replay_id` int(10) NOT NULL,\n  `state_id` int(10) NOT NULL,\n  `state` longtext COLLATE latin1_danish_ci NOT NULL,\n  PRIMARY KEY (`replay_id`,`state_id`)\n) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_danish_ci');
+		}
+		else {
+			console.log("replay exists");
+		}
+	});
+}
+
 /*
 	Queries
 */
@@ -150,26 +183,6 @@ db.set_event = function(effect) {
 	});
 }
 
-/*
-	Gets all the events from the database
-*/
-db.get_all_events = function (next) {
-	connection.query('SELECT * FROM event', function (err, rows, fields) {
-		return next(rows);
-	});
-}
-
-/*
-	Adds an info card to the database
-*/
-db.add_info_card = function (name) {
-	connection.query('INSERT INTO Info cards SET?', {Name: name}, 
-	function (err, rows, fields) {
-		if (err) throw err;
-		console.log('Succesfully added new info card');
-	});
-}
-
 /* 
 	Gets the gamestate of the given state id and replay id
 */
@@ -182,14 +195,5 @@ db.get_command = function (replay_id, state_id, next) {
 	});
 }
 
-/* Adds new user with the giver parameters to the database, works */
 
-db.add_user = function (username, password, id, email, name, is_admin) {
-	connection.query('INSERT INTO User SET?', {User_name: username, Password: password, 
-	ID: id, Email: email, Name: name, Is_Admin: is_admin}, function (err, result) {
-		if (err) throw err;
-		console.log('Successfully added player', username, password, id, email, name, 
-		is_admin);
-	});
-}	
 
