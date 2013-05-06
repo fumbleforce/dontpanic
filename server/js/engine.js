@@ -16,14 +16,14 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
 	console.log("Populating....");
 	console.log("replay_id " + id_replay); 
 
-	
+
 	if(!template.map.nodes) return "No nodes in template!";
 	if(!template.map.zones) return "No zones in template!";
 	if(!template.players) return "No nodes in template!";
 	if(!template.events) return "No events in template!";
 	if(!template.info_cards) return "No info cards in template!";
-	
-	
+
+
 	//Clients
 	this.clients = [client];
 
@@ -36,11 +36,11 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
     //Replay
     this.command_id = 0;
 	this.replay_id = id_replay;
-	
+
 	//Map
 	this.map = {nodes : [], zones : []};
-	
-	
+
+
 	for(var i = 0;i<template.map.nodes.length; i++){
 		this.map.nodes.push(new ge.Node(template.map.nodes[i]));
 	}
@@ -48,13 +48,13 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
 		var tzone = template.map.zones[i];
 		this.map.zones.push(new ge.Zone(tzone));
 	}
-	
+
 	//Players
 
 	this.players = [];
 	var player;
 	var len = template.players.length;
-	
+
     for(var i = 0; i < len; i++){
 		var tplayer = template.players[i]
 		player = new ge.Player(tplayer.id, tplayer.user, tplayer.node , tplayer.color, tplayer.role, tplayer.actions_left);
@@ -67,12 +67,12 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
 		}
     	this.players.push(player);
     }
-	
-	
+
+
 	//Server related
 	this.client = client || null;  //TODO DEPRECATED
 	this.id = id || 0;
-	
+
 	//Local game related
 	this.active_player = 0;
 	this.turn = 0;
@@ -87,7 +87,8 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
 	this.turnsSinceEvent = 0;
 	this.eventblocked = false;
 	this.started=false;
-	
+	this.ended=false;
+
 	//Local
 	var SCALE= 90;
 	var PADD = 50;
@@ -232,13 +233,16 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
 */
 ge.prototype.command = function(client, c){
 	this.command_id++;
+
+	if(this.ended) return;
+
     var nodes = this.map.nodes,
 		zones = this.map.zones,
         players = this.players,
         changed = {none:true};
 
     
-	
+
     switch (c.type) {
         case 'move_player':
             if (c.player_id === this.active_player) {
@@ -291,16 +295,16 @@ ge.prototype.command = function(client, c){
                 changed.zones = [z];
                 changed.players = [p];
             }
-			
+
 			else {
 				this.emit('error', 'Could not decrease panic');
 				break;
 			}
-					
+
 			break;
-			
-			
-			
+
+
+
 		case 'move_people':
 			// TODO: find out how many people we can move, driver can move 10, regulars can only move 5
 			var movePeople = 5;
@@ -319,9 +323,9 @@ ge.prototype.command = function(client, c){
 					}
 				}
 			}
-		
+
 			break;
-			
+
 
 			//TODO Finish this
 		case 'create_info_center':
@@ -334,7 +338,7 @@ ge.prototype.command = function(client, c){
 				this.information_centers < this.max_information_centers
 				&& p.node === n.id 
 				&& n.add_information_center(p)){
-				
+
 				changed.nodes = [n];
 				changed.players = [p];
 				this.information_centers++;
@@ -345,7 +349,7 @@ ge.prototype.command = function(client, c){
 		case 'create_road_block':
 
 			var p = players[this.active_player];
-			
+
 			if((c.selected_node===p.node) && (this.road_blocks < this.max_road_blocks) && nodes[p.node].add_road_block(p, players)){
 				for (var i=0; i<zones.length; i++){
 					if ((!zones[i].isBlocked)&&((zones[i].nodes.indexOf(nodes[p.node].id))>=0)){
@@ -357,7 +361,7 @@ ge.prototype.command = function(client, c){
 								allBlocked=false;
 								break;
 							}
-								 
+
 						}
 						console.log("allBlocked:"+allBlocked);
 						if (allBlocked){
@@ -368,7 +372,7 @@ ge.prototype.command = function(client, c){
 				}
 				changed.nodes = [nodes[p.node]];
 				changed.players = [p];
-				
+
 				this.road_blocks++;
 				for (var i=0; i<zones.length; i++){
 					console.log("Zone "+i+" blocked? "+zones[i].isBlocked);
@@ -378,7 +382,7 @@ ge.prototype.command = function(client, c){
 			break;
 
 		case 'remove_road_block':
-			
+
 			var p = players[this.active_player];
 
 			if(nodes[p.node].remove_road_block(p, players)){
@@ -392,11 +396,11 @@ ge.prototype.command = function(client, c){
 					zones[i].isBlocked=false;
 				}
 			}
-			
+
 			for (var i=0; i<zones.length; i++){
 				console.log("Zone "+i+" blocked? "+zones[i].isBlocked);
 			}
-			
+
 			break;		
 
 
@@ -406,34 +410,34 @@ ge.prototype.command = function(client, c){
 			changed = effect(ic, this);
             changed.players = changed.players ? changed.players.push(players[this.active_player]) :  [players[this.active_player]];
 			break;
-			
-			
+
+
 	    case 'inc_panic':
 	        for (var i = 0; i < zones.length;i++) {
 	        	//update zones with 10 panic
 	        	if (!zones[i].is_panic_zero()){
-					
+
 	        		if (zones[i].people<=10){
-					
-						
+
+
 	        			zones[i].update_panic(10);
 					}
 	        		else if (zones[i].people<=50){
-					
-						
+
+
 	        			zones[i].update_panic(15);
 					}
 	        		else {
-						
+
 	        			zones[i].update_panic(20);
 					}
 				}
 	        }
-			
-			
+
+
 	        this.timer_dur += this.time_step;
 	        this.start_timer();
-			
+
 	        for (var i = 0; i < zones.length;i++) {
 	        	//if zones has 50 panic, spread to adjacent zones
 	        	if (zones[i].panic_level==50&&(!zones[i].isBlocked)){
@@ -441,21 +445,21 @@ ge.prototype.command = function(client, c){
 	        			zones[zones[i].adjacent_zones[j]].update_panic(5);
 	        		}
 	        	}
-	        	
+
 	        }
 
 	        changed.timer = this.timer;
 	        changed.zones = zones;
-	        
+
 	        break;
-		
-		
-		
+
+
+
 		case 'end_turn':
-			
-			
-			
-		    
+
+
+
+
 		    var ap = players[this.active_player];
             ap.actions_left = ap.role === 'activist' ?  5 : 4;
             
@@ -470,17 +474,17 @@ ge.prototype.command = function(client, c){
 				ap.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
 				this.cards_left -= 1;
 			}
-			
 
-			
+
+
 			//fire a random event every Xth turn
 			if (this.turnsSinceEvent>=this.eventTurns){
-			
+
 				if (this.eventblocked){
 				this.eventblocked = false;
 				this.turnsSinceEvent=0;
 				}
-			
+
 				else{
 				var randomEvent=Math.floor(Math.random()*this.events.length);
 				changed = effect(this.events[randomEvent], this);
@@ -491,20 +495,19 @@ ge.prototype.command = function(client, c){
 			changed.players = [ap];
 			changed.turn = this.turn;
 			changed.active_player = this.active_player;
-				
+
 				break;
         
         console.log("No matching command types");
             
     }
-	var stated = state(this);
-	//this.emit('save_state' , JSON.stringify(stated));
-    
+
     //Check for win
     changed.win = this.check_win();
     
     //Check for lose
     changed.lose = this.check_lose();
+    if(changed.lose || changed.win) this.ended = true;
     
     if(changed.players || changed.nodes || changed.zones || changed.turn || changed.event || changed.win || changed.lose){
         changed.none = false;
@@ -554,6 +557,9 @@ ge.prototype.save_state = function(client, c) {
 }
 
 ge.prototype.delete_game = function(client, c) {
+	this.ended = true;
+	this.stop_timer();
+	delete this;
 }
 
 ge.prototype.join_game = function(client) {
@@ -572,6 +578,20 @@ ge.prototype.emit = function(type, o){
 	}
 }
 
+ge.prototype.state = function(){
+	var g = this;
+    return {
+        type : 'state',
+		replay_id : g.replay_id,
+		command_id : g.command_id,
+        zones : g.map.zones,
+        nodes : g.map.nodes,
+        players : g.players,
+        turn : g.turn,
+        timer : g.timer,
+        active_player : g.active_player
+    };
+}
 
 
 
@@ -592,6 +612,7 @@ ge.prototype.start_timer = function() {
 	var that = this;
     that.timer = that.timer_dur;
     
+    if(!this.ended){
     var inter = setInterval(function(){
         
         that.timer--;
@@ -599,10 +620,15 @@ ge.prototype.start_timer = function() {
             that.command("", {type:'inc_panic'});
             clearInterval(inter);
         }
+        
         that.emit('change', JSON.stringify({timer:that.timer}));
     }, 1000);
-    
-    
+    }
+}
+
+ge.prototype.stop_timer = function(){
+	clearInterval(this.inter);
+
 }
 
 
@@ -620,7 +646,7 @@ ge.prototype.check_lose = function(){
 	var zones = this.map.zones;
 	console.log("Checking lose..");
 	for(var i = 0; i < zones.length; i++){
-		console.log("Zone "+i+": "+zones[i].panic);
+		console.log("Zone "+i+": "+zones[i].panic_level);
 		if(zones[i].panic_level < 50){
 			return false;
 		}
@@ -715,60 +741,60 @@ function effect(card, g) {
                     case '':
                         
                         break;
-						
+
 					//The player gets his moves decreased. apal; active player actions left
 
 					case 'decreasemoves1':
-						
+
 						var apal = players[g.active_player];
 						apal.actions_left = apal.actions_left -1;
-						
+
 						break;
-						
-						
+
+
 					case 'decreasemoves2':
-						
+
 						var apal = players[g.active_player];
 						apal.actions_left = apal.actions_left -2;
-						
+
 						break;
-						
+
 					case 'decreasemoves3':
-						
+
 						var apal = players[g.active_player];
 						apal.actions_left = apal.actions_left -3;
-						
+
 						break;
-						
+
 						//The player must skip a turn
 					case 'nextplayer':
-					
+
 						var objectsas = {
 							type : 'end_turn',
 							domain : 'something'
 							};
 						g.command(g.client, objectsas);
-						
-						
-					
+
+
+
 					break;
-						
-						
+
+
 						//player actions are increased to 6
 					case 'increasemoves':
-						
+
 						var apai = players[g.active_player];
 						apai.actions_left = apai.actions_left +2;
-						
+
 						break;
-						
+
 						//Active player steals an action from the next player
 					case 'stealaction':
-					
+
 						var apsa = players[g.active_player]; 
 						apsa.actions_left = apsa.actions_left +1;
 						players[(g.active_player + 1) % (g.players.length)].actions_left -=1;
-						
+
 						break;
 					/*	
 					//TODO This code was a proposal for tradecards
@@ -783,13 +809,13 @@ function effect(card, g) {
 					//TODO	
 					case 'moveanotherplayer':
 						break;
-						
+
 					//TODO
 					case 'blocknextevent':
 						g.eventblocked =true;
-						
-						
-						
+
+
+
 						break;
                 }
             
@@ -866,7 +892,7 @@ ge.Player = function(id, user, node, color, role, actions_left) {
 	this.info_cards = [];
 	this.actions_left = actions_left;
 	this.class = 'player';
-	
+
 }
 
 ge.Player.prototype.update_actions = function (actions) {
@@ -985,7 +1011,7 @@ ge.Node.prototype.can_add_information_center = function (player) {
 		console.log("Player is not on node");
 		return false;
 	}
-	
+
     if(player.can_update_actions(-4) ){
     	console.log("True");
 		return true;
@@ -1014,7 +1040,7 @@ ge.Node.prototype.can_add_road_block = function (player, players) {
 		console.log('error', "Already has road block");
 	    return false;
 	}
-	
+
 	if (!(player.role=='operation expert')){
 		var another_player = false;
 		for (var i = 0; i < players.length; i++) {
@@ -1032,7 +1058,7 @@ ge.Node.prototype.can_add_road_block = function (player, players) {
 		console.log("True");
 		return true;
 	}
-	
+
 	return false;	
 
 }
@@ -1051,7 +1077,7 @@ ge.Node.prototype.can_remove_road_block = function (player, players) {
 		console.log("No road block at this node");
 	    return false;
 	}
-	
+
 	if (!(player.role=='operation expert')){
 		var another_player = false;
 		for (var i = 0; i < players.length; i++) {
@@ -1097,7 +1123,7 @@ ge.Role = function (title, info, effect) {
 ge.Event = function (text, effect) {
 	this.text = text;
 	this.effect = effect;
-	
+
 }
 
 
@@ -1121,7 +1147,7 @@ ge.Zone = function (z) {
 	this.panic_level = parseInt(z.panic_level);//settes til 0 i starten??
 	this.centroid = z.centroid;//center (centroid) X and Y of zone polygon to put panic info
 	this.isBlocked = false; //if all nodes of zone are blocked, then zone is blocked from spreading panic
-	
+
 }
 ge.Zone.prototype.update_panic = function (panic_level) {
 	this.panic_level += panic_level;		
@@ -1288,10 +1314,6 @@ ge.Map = function (nodes, zones) {
 ge.Settings = function (timer_interval) {
 	var timer = new timer(timer_interval);
 }
-
-
-
-
 
 
 

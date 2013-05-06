@@ -51,24 +51,9 @@ var c_height = 1550,
 	
 	var passer_by_img = new Image();
 	passer_by_img.src = "/img/passer_by.png";
-	
-	var role_desc = {
-	    'coordinator':'info',
-	    'passer by':'info',
-	    'crowd manager':'info',
-	    'operation expert':'info',
-	    'driver':'info',
-	
-	}
 
-/* TEMPORARY ZONE IMAGES
 
-industry - http://oi50.tinypic.com/2ccur05.jpg
-largecity - http://oi45.tinypic.com/pn28l.jpg
-park - http://oi46.tinypic.com/11jtevr.jpg
-residential - http://oi50.tinypic.com/96b7ud.jpg
- 
-*/
+
 
 var player_offsetX = [0, 
                       Math.cos(315*(Math.PI/180))*offset_distance,
@@ -122,7 +107,9 @@ gco.ctx = gco.canvas.getContext("2d");
     Object map      The map object containing list of Zones and Nodes
 */
 gco.init_game = function (d) {
+	
     console.log("Game initiated.");
+    set_lang(read_cookie("chosen_lang"));
     gco.players = d.players;
     gco.zones = d.zones;
     gco.nodes = d.nodes;
@@ -130,12 +117,11 @@ gco.init_game = function (d) {
     gco.active_player = d.active_player;
     gco.construct_player_divs(gco.players);
     gco.setup_canvas();
-    gco.set_canvas_listener();
-
-    
+    gco.set_canvas_listener();    
     gco.draw();
     gco.update_cards();
     gco.update_options([]);
+    translate_page();
 
 }
 
@@ -155,8 +141,8 @@ gco.update_timer = function(time){
 	if (time===10){
 	countdown.play();
 	}
-	var lab = document.getElementById("timer-label");
-    lab.innerHTML = "Panic Increase in: "+time;
+	
+    $("#timer-label").html(speak("timer-label")+time);
 }
 
 
@@ -189,12 +175,12 @@ gco.construct_player_divs = function(players){
 		lim2 = 0;
 	}
 	for(i = 0; i<lim1; i++){
-		inner += "<div id='p"+i+"' class='sidebar-player'><h2>Player "+i+"</h2><br><div class='player-info'><p>"+ players[i].role +"</p><div id='"+i+"_text' class='role-info-label'>"+ role_desc[players[i].role] +"</div></div><div id='"+i+"_cards' class='card-container'></div></div>";
+		inner += "<div id='p"+i+"' class='sidebar-player'><h2>"+speak("player")+i+"</h2><br><div class='player-info'><p>"+ speak("role_name")[players[i].role] +"</p><div id='"+i+"_text' class='role-info-label'>"+ speak("role_desc")[players[i].role] +"</div></div><div id='"+i+"_cards' class='card-container'></div></div>";
 	}
 	$l.html(inner);
 	inner = '';
 	for(i=lim1; i<lim2; i++){
-		inner += "<div id='p"+i+"' class='sidebar-player'><h2>Player "+i+"</h2><br><div class='player-info'><p>"+ players[i].role +"</p><div id='"+i+"_text' class='role-info-label'>"+ role_desc[players[i].role] +"</div></div><div id='"+i+"_cards' class='card-container'></div></div>";
+		inner += "<div id='p"+i+"' class='sidebar-player'><h2>"+speak("player")+i+"</h2><br><div class='player-info'><p>"+ speak("role_name")[players[i].role] +"</p><div id='"+i+"_text' class='role-info-label'>"+ speak("role_desc")[players[i].role] +"</div></div><div id='"+i+"_cards' class='card-container'></div></div>";
 	}
 	$r.html(inner);
 }
@@ -217,24 +203,24 @@ gco.update_options = function(o){
 	var $s = $('#selection'),
 		inner = '';
 		
-	inner += "<button class='btn' onclick='command("+'"'+"end_turn"+'"'+");'>Next Turn</button>";
+	inner += "<button class='btn' onclick='command("+'"'+"end_turn"+'"'+");'>"+speak("op-next-player")+"</button>";
 	
 	for (var i=0; i<o.length;i++){
 		switch(o[i]){
 			case 'block':
-				inner += "<button class='btn' onclick='command("+'"'+"create_road_block"+'"'+");'>Add road block</button>";
+				inner += "<button class='btn' onclick='command("+'"'+"create_road_block"+'"'+");'>"+speak("op-add-road-block")+"</button>";
 				break;
 			case 'info':
-				inner += "<button class='btn' onclick='command("+'"'+"create_info_center"+'"'+");'>Add information center</button>";
+				inner += "<button class='btn' onclick='command("+'"'+"create_info_center"+'"'+");'>"+speak("op-info-center")+"</button>";
 				break;
 			case 'panic':
-				inner += "<button class='btn' onclick='command("+'"'+"decrease_panic"+'"'+");'>Decrease panic</button>";
+				inner += "<button class='btn' onclick='command("+'"'+"decrease_panic"+'"'+");'>"+speak("op-dec-panic")+"</button>";
 				break;
 			case 'people':
-				inner += "<button class='btn' onclick='gco.move_people();'>Move people</button>";
+				inner += "<button class='btn' onclick='gco.move_people();'>"+speak("op-move-people")+"</button>";
 				break;
 			case 'rem_block':
-				inner += "<button class='btn' onclick='command("+'"'+"remove_road_block"+'"'+");'>Remove road block</button>";
+				inner += "<button class='btn' onclick='command("+'"'+"remove_road_block"+'"'+");'>"+speak("op-rem-road-block")+"</button>";
 				break;
 
 		}
@@ -291,10 +277,7 @@ gco.update_cards = function() {
     for (i = 0; i < ps.length; i++){
         cards = ps[i].info_cards;
 		
-		$con = $("#"+i+"_text");
-		$con.empty();
-		something = $("<p>"+ps[i].role+"</p>");
-		something.appendTo($con);
+		
 		
 
         $con = $("#"+i+"_cards");
@@ -344,7 +327,7 @@ snd.play();
 
 gco.move_people = function(){
 	if(gco.cst.selected_zone !== null){
-		gco.update_status("Moving people from zone "+gco.cst.selected_zone+"...");
+		gco.update_status(speak('stat-move-people')+gco.cst.selected_zone+"...");
 		gco.cst.moving_people = true;
 		gco.cst.moving_from = gco.cst.selected_zone;
 		
@@ -720,9 +703,9 @@ gco.draw = function(){
     }
     
     if(players.length > 1){
-        document.getElementById("turn-label").innerHTML = "Turn: "+(gco.turn); 
-        document.getElementById("player-turn-label").innerHTML = "Player "+(gco.active_player)+"'s turn";
-        document.getElementById("action-label").innerHTML = "Actions left: "+(players[gco.active_player].actions_left); 
+        $("#turn-label").html(speak("turn-label")+(gco.turn)); 
+        $("#player-turn-label").html(speak("player-turn-label")[0]+(gco.active_player)+"'"+speak("player-turn-label")[1]);
+        $("#action-label").html(speak("action-label")+(players[gco.active_player].actions_left)); 
     } 
     
 }// end draw
@@ -765,7 +748,7 @@ gco.set_canvas_listener = function(){
         for (var i = 0; i < players.length; i++) {
 
         	if (gco.player_contains(players[i], mx, my)) {
-        		gco.update_status("Clicked on player  "+i);
+        		gco.update_status(speak("stat-click-player")+i);
         		selected = players[i];
         		//Check if player is active, so it can be moved
         		if (i===gco.active_player || gco.is_gm){
@@ -785,7 +768,7 @@ gco.set_canvas_listener = function(){
 		for (var i = 0; i < nodes.length; i++) {
 
         	if (gco.node_contains(nodes[i], mx, my)) {
-        		gco.update_status("Selected node "+i);
+        		gco.update_status(speak("stat-select-node")+i);
         		cst.selected_node = i;
 				command('select_node', {node_id : cst.selected_node});
         		gco.draw();
@@ -797,12 +780,12 @@ gco.set_canvas_listener = function(){
 
         	if (gco.zone_contains(zones[i], mx, my)) {
         		console.log("Clicked on zone "+i);
-        		gco.update_status("Selected zone "+i);
+        		gco.update_status(speak("stat-select-node")+i);
         		cst.selected_zone = i;
         		//TODO for testing, we add 'decrease_panic' when selecting zones
         		if(cst.moving_people){
         			command('move_people', {zone_from: cst.moving_from, zone_to:i});
-        			gco.update_status("Moved people to zone "+i);
+        			gco.update_status(speak("stat-moved-people")+i);
         			cst.moving_from = null;
         			cst.moving_people = false;
         		}
@@ -830,7 +813,7 @@ gco.set_canvas_listener = function(){
             cst.selection.y = my - cst.dragoffy;   
             gco.draw();
 			moving_player.play();
-            gco.update_status("Dragging player "+cst.selection.id);
+            gco.update_status(speak("stat-dragging-player")+cst.selection.id);
 			
         }
 		
@@ -849,7 +832,7 @@ gco.set_canvas_listener = function(){
                         player_id : cst.selection.id,
                         node_id : i
                     });
-                    gco.update_status("Moved player "+cst.selection.id);
+                    
                     cst.selection = undefined;
 					moving_player.pause();
                     cst.dragging = false;
@@ -868,5 +851,15 @@ gco.set_canvas_listener = function(){
     }, true);//end mouseup listener
     
 }//end set canvas listener
+
+
+
+var translate_page = function(){
+	$("#end-game-label").html(speak("end-game-label"));
+	$("footer").html(speak("footer"));
+}
+
+
+
 
 

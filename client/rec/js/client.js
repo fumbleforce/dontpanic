@@ -91,7 +91,7 @@ socket.on('change', function (data) {
     }
     if (d.win) {
     	console.log("WON");
-    	//window.alert("You won the game! Congratulations! Replay is saved to database.");
+    	window.alert("You won the game! Congratulations! Replay is saved to database.");
     	//Save to database
     }
     if (d.lose) {

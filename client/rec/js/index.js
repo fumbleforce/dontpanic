@@ -63,7 +63,7 @@ function selected_template(id){
 }
 
 function replay(){
-	create_cookie("is_gm", true, 1);
+	create_cookie("is_gm", false, 1);
 
 	$.ajax({
         url: remote_ip+':8124/replays',
@@ -94,8 +94,8 @@ function replays(d){
 			console.log("Replay parsed:");
 			console.log(info);
 			desc = info.desc ? info.desc : "Default replay";
-			cont += "<a href='"+remote_ip+":8008/replay/' onclick='selected_replay("+t.id+")'><div class='template-entry clearfix'>";
-			cont += "<div class='template-info'>"+ t.replay_id + "</div>";	
+			cont += "<a href='"+remote_ip+":8008/replay/' onclick='selected_replay("+info+")'><div class='template-entry clearfix'>";
+			cont += "<div class='template-info'>"+ info + "</div>";	
 			cont += "<div class='template-info'>"+ desc + "</div>";	
 			cont += "</div></a>";
 		}
@@ -104,21 +104,21 @@ function replays(d){
 	else if (typeof d === 'object'){
 		info = JSON.parse(d.json_string);
 		desc = info.desc ? info.desc : "Default replay";
-		cont += "<a href='"+remote_ip+":8008/replay/' onclick='selected_replay("+d.replay_id+")'><div class='template-entry clearfix'>";
-		cont += "<div class='template-info'>"+ d.replay_id + "</div>";	
+		cont += "<a href='"+remote_ip+":8008/replay/' onclick='selected_replay("+info+")'><div class='template-entry clearfix'>";
+		cont += "<div class='template-info'>"+ info + "</div>";	
 		cont += "<div class='template-info'>"+ desc + "</div>";
 		cont += "</div></a>";
 		$("#maindiv").html(cont);
 	}
 	else{
-		alert("No replays are available!");
+		alert(speak("no-avail-replay"));
 	}
 }
 
 function selected_replay (replay_id) {
 	console.log("creating cookie for chosen replay: "+replay_id);
 	create_cookie("is_gm", false, 1);
-	create_cookie("replay_id", id, 1);
+	create_cookie("replay_id", replay_id, 1);
 }	
 
 function game_manager(){
@@ -154,7 +154,7 @@ function game_master(d){
 			
 			console.log("Room parsed:");
 			console.log(t);
-			desc = t.desc ? t.desc : "Default template";
+			desc = t.desc ? t.desc : speak("default-template");
 
 			cont += "<a href='"+remote_ip+":8008/game/' onclick='selected_game("+t.id+")'><div class='template-entry clearfix'>";
 			cont += "<div class='template-info'>"+ t.id + "</div>";	
@@ -178,7 +178,7 @@ function game_master(d){
 		$("#maindiv").html(cont);
 	}*/
 	else{
-		alert("No rooms are active!");
+		alert(speak("no-active-rooms"));
 	}
 
 
@@ -190,8 +190,15 @@ function selected_game(id){
 
 
 
-
-
+function translate_page(){
+	$("#play-btn").html(speak("play"));
+	$("#expert-btn").html(speak("expert-interface"));
+	$("#gm-btn").html(speak("game-master"));
+	$("#replay-btn").html(speak("replay"));
+	$("footer").html(speak("footer"));
+	$("#title-text").html(speak("title"));
+}
+translate_page();
 
 
 

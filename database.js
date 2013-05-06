@@ -120,8 +120,8 @@ db.get_all_replays = function (next) {
 	Sets a game state to the given replay
 */
 
-db.set_replay = function (replay_id, command_id, command) {
-	connection.query('INSERT INTO replay SET?', {replay_id: replay_id, command_id: command_id, command: command},
+db.set_replay = function (replay_id, state_id, state) {
+	connection.query('INSERT INTO replay SET?', {replay_id: replay_id, state_id: state_id, state: state},
 	function(err, rows, fields) {
 		if (err) throw err;
 		console.log('successfully added replay state to database');
@@ -133,12 +133,11 @@ db.set_replay = function (replay_id, command_id, command) {
 */
 
 db.get_replay = function (replay_id, next) {
-	connection.query('SELECT command FROM replay WHERE replay_id = ' + replay_id, function (err, rows, fields) {
+	connection.query('SELECT state FROM replay WHERE replay_id = ' + replay_id, function (err, rows, fields) {
 		if (err) throw err;
 		return next(rows);
 	});
 }
-
 /*
 	Sets an event in the database
 */
@@ -175,9 +174,9 @@ db.add_info_card = function (name) {
 	Gets the gamestate of the given state id and replay id
 */
 
-db.get_command = function (replay_id, command_id, next) {
-	connection.query('SELECT command AS solution FROM Replay WHERE replay_id = ' + 
-	replay_id, 'AND command_id = ' + command_id, function (err, rows, fields) {
+db.get_command = function (replay_id, state_id, next) {
+	connection.query('SELECT state AS solution FROM Replay WHERE replay_id = ' + 
+	replay_id, 'AND state_id = ' + state_id, function (err, rows, fields) {
 		if (err) throw err;
 		return next(rows[0].solution);
 	});
