@@ -25,6 +25,7 @@ server.engine('.html', require('ejs').__express);
 server.set('views', __dirname + '/client/views');
 server.use(express.static(__dirname + '/client/rec'));
 server.use('/img', (__dirname + '/client/rec/img'));
+server.use('/music', (__dirname + '/client/rec/music'));
 server.set('view engine', 'html');
 server.set('port', process.env.PORT || 8008);
 
@@ -72,31 +73,46 @@ http.createServer(function (req, res) {
     console.log('Data request received');
 	console.log("method: "+req.method);
     console.log("url: "+req.url);
-	
-	if(req.method === "POST"){
-	
-		console.log("recieve template");
-			
-		req.on("data", function(data) {
-			
-			console.log(JSON.parse(data.toString()));
-			db.set_template_string(data.toString());			
 
-		
+	if(req.method === "POST"){
+
+		console.log("recieved state or template");
+
+		req.on("data", function(data) {
+			var datainfo = JSON.parse(data);
+
+
+			if(datainfo.type == 'state'){
+				console.log("state");
+				console.log("replay id: " + datainfo.replay_id);
+
+				console.log("command id: " + datainfo.command_id);
+
+				db.set_replay(datainfo.replay_id, datainfo.command_id, data.toString());
+
+			}
+			if(JSON.parse(data).type == 'template'){
+				console.log("template");
+				db.set_template_string(data.toString());
+
+			}
+
+
+
+
 		});
-		
+
 		//res.end();
 
 	}
-	
+
 	else if (req.method === "GET") {
 
 		if (req.url.indexOf("replays") !== -1) {
-			console.log("requesting replay");
-			
+			console.log("requesting replays");
+
 			res.writeHead(200, {'Content-Type': 'text/plain'});
 			db.get_all_replays(function (result) {
-				console.log(result);
 				var	replays = [];
 				var temp;
 				for (var i = 0; i < result.length;i++){
@@ -104,13 +120,32 @@ http.createServer(function (req, res) {
 					replays.push(JSON.stringify(temp));
 				}	
 				console.log("Sending list of replays");
-
 				res.end('replays('+JSON.stringify(replays)+')');
 			});
 		}
+
+		else if (req.url.indexOf("show_replay") !== -1) {
+			console.log("requesting replay");
+			res.writeHead(200, {'Content-Type': 'text/plain'});
+			var first_index_of_replay_id = req.url.indexOf("replay_id") + 10;
+			var last_index_of_replay_id = req.url.lastIndexOf("&_");			
+			var replay_id = req.url.slice(first_index_of_replay_id, last_index_of_replay_id);
+			db.get_replay(replay_id, function (result) {
+				var replay = [];
+				var temp;
+				for (var i = 0; i < result.length; i++) {
+					temp = result[i];
+					replay.push(JSON.parse(temp.state));
+				}
+				console.log("Sending replay states");
+				res.end('start_replay('+JSON.stringify(replay)+')');
+			});
+
+
+		}
 		else if (req.url.indexOf("game_master") !== -1) {
 			res.writeHead(200, {'Content-Type': 'text/plain'});
-			
+
 			var game_list = [];
 			for (var g in games){
 				game_list.push(JSON.stringify({id:games[g].id}));
@@ -118,7 +153,7 @@ http.createServer(function (req, res) {
 			res.end('game_master('+JSON.stringify(game_list)+')');
 		}
 		else if (req.url.indexOf("templates") !== -1) {
-	
+
 			res.writeHead(200, {'Content-Type': 'text/plain'});
 			db.get_all_templates(function(result) {
 
@@ -128,7 +163,7 @@ http.createServer(function (req, res) {
 					temp = result[i];
 					gametemplates.push(JSON.stringify(temp));
 				}
-			
+
 				console.log("Sending list of templates");
 
 				res.end('templates('+JSON.stringify(gametemplates)+')');
@@ -136,7 +171,7 @@ http.createServer(function (req, res) {
 			});
 		}
 	}
-	
+
 
 }).listen(8124);
 console.log('Data server running at http://127.0.0.1:8124/');
@@ -147,7 +182,7 @@ console.log('Data server running at http://127.0.0.1:8124/');
     The socket.IO server listens to a http-server, that in turn listens to the express server.
 */
 ioserver.listen(server.get('port'));
-var socket_listener = require('socket.io').listen(ioserver, {log:false});
+var socket_listener = require('socket.io').listen(ioserver, {log:false});
 
 
 /*  Handle client interaction through socket.io:
@@ -169,6 +204,7 @@ socket_listener.sockets.on('connection', function (client) {
         console.log("Checking for user ID... "+o.id);
         
         if(o.is_gm){
+        	client.is_gm = true;
         	client.emit("get_room_id");
         }
         
@@ -201,22 +237,27 @@ socket_listener.sockets.on('connection', function (client) {
         console.log('**SOCKET_LISTENER** received command ' + c);
         engine.end_game(client, c);
     });
-	
+
 	//Client has chosen a game template, and sent a template_id to start a game with.
     client.on('create_game', function(c) {
-		
+
 		console.log('**SOCKET_LISTENER** received create command ');
 
     	console.log('Retrieving template with id: '+c.template_id);
     	db.get_template_string(c.template_id, function(result) {
 			var	gametemplate = JSON.parse(result[0].json_string);
-			
+
 			console.log("Creating game object based on template..");
-			var g = new engine(client.userid, client, gametemplate, c.template_id);
-			console.log("Created.");
-	    	games[g.id] = g;
-	    	client.game_id = g.id;
-	    	g.start(client);		
+
+			db.get_replay_id(function (result) { 
+				var g = new engine(client.userid, client, gametemplate, c.template_id, result+1);
+				console.log("Created.");
+				console.log(typeof g);
+	    		games[g.id] = g;
+	    		client.game_id = g.id;
+	    		g.start(client);	
+
+			});
 		});
     })
     
@@ -232,6 +273,7 @@ socket_listener.sockets.on('connection', function (client) {
     client.on('leave_game', function(c) {
         console.log('**SOCKET_LISTENER** received leave command ' + c);
         //TODO Save game replay
+        games[client.game_id].delete_game();
         delete games[client.game_id];
     });
     
@@ -240,27 +282,25 @@ socket_listener.sockets.on('connection', function (client) {
         console.log('**SOCKET_LISTENER** Received:');
         var parsed = JSON.parse(c);
         
-        if(client.game_id) games[client.game_id].command(client, parsed);
+        if(client.game_id){
+        	var g = games[client.game_id];
+		    g.command(client, parsed);
+		    db.set_replay(g.replay_id, g.command_id, JSON.stringify(g.state()));
+		}
     });
-	
+
 	client.on('replay', function (c) {
 		db.get_all_replays(function(result) {
-			
+
 			var r = new replay(result);
 			var	replays = [];
 			var temp;
-			
+
 			for (var i = 0; i < result.length;i++){
 				temp = result[i];
 				replays.push(JSON.stringify(temp));
 			}
 			res.end('replays('+JSON.stringify(replays)+')');
-		});
-	})
-	
-	client.on('next_command', function (c) {
-		db.get_command(c.replay_id, c.command_id, function(result) {
-			
 		});
 	})
 
@@ -285,3 +325,4 @@ function find_game(userid){
 	}
 	return;
 }
+

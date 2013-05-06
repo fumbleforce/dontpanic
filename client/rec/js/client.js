@@ -1,5 +1,6 @@
 
-var socket = io.connect('http://localhost');
+
+var socket = io.connect(remote_ip);
 
 socket.on('is_connected', function () {
     console.log('Connected');
@@ -28,6 +29,7 @@ socket.on('not_in_game', function(o){
 });
 
 socket.on('error', function (e) {
+	gco.update_error(speak(e));
     console.log(e);
 });
 
@@ -36,11 +38,25 @@ socket.on('get_room_id', function(){
 	socket.emit("selected_room_id", room);
 });
 
+socket.on('roadblock', function(){
+	roadblock_audio.play();
+
+});
+
 socket.on('start_game', function (data) {
 	console.log("Recieved starting state, initializing.");
     var d = JSON.parse(data);
     console.log(d);
     gco.init_game(d);
+});
+
+socket.on('save_state', function (data) {
+	console.log("saving state");
+	
+	
+	$.post(remote_ip+':8124/', data);
+	console.log(data);
+	
 });
 
 socket.on('change', function (data) {
@@ -61,6 +77,7 @@ socket.on('change', function (data) {
     }
     if (d.turn) {
         gco.update_turn(d.turn, d.active_player);
+		
     }
     if (d.options) {
     	gco.update_options(d.options);
@@ -69,11 +86,13 @@ socket.on('change', function (data) {
         gco.reset();
     }
     if (d.event) {
+		event_scream.play();
     	window.alert(d.event.name);
+		
     }
     if (d.win) {
     	console.log("WON");
-    	//window.alert("You won the game! Congratulations! Replay is saved to database.");
+    	window.alert("You won the game! Congratulations! Replay is saved to database.");
     	//Save to database
     }
     if (d.lose) {
@@ -91,6 +110,25 @@ socket.on('change', function (data) {
 function command(type, o){
     var c = o || {}
     c.type = type;
+	if (type == 'create_road_block'){
+		roadblock_audio.play();
+	}
+	else if (type == 'create_info_center'){
+		information_center_audio.play();
+	}
+		
+	else if (type == 'move_people'){
+		move_people_audio.play();
+	}	
+	
+	else if (type == 'remove_road_block'){
+		checkpoint_mixdown.play();
+	}	
+	
+	else if (type == 'decrease_panic'){
+		decrease_panic.play();
+	}
+		
     if (gco.cst.selected_node !== null) c.selected_node = gco.cst.selected_node;
     if (gco.cst.selected_zone !== null) c.selected_zone = gco.cst.selected_zone;
     var send = JSON.stringify(c);

@@ -3,16 +3,42 @@
 
 <head>
     <link rel="stylesheet" href="/css/styles.css" >
+    <script src="/js/jquery-1.9.1.min.js"></script>
+    <script src="/js/lang.js"></script>
+    <script src="/js/conf.js"></script>
 </head>
 
 <body style="height:2000px">
 
+
+
+
+
+<div style="position: absolute; top: 0; right: 0; width: 500px; text-align:right;">
+<embed
+src="/music/panic_screams_introv2.mp3"
+width="450"
+height="47"
+loop="true"
+type="audio/mpeg"
+autostart="true" />
+    </div>
+
+<div style="position:absolute; top:0;left:0;width:auto;height:auto;">
+<button class="btn" onclick="set_lang('en');translate_page();">English</button>
+<button class="btn" onclick="set_lang('no');translate_page()">Norwegian</button>
+</div>
+
+
 <div class="content-table">
+
+
+
 
     
     <div class="title-row content-row">
         <div class="content-column"></div>
-        <div class="content-column title-text">
+        <div id="title-text" class="content-column title-text">
             DON'T PANIC
         </div>
         <div class="content-column"></div>
@@ -21,11 +47,10 @@
     <div class="content-row">
     	<div class="content-column"></div>
         <div class="content-column" id="maindiv">
-			<button class="indexbtn" onclick="play()">Play</button>
-       		<a href="/expert" ><button class="indexbtn">Expert Interface</button></a>
-       		<button onclick="game_manager()" class="indexbtn">Game Master</button>
-       		<button class="indexbtn" onclick="replay()" >Replay</button>
-
+			<button id="play-btn" class="indexbtn" onclick="play()">Play</button>
+       		<a href="/expert" ><button id="expert-btn" class="indexbtn">Expert Interface</button></a>
+       		<button onclick="game_manager()" id="gm-btn" class="indexbtn">Game Master</button>
+       		<button class="indexbtn" id="replay-btn" onclick="replay()" >Replay</button>
         </div>
         <div class="content-column"></div>
        
@@ -42,8 +67,10 @@
 
 <footer>A game by Group 10</footer>
 
+
+
 <script src="/js/cookies.js"></script>
-<script src="/js/jquery-1.9.1.min.js"></script>
+
 <script src="/js/index.js"></script>
 
 

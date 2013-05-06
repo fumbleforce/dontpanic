@@ -1,22 +1,29 @@
 /**  Engine module
 
     This module will be a game "Class".
-<<<<<<< HEAD
     It is an instance of a game, and handles all game related logic.
     
     id			Integer				Game id from the server
     client		socket.io client	The client that created the game
     template	Object				Contains the map, players and settings configured as a template by an expert
 */
-var ge = module.exports = function (id, client, template,template_id) {
+var ge = module.exports = function (id, client, template,template_id, id_replay) {
 
-
+    
 
 	console.log("Base template:");
 	console.log(template);
 	console.log("Populating....");
+	console.log("replay_id " + id_replay); 
 
-	
+
+	if(!template.map.nodes) return "No nodes in template!";
+	if(!template.map.zones) return "No zones in template!";
+	if(!template.players) return "No nodes in template!";
+	if(!template.events) return "No events in template!";
+	if(!template.info_cards) return "No info cards in template!";
+
+
 	//Clients
 	this.clients = [client];
 
@@ -25,13 +32,15 @@ var ge = module.exports = function (id, client, template,template_id) {
 	this.events = template.events || [];
 	this.settings = template.settings || {};
 	this.template_id = template_id || 0;
-	
+
+    //Replay
+    this.command_id = 0;
+	this.replay_id = id_replay;
+
 	//Map
 	this.map = {nodes : [], zones : []};
-	if(!template.map.nodes) console.log("No nodes in template!");
-	if(!template.map.zones) console.log("No zones in template!");
-	if(!template.players) console.log("No nodes in template!");
-	
+
+
 	for(var i = 0;i<template.map.nodes.length; i++){
 		this.map.nodes.push(new ge.Node(template.map.nodes[i]));
 	}
@@ -39,35 +48,30 @@ var ge = module.exports = function (id, client, template,template_id) {
 		var tzone = template.map.zones[i];
 		this.map.zones.push(new ge.Zone(tzone));
 	}
-	
+
 	//Players
 
 	this.players = [];
 	var player;
 	var len = template.players.length;
-	
+
     for(var i = 0; i < len; i++){
 		var tplayer = template.players[i]
 		player = new ge.Player(tplayer.id, tplayer.user, tplayer.node , tplayer.color, tplayer.role, tplayer.actions_left);
-    	
 
 		player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
-
     	
     	//First player gets one extra
 		if(i === 0){
 			player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
 		}
-
-		
     	this.players.push(player);
     }
-	
-	
+
+
 	//Server related
-	this.client = client || null;  //TODO DEPRECATED
 	this.id = id || 0;
-	
+
 	//Local game related
 	this.active_player = 0;
 	this.turn = 0;
@@ -82,133 +86,15 @@ var ge = module.exports = function (id, client, template,template_id) {
 	this.turnsSinceEvent = 0;
 	this.eventblocked = false;
 	this.started=false;
-	
+	this.ended=false;
+	this.used_info_card = false;
+
 	//Local
 	var SCALE= 90;
 	var PADD = 50;
 
     //TODO Import from template	
-    this.events = [
-                   {   id:0,
-                	   name:"Fire engulfs industrial complex! Workers in all districts gives into panic.\nPanic increased by 20 in all industrial districts",
-                	   effects: [{
-                		   domain:'zone',
-                		   type:'event',
-                		   panic:(20),
-                		   affects:'industry'
-                	   }]
-                   },
-                    {   id:1,
-                    	name:"Power outage in all residential districts!\nPanic increased by 5 in all residential districts",
-                    	effects: [{
-                    		domain:'zone',
-                    		type:'event',
-                    		panic:(5),
-                    		affects:'residential'
-                    	}]
-                    },
-                     {   id:2,
-                    	 name:"Terrorist attack in all finacial districts!\nPanic increased by 10 in all financial districts",
-                    	 effects: [{
-                    		 domain:'zone',
-                    		 type:'event',
-                    		 panic:(35),
-                    		 affects:[9, 10, 11]
-                    	 }]
-                     }
-					 ,
-                    {   id:3,
-                    	name:"Power outage in all residential districts\nPanic increased by 10 in all residential districts!",
-                    	effects: [{
-                    		domain:'zone',
-                    		type:'event',
-                    		panic:(5),
-                    		affects:'residential'
-                    	}]
-                    } ,
-                    {   id:4,
-                    	name:"Shouting about an epedemic can be heard.\nPanic increased by 10 in all districts",
-                    	effects: [{
-                    		domain:'zone',
-                    		type:'event',
-                    		panic:(10),
-                    		affects:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
-                    	}]
-                    } ,
-                    {   id:5,
-                    	name:"An explosion has occured!\nPanic increased by 10 in all industry districts",
-                    	effects: [{
-                    		domain:'zone',
-                    		type:'event',
-                    		panic:(10),
-                    		affects:'industry'
-                    	}]
-                    } ,
-                    {   id:6,
-                    	name:"Rabid dogs roam the park!\nPanic increased by 10 in all parks",
-                    	effects: [{
-                    		domain:'zone',
-                    		type:'event',
-                    		panic:(10),
-                    		affects:'park'
-                    	}]
-                    } ,
-                    {   id:7,
-                    	name:"Viable pipe bomb has been found near a school!\nPanic increased by 10 in all residential districts",
-                    	effects: [{
-                    		domain:'zone',
-                    		type:'event',
-                    		panic:(10),
-                    		affects:'residential'
-                    	}]
-                    } ,
-                    {   id:8,
-                    	name:"Gunshots can be heard through a school cooridor!\nPanic increased by 10 in all residential districts",
-                    	effects: [{
-                    		domain:'zone',
-                    		type:'event',
-                    		panic:(10),
-                    		affects:'residential'
-                    	}]
-                    },
-                    {   id:9,
-                    	name:"Anthrax has been spread on an undergroud!\nPanic increased by 10 in all financial districts",
-                    	effects: [{
-                    		domain:'zone',
-                    		type:'event',
-                    		panic:(10),
-                    		affects:'largecity'
-                    	}]
-
-                    },
-                    {   id:10,
-                    	name:"Large occurenses of MRSA Staph Bacteria Infections have been reported!\nPanic increased by 10 in all residential districts",
-                    	effects: [{
-                    		domain:'zone',
-                    		type:'event',
-                    		panic:(10),
-                    		affects:'residential'
-                    	}]
-                    },
-                    {   id:11,
-                    	name:"Gunshots can be heard through a school cooridor!\nPanic increased by 10 in all residential districts",
-                    	effects: [{
-                    		domain:'zone',
-                    		type:'event',
-                    		panic:(10),
-                    		affects:'residential'
-                    	}]
-                    }/*,
-					{   id:2,
-                    	name:"WTF, DID THAT JUST HAPPEN?!",
-                    	effects: [{
-                    		domain:'player',
-                    		type:'blocknextevent'
-                    		},]
-							
-                    },*/
-
-            ];
+    this.events = template.events || [];
                 
                 
 	console.log("Finished populating engine object.");
@@ -224,35 +110,42 @@ var ge = module.exports = function (id, client, template,template_id) {
     Executes in-game commands.
 */
 ge.prototype.command = function(client, c){
+	this.command_id++;
+
+	if(this.ended) return;
+
     var nodes = this.map.nodes,
 		zones = this.map.zones,
         players = this.players,
         changed = {none:true};
+
     
-	
+
     switch (c.type) {
         case 'move_player':
             if (c.player_id === this.active_player) {
                 var p = players[c.player_id];
-		    	if(p.move_player(nodes[p.node], nodes[c.node_id]))
-		    		{changed.players = [p];}
+		    	if(p.move_player(this,nodes[p.node], nodes[c.node_id])){changed.players = [p];}
             }
+            //must send player object even if not moved, to paint it correctly, apparently
+            changed.players = [p];
             break;
             
   		case 'select_node':
   			var n = c.node_id,
   				options = [],
   				p = players[this.active_player];
-  				if(nodes[n].can_add_information_center(p)) {
+  				if(nodes[n].can_add_information_center(this,p)) {
   					options.push('info');
   				}
-  				if (nodes[n].can_add_road_block(p, players)) {
+  				if (nodes[n].can_add_road_block(this,p, players)) {
   					options.push('block');
   				}
-  				if (nodes[n].can_remove_road_block(p, players)) {
+  				if (nodes[n].can_remove_road_block(this,p, players)) {
   					options.push('rem_block');
   				}
   			changed.options = options;
+  			this.emit("error", "none");
   			
   			break;
   			
@@ -260,14 +153,14 @@ ge.prototype.command = function(client, c){
   			var z = zones[c.zone_id],
   				options = [],
   				p = players[this.active_player];
-  				
-  			if(z.can_move_people_from(p, 5)) {
+  			if(z.can_move_people_from(this,p, 5)) {
 				options.push('people');
   			}
-  			if(z.can_dec_panic(p,nodes[p.node])){
+  			if(z.can_dec_panic(this,p,nodes[p.node])){
   				options.push('panic');
   			}
   			changed.options = options;
+  			this.emit("error", "none");
   			break;
   
   
@@ -277,35 +170,36 @@ ge.prototype.command = function(client, c){
             var z = zones[c.selected_zone],
                 p = players[this.active_player]
             
-            if (z.dec_panic(p, nodes[p.node])){
+            if (z.dec_panic(this,p, nodes[p.node])){
                 changed.zones = [z];
                 changed.players = [p];
             }
-			
-			else {
-				this.emit('error', 'Could not decrease panic');
-				break;
-			}
-					
+
 			break;
-			
-			
-			
+
+
+
 		case 'move_people':
 			// TODO: find out how many people we can move, driver can move 10, regulars can only move 5
-			console.log("Trying to move people from zone: " + c.zone_from+
+			var movePeople = 5;
+			if (players[this.active_player].role=="driver"){
+				movePeople = 10;}
+			console.log([players[this.active_player]].role+" is trying to move "+movePeople+" people from zone: " + c.zone_from+
 				"to zone: " + c.zone_to);
-
-			
-			if (zones[c.zone_from].move_people(players[this.active_player], zones[c.zone_to], 5)) {
-				changed.zones=[zones[c.zone_to], zones[c.zone_from]];
-				changed.players = [players[this.active_player]];
+			//see if roads are blocked or not
+			for (var i = 0; i < zones[c.zone_from].nodes.length; i++){
+				//if one node is unblocked, can move people
+				if (zones[c.zone_to].nodes.indexOf(zones[c.zone_from].nodes[i])>-1&&(!nodes[zones[c.zone_from].nodes[i]].has_road_block)){
+					if (zones[c.zone_from].move_people(this,players[this.active_player], zones[c.zone_to], movePeople)) {
+						changed.zones=[zones[c.zone_to], zones[c.zone_from]];
+						changed.players = [players[this.active_player]];
+						break;
+					}
+				}
 			}
-			
-
 
 			break;
-			
+
 
 			//TODO Finish this
 		case 'create_info_center':
@@ -317,8 +211,8 @@ ge.prototype.command = function(client, c){
 			if(
 				this.information_centers < this.max_information_centers
 				&& p.node === n.id 
-				&& n.add_information_center(p)){
-				
+				&& n.add_information_center(this,p)){
+
 				changed.nodes = [n];
 				changed.players = [p];
 				this.information_centers++;
@@ -329,8 +223,10 @@ ge.prototype.command = function(client, c){
 		case 'create_road_block':
 
 			var p = players[this.active_player];
+
 			
-			if((c.selected_node===p.node) && (this.road_blocks < this.max_road_blocks) && nodes[p.node].add_road_block(p, players)){
+			if((c.selected_node===p.node) && (this.road_blocks < this.max_road_blocks) && nodes[p.node].add_road_block(this,p, players)){
+
 				for (var i=0; i<zones.length; i++){
 					if ((!zones[i].isBlocked)&&((zones[i].nodes.indexOf(nodes[p.node].id))>=0)){
 						var allBlocked=true;
@@ -341,7 +237,7 @@ ge.prototype.command = function(client, c){
 								allBlocked=false;
 								break;
 							}
-								 
+
 						}
 						console.log("allBlocked:"+allBlocked);
 						if (allBlocked){
@@ -352,6 +248,7 @@ ge.prototype.command = function(client, c){
 				}
 				changed.nodes = [nodes[p.node]];
 				changed.players = [p];
+
 				this.road_blocks++;
 				for (var i=0; i<zones.length; i++){
 					console.log("Zone "+i+" blocked? "+zones[i].isBlocked);
@@ -361,10 +258,10 @@ ge.prototype.command = function(client, c){
 			break;
 
 		case 'remove_road_block':
-			
+
 			var p = players[this.active_player];
 
-			if(nodes[p.node].remove_road_block(p, players)){
+			if(nodes[p.node].remove_road_block(this,p, players)){
 				changed.nodes = [nodes[p.node]];
 				changed.players = [p];
 				this.road_blocks--;
@@ -375,29 +272,49 @@ ge.prototype.command = function(client, c){
 					zones[i].isBlocked=false;
 				}
 			}
-			
+
 			for (var i=0; i<zones.length; i++){
 				console.log("Zone "+i+" blocked? "+zones[i].isBlocked);
 			}
-			
+
 			break;		
 
 
 
 		case 'use_card':
-			var ic = players[this.active_player].info_cards.splice(c.card,1)[0];
-			changed = effect(ic, this);
-            changed.players = changed.players ? changed.players.push(players[this.active_player]) :  [players[this.active_player]];
+			if(!this.used_info_card || client.is_gm){
+				var ic = players[this.active_player].info_cards.splice(c.card,1)[0];
+				changed = effect(ic, this);
+		        changed.players = changed.players ? changed.players.push(players[this.active_player]) :  [players[this.active_player]];
+		        if(!client.is_gm) this.used_info_card = true;
+            }
 			break;
-			
-			
+
+
 	    case 'inc_panic':
 	        for (var i = 0; i < zones.length;i++) {
 	        	//update zones with 10 panic
 	        	if (!zones[i].is_panic_zero()){
-					zones[i].update_panic(10);
+
+	        		if (zones[i].people<=10){
+
+					
+						
+	        			zones[i].update_panic(this,10);
+					}
+	        		else if (zones[i].people<=50){
+					
+						
+	        			zones[i].update_panic(this,15);
+					}
+	        		else {
+						
+	        			zones[i].update_panic(this,20);
+
+					}
 				}
 	        }
+
 
 	        this.timer_dur += this.time_step;
 	        this.start_timer();
@@ -406,21 +323,24 @@ ge.prototype.command = function(client, c){
 	        	//if zones has 50 panic, spread to adjacent zones
 	        	if (zones[i].panic_level==50&&(!zones[i].isBlocked)){
 	        		for (var j = 0; j < zones[i].adjacent_zones.length; j++){
-	        			zones[zones[i].adjacent_zones[j]].update_panic(5);
+	        			zones[zones[i].adjacent_zones[j]].update_panic(this,5);
 	        		}
 	        	}
-	        	
+
 	        }
 
 	        changed.timer = this.timer;
 	        changed.zones = zones;
-	        
+
 	        break;
-		
-		
-		
+
+
+
 		case 'end_turn':
-		    
+
+
+
+
 		    var ap = players[this.active_player];
             ap.actions_left = ap.role === 'activist' ?  5 : 4;
             
@@ -435,44 +355,40 @@ ge.prototype.command = function(client, c){
 				ap.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
 				this.cards_left -= 1;
 			}
-			
 
-			
+
+
 			//fire a random event every Xth turn
-			console.log("what is event blocked now?  " + this.eventblocked);
 			if (this.turnsSinceEvent>=this.eventTurns){
-			
+
 				if (this.eventblocked){
-				console.log("event to set to false 134456 " + this.eventblocked);
 				this.eventblocked = false;
 				this.turnsSinceEvent=0;
-				console.log("event to set to false " + this.eventblocked);
-			
-
 				}
-			
+
 				else{
 				var randomEvent=Math.floor(Math.random()*this.events.length);
 				changed = effect(this.events[randomEvent], this);
-				changed.event = this.events[randomEvent];
+				changed.event = this.events[randomEvent];			
 				this.turnsSinceEvent=0;
 				}
 			}
 			changed.players = [ap];
 			changed.turn = this.turn;
 			changed.active_player = this.active_player;
-				
+
 				break;
         
         console.log("No matching command types");
             
     }
-    
+
     //Check for win
     changed.win = this.check_win();
     
     //Check for lose
     changed.lose = this.check_lose();
+    if(changed.lose || changed.win) this.ended = true;
     
     if(changed.players || changed.nodes || changed.zones || changed.turn || changed.event || changed.win || changed.lose){
         changed.none = false;
@@ -522,6 +438,9 @@ ge.prototype.save_state = function(client, c) {
 }
 
 ge.prototype.delete_game = function(client, c) {
+	this.ended = true;
+	this.stop_timer();
+	delete this;
 }
 
 ge.prototype.join_game = function(client) {
@@ -540,6 +459,20 @@ ge.prototype.emit = function(type, o){
 	}
 }
 
+ge.prototype.state = function(){
+	var g = this;
+    return {
+        type : 'state',
+		replay_id : g.replay_id,
+		command_id : g.command_id,
+        zones : g.map.zones,
+        nodes : g.map.nodes,
+        players : g.players,
+        turn : g.turn,
+        timer : g.timer,
+        active_player : g.active_player
+    };
+}
 
 
 
@@ -560,6 +493,7 @@ ge.prototype.start_timer = function() {
 	var that = this;
     that.timer = that.timer_dur;
     
+    if(!this.ended){
     var inter = setInterval(function(){
         
         that.timer--;
@@ -567,10 +501,15 @@ ge.prototype.start_timer = function() {
             that.command("", {type:'inc_panic'});
             clearInterval(inter);
         }
+        
         that.emit('change', JSON.stringify({timer:that.timer}));
     }, 1000);
-    
-    
+    }
+}
+
+ge.prototype.stop_timer = function(){
+	clearInterval(this.inter);
+
 }
 
 
@@ -588,7 +527,7 @@ ge.prototype.check_lose = function(){
 	var zones = this.map.zones;
 	console.log("Checking lose..");
 	for(var i = 0; i < zones.length; i++){
-		console.log("Zone "+i+": "+zones[i].panic);
+		console.log("Zone "+i+": "+zones[i].panic_level);
 		if(zones[i].panic_level < 50){
 			return false;
 		}
@@ -635,7 +574,7 @@ function effect(card, g) {
                 switch(e.type){
                     case 'panic':
                         for (z = 0; z<e.affects.length; z++){
-                            zones[e.affects[z]].update_panic(e.panic);
+                            zones[e.affects[z]].update_panic(g,e.panic);
                             changed.zones.push(zones[e.affects[z]]);
                         }
                         break;
@@ -653,12 +592,12 @@ function effect(card, g) {
                     		}
                     		if (infoCenter){
                     			console.log("LOL INFO");
-                    			zones[e.affects[z]].update_panic(round5((e.panic)/2));
+                    			zones[e.affects[z]].update_panic(g,round5((e.panic)/2));
                     			changed.zones.push(zones[e.affects[z]]);
                     		}
                     		else{
                     			console.log("LOL NOINFO");
-                    			zones[e.affects[z]].update_panic(e.panic);
+                    			zones[e.affects[z]].update_panic(g,e.panic);
                     			changed.zones.push(zones[e.affects[z]]);
                     		}
                     		infoCenter=false;
@@ -676,67 +615,37 @@ function effect(card, g) {
                 switch(e.type){
                     case 'actions':
                         for (p = 0; p < e.affects.length; p++){
-                            players[e.affects[p]].update_actions(e.actions);
+                            players[e.affects[p]].update_actions(g,e.actions);
                             changed.players.push(players[e.affects[p]]);
                         }
                         break;
                     case '':
                         
                         break;
-						
+
 					//The player gets his moves decreased. apal; active player actions left
 
-					case 'decreasemoves1':
-						
-						var apal = players[g.active_player];
-						apal.actions_left = apal.actions_left -1;
-						
-						break;
-						
-						
-					case 'decreasemoves2':
-						
-						var apal = players[g.active_player];
-						apal.actions_left = apal.actions_left -2;
-						
-						break;
-						
-					case 'decreasemoves3':
-						
-						var apal = players[g.active_player];
-						apal.actions_left = apal.actions_left -3;
-						
-						break;
-						
+
 						//The player must skip a turn
 					case 'nextplayer':
-					
+
 						var objectsas = {
 							type : 'end_turn',
 							domain : 'something'
 							};
 						g.command(g.client, objectsas);
-						
-						
-					
+
+
+
 					break;
-						
-						
-						//player actions are increased to 6
-					case 'increasemoves':
-						
-						var apai = players[g.active_player];
-						apai.actions_left = apai.actions_left +2;
-						
-						break;
-						
+
 						//Active player steals an action from the next player
 					case 'stealaction':
-					
+
 						var apsa = players[g.active_player]; 
 						apsa.actions_left = apsa.actions_left +1;
 						players[(g.active_player + 1) % (g.players.length)].actions_left -=1;
-						
+
 						break;
 					/*	
 					//TODO This code was a proposal for tradecards
@@ -751,13 +660,13 @@ function effect(card, g) {
 					//TODO	
 					case 'moveanotherplayer':
 						break;
-						
+
 					//TODO
 					case 'blocknextevent':
 						g.eventblocked =true;
-						
-						
-						
+
+
+
 						break;
                 }
             
@@ -783,6 +692,8 @@ function effect(card, g) {
 function state(g){
     return {
         type : 'state',
+		replay_id : g.replay_id,
+		command_id : g.command_id,
         zones : g.map.zones,
         nodes : g.map.nodes,
         players : g.players,
@@ -832,11 +743,11 @@ ge.Player = function(id, user, node, color, role, actions_left) {
 	this.info_cards = [];
 	this.actions_left = actions_left;
 	this.class = 'player';
-	
+
 }
 
-ge.Player.prototype.update_actions = function (actions) {
-	var able = this.can_update_actions(actions);
+ge.Player.prototype.update_actions = function (g,actions) {
+	var able = this.can_update_actions(g,actions);
 	if (able) {
 	    this.actions_left += actions;
 	    console.log("Changed player actions by "+actions);
@@ -844,50 +755,53 @@ ge.Player.prototype.update_actions = function (actions) {
 	}
     return false;
 }
-ge.Player.prototype.can_update_actions = function (actions) {
+ge.Player.prototype.can_update_actions = function (g,actions) {
 
 	var result_action = this.actions_left + actions;
 	if (result_action < 0) {
-		console.log("Not enough actions left");
+		g.emit("error", "player-lacks-action");
 	    return false;
 	}
     return true;
 }
 
-ge.Player.prototype.remove_info_card = function(info_card) {
+ge.Player.prototype.remove_info_card = function(g,info_card) {
 	for (var i = 0; i < this.info_cards.length; i++) {
 		if (this.info_cards[i] === info_card) {
 			this.info_cards.splice(i, 1);
 		}
 	}
 }
-ge.Player.prototype.add_info_card = function(info_card) {
+ge.Player.prototype.add_info_card = function(g,info_card) {
 	this.info_cards.push(info_card);
 }
 
-ge.Player.prototype.move_player = function (node_from, node_to) {
-	var able = this.can_move_player(node_from, node_to);
+ge.Player.prototype.move_player = function (g,node_from, node_to) {
+	var able = this.can_move_player(g,node_from, node_to);
 	if (able) {
-	    this.update_actions(-1);
+	    this.update_actions(g,-1);
 	    this.node = node_to.id;
 	    return true;
 	}
 	return false;
 }
-ge.Player.prototype.can_move_player = function (node_from, node_to) {
+ge.Player.prototype.can_move_player = function (g,node_from, node_to) {
 	console.log("Can move player?");
 	if (node_from === node_to) {
-	    console.log("node from and to are same");
+	    g.emit("error", "move-same");
 		return false;
 	} 
 	else if (node_from.connects_with(node_to)) {
-		if (this.can_update_actions(-1)){
+		if (this.can_update_actions(g,-1)){
 			console.log("True");
 		    return true;
 		}
+		else{
+			g.emit("error", "player-lacks-action");
+		}
 		return false;
 	}
-	console.log("node does not connect");
+	g.emit("error", "node-not-conn");
 	return false;
 }
 
@@ -929,26 +843,29 @@ ge.Node = function (n) {
 	this.has_road_block = false;
 
 }
-ge.Node.prototype.add_information_center = function (player) {
+ge.Node.prototype.add_information_center = function (g,player) {
 	var able = this.can_add_information_center(player);
 	if (able){
 		this.has_information_center = true;
+		player.update_actions(g,-4);
 		return true;
 	}
 	return false;
 }
-ge.Node.prototype.can_add_information_center = function (player) {
+ge.Node.prototype.can_add_information_center = function (g,player) {
 	console.log("Can add info center?");
 	if (this.has_information_center) {
-		console.log("Already has information center");
+		g.emit("error", "has-info");
 		return false;
 	}
 	if(this.id !== player.node){
-		console.log("Player is not on node");
+		g.emit("error", "player-not-node");
 		return false;
 	}
+
 	
-    if(player.can_update_actions(-4) ){
+    if(player.can_update_actions(g,-4) ){
+
     	console.log("True");
 		return true;
     }
@@ -956,71 +873,78 @@ ge.Node.prototype.can_add_information_center = function (player) {
 }
 
 
-ge.Node.prototype.add_road_block = function (player, players) {
-	var able = this.can_add_road_block(player, players);
+ge.Node.prototype.add_road_block = function (g,player, players) {
+	var able = this.can_add_road_block(g,player, players);
 	if (able){
 		this.has_road_block = true;
+		player.update_actions(g,-1);
 		return true;
 	}
 	return false;	
 
 }
-ge.Node.prototype.can_add_road_block = function (player, players) {
+ge.Node.prototype.can_add_road_block = function (g,player, players) {
 	console.log("Can add road block?");
 
 	if (player.node!=this.id){
 		return false;
 	}
 	if (this.has_road_block) {
-		console.log('error', "Already has road block");
+		g.emit("error", "node-has-rb");
 	    return false;
 	}
-	
-	var another_player = false;
-	for (var i = 0; i < players.length; i++) {
-		if ((players[i].node===player.node)&&(!(i===player.id))) {
-			another_player = true;
+
+	if (!(player.role=='operation expert')){
+		var another_player = false;
+		for (var i = 0; i < players.length; i++) {
+			if ((players[i].node===player.node)&&(!(i===player.id))) {
+				another_player = true;
+			}
+		}
+		if (!another_player){
+			g.emit("error", "need-player-node");
+			return false
 		}
 	}
-	if (!another_player){
-		console.log("Player "+player+" failed to add road block, no other players on node!");
-		return false
-	}
-	
-	if(player.can_update_actions(-1) ){
+
+	if(player.can_update_actions(g,-1) ){
 		console.log("True");
 		return true;
 	}
-	
+
 	return false;	
 
 }
-ge.Node.prototype.remove_road_block = function (player, players) {
-	var able = this.can_add_road_block(player, players);
+ge.Node.prototype.remove_road_block = function (g,player, players) {
+	var able = this.can_remove_road_block(g,player, players);
 	if (able){
 		this.has_road_block = false;
+		player.update_actions(g,-1);
 		return true;
 	}
 	return false;
 }
-ge.Node.prototype.can_remove_road_block = function (player, players) {
+ge.Node.prototype.can_remove_road_block = function (g,player, players) {
 	console.log("Can remove road block?");
 	if (!this.has_road_block) {
-		console.log("No road block at this node");
+		g.emit("error", "no-rb");
 	    return false;
 	}
-	
-	var another_player = false;
-	for (var i = 0; i < players.length; i++) {
-		if ((players[i].node===player.node)&&(!(i===player.id))) {
-			another_player = true;
+
+	if (!(player.role=='operation expert')){
+		var another_player = false;
+		for (var i = 0; i < players.length; i++) {
+			if ((players[i].node===player.node)&&(!(i===player.id))) {
+				another_player = true;
+			}
+		}
+		if (!another_player){
+			g.emit("error", "need-player-node");
+			return false
 		}
 	}
-	if (!another_player){
-		console.log("No other players on node");
-		return false
-	}
-	if(player.can_update_actions(-1) ){
+
+	if(player.can_update_actions(g,-1) ){
 		console.log("Can remove road block");
 		return true;
 	}
@@ -1052,6 +976,7 @@ ge.Role = function (title, info, effect) {
 ge.Event = function (text, effect) {
 	this.text = text;
 	this.effect = effect;
+
 }
 
 
@@ -1072,12 +997,12 @@ ge.Zone = function (z) {
 	this.people = z.people;
 	this.nodes = z.nodes;
 	this.adjacent_zones = z.adjacent_zones;
-	this.panic_level = 0;// z.panic_level;//settes til 0 i starten??
+	this.panic_level = parseInt(z.panic_level);//settes til 0 i starten??
 	this.centroid = z.centroid;//center (centroid) X and Y of zone polygon to put panic info
 	this.isBlocked = false; //if all nodes of zone are blocked, then zone is blocked from spreading panic
-	
+
 }
-ge.Zone.prototype.update_panic = function (panic_level) {
+ge.Zone.prototype.update_panic = function (g,panic_level) {
 	this.panic_level += panic_level;		
 	if (this.panic_level >= 50) {
 		this.panic_level = 50;
@@ -1092,85 +1017,90 @@ ge.Zone.prototype.is_panic_zero = function () {
 ge.Zone.prototype.get_panic_level = function () {
 	return this.panic_level;
 }
-ge.Zone.prototype.dec_panic = function(player, node) {
-	var able = this.can_dec_panic(player, node);
+ge.Zone.prototype.dec_panic = function(g,player, node) {
+	var able = this.can_dec_panic(g,player, node);
 	if(able){
 		if(player.role === 'crowd manager'){
-			this.update_panic(player.role.panic)
+			this.update_panic(g,-10);
 		}
 		else{
-			this.update_panic(-5);
+			this.update_panic(g,-5);
 		}
-		player.update_actions(-1);
+		player.update_actions(g,-1);
 		return true;
 	}
 	return false;
 }
-ge.Zone.prototype.can_dec_panic = function(player, node) {
+ge.Zone.prototype.can_dec_panic = function(g,player, node) {
 	console.log("Can decrease panic?");
 	if (this.nodes.indexOf(node.id) >= 0) {
 		if(this.panic_level >= 5){
 
-			if(player.can_update_actions(-1)){
+			if(player.can_update_actions(g,-1)){
 				console.log("True");
 				return true;
 			}
 		}
 		else{
-			console.log("Panic is too low");
+			g.emit("error", "panic-too-low");
 		}
 	}
 	else{
-		console.log("Not an adjacent node");
+		g.emit("error", "not-adj-node");
 	}
 	return false;
 }
 
 
-ge.Zone.prototype.move_people = function (p, to_zone, num) {
-	var able = this.can_move_people(p, to_zone, num);
-	if(able){
-		this.people -= num;
-		to_zone.people += num;
-		p.update_actions(-1);
+ge.Zone.prototype.move_people = function (g, p, to_zone, num) {
+	var peopleMoved = this.can_move_people(g,p, to_zone, num);
+	if(peopleMoved==5||peopleMoved==10){
+		this.people -= peopleMoved;
+		to_zone.people += peopleMoved;
+		p.update_actions(g,-1);
 		return true;
 	}
 	return false;
 }
-ge.Zone.prototype.can_move_people = function (p, to_zone, num) {
+ge.Zone.prototype.can_move_people = function (g, p, to_zone, num) {
 	console.log("Can move people?");
+	//if driver wants to move 5, but there is only 5, change driver's move-variable to 5
+	if (this.people==5)
+		num=5;
 	if (this.people >= num){
+		//player can only move to adjacent zones
 		if(this.adjacent_zones.indexOf(to_zone.id)>=0 ){
-			if(p.can_update_actions(-1)) {
+			if(p.can_update_actions(g,-1)) {
 				console.log("True");
-				return true;
+				return num;
 			}
-			
+
 		}
 		else{
-			console.log("Not an adjacent zone");
+			g.emit("error", "player-not-adj");
 		}
 	}
 	else {
-		console.log("There isnt that many people in this zone");
+		g.emit("error", "not-enough-people");
 	}
-	return false;
+	return 0;
 }
-ge.Zone.prototype.can_move_people_from = function (p, num){
-	console.log("Can move from this zone?");
+ge.Zone.prototype.can_move_people_from = function (g, p, num){
+	if (this.people==5)
+		num=5;
 	if (this.people >= num){
 		if(this.nodes.indexOf(p.node)>=0 ){
-			if(p.can_update_actions(-1)) {
+			if(p.can_update_actions(g,-1)) {
 				console.log("True");
 				return true;
 			}
 		}
 		else{
-			console.log("Zone is not adjacent to player");
+			g.emit("error", "player-not-adj");
 		}
 	}
 	else{
-		console.log("Not enough people in zone");
+		g.emit("error", "not-enough-people");
 	}
 	return false;
 }
@@ -1210,10 +1140,6 @@ ge.Map = function (nodes, zones) {
 ge.Settings = function (timer_interval) {
 	var timer = new timer(timer_interval);
 }
-
-
-
-
 
 
 
