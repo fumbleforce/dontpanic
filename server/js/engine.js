@@ -207,7 +207,6 @@ ge.prototype.command = function(client, c){
 			var p = players[this.active_player],
 				n = nodes[c.selected_node];
 
-
 			if(
 				this.information_centers < this.max_information_centers
 				&& p.node === n.id 
@@ -844,7 +843,8 @@ ge.Node = function (n) {
 
 }
 ge.Node.prototype.add_information_center = function (g,player) {
-	var able = this.can_add_information_center(player);
+	console.log("IN ADD: "+player.node);
+	var able = this.can_add_information_center(g, player);
 	if (able){
 		this.has_information_center = true;
 		player.update_actions(g,-4);
@@ -854,6 +854,7 @@ ge.Node.prototype.add_information_center = function (g,player) {
 }
 ge.Node.prototype.can_add_information_center = function (g,player) {
 	console.log("Can add info center?");
+	console.log("IN CAN: "+player.node);
 	if (this.has_information_center) {
 		g.emit("error", "has-info");
 		return false;

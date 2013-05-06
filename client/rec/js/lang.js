@@ -102,15 +102,11 @@ var lang = {
 		
 		// Game related
 		'role_desc' : {
-			'coordinator':'Koordinerer ting',
-			'passer by':'Går forbi',
-			'crowd manager':'Passer på massene',
-			'operation expert':'Opererer',
-			'driver':'Kjører rundt',
+			'crowd manager':'Folkestyreren kan senke panikknivået i en sone med 10 i stedet for 5',
+			'operation expert':'Operasjonseksperten kan bygge og rive blokader alene',
+			'driver':'Sjåføren kan flytte 10 personer om gangen i stedet for 5',
 		},
 		'role_name' : {
-			'coordinator':'Koordinator',
-			'passer by':'Forbipasserende',
 			'crowd manager':'Folkestyrer',
 			'operation expert':'Operasjonsekspert',
 			'driver':'Sjåfør',

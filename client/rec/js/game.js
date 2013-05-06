@@ -220,7 +220,7 @@ gco.update_options = function(o){
 				inner += "<button class='btn' onclick='gco.move_people();'>"+speak("op-move-people")+"</button>";
 				break;
 			case 'rem_block':
-				inner += "<button class='btn' onclick='command("+'"'+"remove_road_block"+'"'+");'>"+speak("op-rem-road-block")+"</button>";
+				inner += "<button class='btn' onclick='command("+'"'+"remove_road_block"+'"'+");'>"+speak("op-rem-block")+"</button>";
 				break;
 
 		}
