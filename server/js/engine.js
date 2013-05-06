@@ -37,7 +37,7 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
 	this.template_id = template_id || 0;
 
     //Replay
-    this.command_id = 0;
+    this.state_id = 0;
 	this.replay_id = id_replay;
 
 	//Map
@@ -117,7 +117,7 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
 * @param {Object} c Command object containing instructions
 */
 ge.prototype.command = function(client, c){
-	this.command_id++;
+	this.state_id++;
 
 	if(this.ended) return;
 
@@ -213,7 +213,6 @@ ge.prototype.command = function(client, c){
 
 			var p = players[this.active_player],
 				n = nodes[c.selected_node];
-
 
 			if(
 				this.information_centers < this.max_information_centers
@@ -347,7 +346,7 @@ ge.prototype.command = function(client, c){
 
 
 
-
+			this.used_info_card=false;
 		    var ap = players[this.active_player];
             ap.actions_left = ap.role === 'activist' ?  5 : 4;
             
@@ -387,7 +386,6 @@ ge.prototype.command = function(client, c){
 				break;
         
         console.log("No matching command types");
-            
     }
 
     //Check for win
@@ -949,7 +947,8 @@ ge.Node = function (n) {
 * @param {Player} player Player to decrease panic on
 */
 ge.Node.prototype.add_information_center = function (g,player) {
-	var able = this.can_add_information_center(player);
+	console.log("IN ADD: "+player.node);
+	var able = this.can_add_information_center(g, player);
 	if (able){
 		this.has_information_center = true;
 		player.update_actions(g,-4);
@@ -965,6 +964,7 @@ ge.Node.prototype.add_information_center = function (g,player) {
 */
 ge.Node.prototype.can_add_information_center = function (g,player) {
 	console.log("Can add info center?");
+	console.log("IN CAN: "+player.node);
 	if (this.has_information_center) {
 		g.emit("error", "has-info");
 		return false;

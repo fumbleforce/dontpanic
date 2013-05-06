@@ -1,3 +1,11 @@
+/**
+	Provides connection for a mySQL-connection	
+
+	@class Database 
+	@constructor
+**/
+
+
 var db = module.exports = function () {
 
 }
@@ -13,9 +21,12 @@ console.log('Database server running at http://127.0.0.1:1337/');
 
 var mysql = require('mysql');
 
-/*
-	Connection parameters to the database
-*/
+/**
+	The connection-object containing the connection parameters 
+
+	@property connection
+	@type Object
+**/
 
 var connection = mysql.createConnection({
 
@@ -35,6 +46,13 @@ connection.connect(function(err) {
 		console.log('ERROR: ' + err);
 	}
 });
+
+/**
+	Handles disconnects from the MySQL-server.	
+
+	@method handleDisconnect
+	@params {Object} connection
+**/
 
 function handleDisconnect(connection) {
   connection.on('error', function(err) {
@@ -56,10 +74,12 @@ function handleDisconnect(connection) {
 
 handleDisconnect(connection);
 
-/*
+/**
 	Checking if the tables for the database exists, if they dont, they will be made and a 
 	a default gametemplate will be put in the database
-*/
+
+	@method set_up_database
+**/
 
 db.set_up_database = function () {
 	connection.query('show tables like "gametemplate"', function (err, rows, fields) {
@@ -92,9 +112,12 @@ db.set_up_database = function () {
 	Queries
 */
 
-/*
+/**
 	Gets the maximum replay id that exists in the database
-*/
+
+	@method get_replay_id
+	@param {function} next
+**/
 
 db.get_replay_id = function(next) {
 	connection.query('SELECT replay_id FROM replay ORDER BY replay_id DESC',
@@ -104,9 +127,13 @@ db.get_replay_id = function(next) {
 	});
 }
 
-/*
+/**
 	Gets a gametemplate from the database with the given id
-*/
+
+	@method get_template_string
+	@param {int} gametemplate_id
+	@param {function} next
+**/
 
 db.get_template_string = function (gametemplate_id, next) {
 	connection.query('SELECT id, json_string FROM gametemplate WHERE id = ' 
@@ -116,9 +143,12 @@ db.get_template_string = function (gametemplate_id, next) {
 	});
 }
 
-/*
+/**
 	Sets the given gametemplate to the database, auto increment on ID
-*/
+
+	@method set_template_string
+	@param {String} json_string
+**/
 
 db.set_template_string = function (json_string) {
 	connection.query('INSERT INTO gametemplate SET?', {json_string: json_string},
@@ -128,9 +158,12 @@ db.set_template_string = function (json_string) {
 	});
 }
 
-/*
+/**
 	Gets all the gametemplates from the database
-*/
+
+	@method get_all_templates
+	@param {function} next
+**/
 db.get_all_templates = function (next) {
 	connection.query('SELECT * FROM gametemplate', function (err, rows, fields) {
 		if (err) throw err;
@@ -139,9 +172,12 @@ db.get_all_templates = function (next) {
 	
 }
 
-/*
+/**
 	Gets all the replays from the database
-*/
+
+	@method get_all_replays
+	@param {function} next
+**/
 db.get_all_replays = function (next) {
 	connection.query('SELECT distinct replay_id FROM replay', function (err, rows, fields) {
 		if (err) throw err;
@@ -149,9 +185,14 @@ db.get_all_replays = function (next) {
 	});
 }
 
-/*
+/**
 	Sets a game state to the given replay
-*/
+	
+	@method set_replay
+	@param {int} replay_id
+	@param {int} state_id
+	@param {String} state
+**/
 
 db.set_replay = function (replay_id, state_id, state) {
 	connection.query('INSERT INTO replay SET?', {replay_id: replay_id, state_id: state_id, state: state},
@@ -161,9 +202,13 @@ db.set_replay = function (replay_id, state_id, state) {
 	});
 }
 
-/*
+/**
 	Gets all the game states of the given replay
-*/
+
+	@method get_replay
+	@param {int} replay_id
+	@param {function} next
+**/
 
 db.get_replay = function (replay_id, next) {
 	connection.query('SELECT state FROM replay WHERE replay_id = ' + replay_id, function (err, rows, fields) {
@@ -171,9 +216,12 @@ db.get_replay = function (replay_id, next) {
 		return next(rows);
 	});
 }
-/*
+/**
 	Sets an event in the database
-*/
+
+	@method set_event
+	@param {String} effect
+**/
 
 db.set_event = function(effect) {
 	connection.query('INSERT INTO event SET?', {effect: effect}, 
@@ -183,9 +231,14 @@ db.set_event = function(effect) {
 	});
 }
 
-/* 
+/**
 	Gets the gamestate of the given state id and replay id
-*/
+
+	@method get_command
+	@param {int} replay_id
+	@param {int} state_id
+	@param {function} next
+**/
 
 db.get_command = function (replay_id, state_id, next) {
 	connection.query('SELECT state AS solution FROM Replay WHERE replay_id = ' + 
