@@ -97,7 +97,7 @@ socket.on('change', function (data) {
     }
     if (d.lose) {
     	console.log("LOST");
-    	//window.alert("You lost the game! Replay is saved to database.");
+    	window.alert("You lost the game! Replay is saved to database.");
     	//Save to database
     }
     gco.draw();
