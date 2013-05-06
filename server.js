@@ -285,7 +285,7 @@ socket_listener.sockets.on('connection', function (client) {
         if(client.game_id){
         	var g = games[client.game_id];
 		    g.command(client, parsed);
-		    db.set_replay(g.replay_id, g.command_id, JSON.stringify(g.state()));
+		    db.set_replay(g.replay_id, g.state_id, JSON.stringify(g.state()));
 		}
     });
 

@@ -34,7 +34,7 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
 	this.template_id = template_id || 0;
 
     //Replay
-    this.command_id = 0;
+    this.state_id = 0;
 	this.replay_id = id_replay;
 
 	//Map
@@ -110,7 +110,7 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
     Executes in-game commands.
 */
 ge.prototype.command = function(client, c){
-	this.command_id++;
+	this.state_id++;
 
 	if(this.ended) return;
 
@@ -379,7 +379,6 @@ ge.prototype.command = function(client, c){
 				break;
         
         console.log("No matching command types");
-            
     }
 
     //Check for win
