@@ -28,15 +28,11 @@ var lang = {
 		
 		// Game related
 		'role_desc' : {
-			'coordinator':'info',
-			'passer by':'info',
-			'crowd manager':'info',
-			'operation expert':'info',
-			'driver':'info',
+			'crowd manager':'The Crowd Manager can decrease panic by 10 instead of 5',
+			'operation expert':'The Operation Expert can build and remove roadblocks alone',
+			'driver':'The Driver can move 10 people between zones instead of 5',
 		},
 		'role_name' : {
-			'coordinator':'Coordinator',
-			'passer by':'Passer By',
 			'crowd manager':'Crowd Manager',
 			'operation expert':'Operation Expert',
 			'driver':'Driver',
@@ -83,23 +79,19 @@ var lang = {
 		'player-turn-label' : ['Spiller ','s tur'],
 		'turn-label' : 'Runde: ',
 		'action-label' : 'Handlinger igjen: ',
-		'timer-label' : 'Panikk Ã¸ker om: ',
+		'timer-label' : 'Panikk øker om: ',
 		'player' : 'Spiller ',
 		
 		// Game related
 		'role_desc' : {
-			'coordinator':'Koordinerer ting',
-			'passer by':'GÃ¥r forbi',
-			'crowd manager':'Passer pÃ¥ massene',
-			'operation expert':'Opererer',
-			'driver':'KjÃ¸rer rundt',
+			'crowd manager':'Folkestyreren kan senke panikknivået i soner med 10 i stedet for 5',
+			'operation expert':'Operasjonseksperten kan bygge og rive blokader alene',
+			'driver':'Sjåføren kan flytte 10 personer om gangen i stedet for 5',
 		},
 		'role_name' : {
-			'coordinator':'Koordinator',
-			'passer by':'Forbipasserende',
 			'crowd manager':'Folkestyrer',
 			'operation expert':'Operasjonsekspert',
-			'driver':'SjÃ¥fÃ¸r',
+			'driver':'Sjåfør',
 		},
 		
 		// Actions
@@ -107,13 +99,13 @@ var lang = {
 		'op-info-center' : 'Legg til informasjonssenter',
 		'op-dec-panic' : 'Senk panikk',
 		'op-move-people' : 'Flytt folk',
-		'op-rem-block' : 'Fjern blokkade',
+		'op-rem-block' : 'Fjern blokade',
 		'op-next-player' : 'Neste spiller',
 		
 		
 		// Status updates
 		'stat-move-people' : 'Flytter folk fra sone ',
-		'stat-click-player' : 'Trykker pÃ¥ spiller ',
+		'stat-click-player' : 'Trykker på spiller ',
 		'stat-select-node' : 'Valgte node ',
 		'stat-select-zone' : 'Valgte sone ',
 		'stat-moved-people' : 'Flyttet folk til sone ',
@@ -126,7 +118,7 @@ var lang = {
 		'replay' : 'Reprise',
 		
 		'footer' : 'Et spill av gruppe 10',
-		'title' : 'Ikke fÃ¥ panikk!',
+		'title' : 'Ikke få panikk!',
 		
 		'default-template' : 'Standard mal',
 		'no-active-rooms' : 'Ingen aktive rom!',

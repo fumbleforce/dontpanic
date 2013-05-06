@@ -211,7 +211,7 @@ gco.update_options = function(o){
 				inner += "<button class='btn' onclick='command("+'"'+"create_road_block"+'"'+");'>"+speak("op-add-road-block")+"</button>";
 				break;
 			case 'info':
-				inner += "<button class='btn' onclick='command("+'"'+"create_info_center"+'"'+");'>"+speak("op-info-block")+"</button>";
+				inner += "<button class='btn' onclick='command("+'"'+"create_info_center"+'"'+");'>"+speak("op-info-center")+"</button>";
 				break;
 			case 'panic':
 				inner += "<button class='btn' onclick='command("+'"'+"decrease_panic"+'"'+");'>"+speak("op-dec-panic")+"</button>";
