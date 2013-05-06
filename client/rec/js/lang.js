@@ -79,19 +79,23 @@ var lang = {
 		'player-turn-label' : ['Spiller ','s tur'],
 		'turn-label' : 'Runde: ',
 		'action-label' : 'Handlinger igjen: ',
-		'timer-label' : 'Panikk øker om: ',
+		'timer-label' : 'Panikk Ã¸ker om: ',
 		'player' : 'Spiller ',
 		
 		// Game related
 		'role_desc' : {
-			'crowd manager':'Folkestyreren kan senke panikknivået i soner med 10 i stedet for 5',
-			'operation expert':'Operasjonseksperten kan bygge og rive blokader alene',
-			'driver':'Sjåføren kan flytte 10 personer om gangen i stedet for 5',
+			'coordinator':'Koordinerer ting',
+			'passer by':'GÃ¥r forbi',
+			'crowd manager':'Passer pÃ¥ massene',
+			'operation expert':'Opererer',
+			'driver':'KjÃ¸rer rundt',
 		},
 		'role_name' : {
+			'coordinator':'Koordinator',
+			'passer by':'Forbipasserende',
 			'crowd manager':'Folkestyrer',
 			'operation expert':'Operasjonsekspert',
-			'driver':'Sjåfør',
+			'driver':'SjÃ¥fÃ¸r',
 		},
 		
 		// Actions
@@ -99,13 +103,13 @@ var lang = {
 		'op-info-center' : 'Legg til informasjonssenter',
 		'op-dec-panic' : 'Senk panikk',
 		'op-move-people' : 'Flytt folk',
-		'op-rem-block' : 'Fjern blokade',
+		'op-rem-block' : 'Fjern blokkade',
 		'op-next-player' : 'Neste spiller',
 		
 		
 		// Status updates
 		'stat-move-people' : 'Flytter folk fra sone ',
-		'stat-click-player' : 'Trykker på spiller ',
+		'stat-click-player' : 'Trykker pÃ¥ spiller ',
 		'stat-select-node' : 'Valgte node ',
 		'stat-select-zone' : 'Valgte sone ',
 		'stat-moved-people' : 'Flyttet folk til sone ',
@@ -118,7 +122,7 @@ var lang = {
 		'replay' : 'Reprise',
 		
 		'footer' : 'Et spill av gruppe 10',
-		'title' : 'Ikke få panikk!',
+		'title' : 'Ikke fÃ¥ panikk!',
 		
 		'default-template' : 'Standard mal',
 		'no-active-rooms' : 'Ingen aktive rom!',
