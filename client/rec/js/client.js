@@ -29,6 +29,7 @@ socket.on('not_in_game', function(o){
 });
 
 socket.on('error', function (e) {
+	gco.update_status(speak(e));
     console.log(e);
 });
 
