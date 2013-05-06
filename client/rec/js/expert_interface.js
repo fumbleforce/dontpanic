@@ -148,7 +148,204 @@ gco.init_game = function () {
     
     gco.setup_canvas();
     gco.set_canvas_listener();
+	
+	gco.events.push(
+		   {  	name:"Fire in industrial",
+				desc:"Fire engulfs industrial complex! Workers in all districts gives into panic.\nPanic increased by 20 in all industrial districts",
+				effects: [{
+					name:"industry + 20 panic",
+					domain:'zone',
+					type:'event',
+					panic:(20),
+					affects:'industry'
+			   }]
+		   });
+	gco.events.push(
+			{   name:"Power outage in residential",
+				desc:"Power outage in all residential districts!\nPanic increased by 5 in all residential districts",
+				effects: [{
+					name:"residential +5 panic",
+					domain:'zone',
+					type:'event',
+					panic:(5),
+					affects:'residential'
+				}]
+			});
+	gco.events.push(
+			 {  name:"Terrorist attack in the city",
+				desc:"Terrorist attack in the city!\nPanic increased by 10 in all largecity districts",
+				effects: [{
+					name:"largecity + 10 panic",
+					domain:'zone',
+					type:'event',
+					panic:(10),
+					affects:'largecity'
+				 }]
+			 });
+	gco.events.push(
+			{   name:"Power outage in residential",
+				desc:"Power outage in all residential districts\nPanic increased by 10 in all residential districts!",
+				effects: [{
+					name:"residential +10 panic",
+					domain:'zone',
+					type:'event',
+					panic:(10),
+					affects:'residential'
+				}]
+			});
+	gco.events.push(
+			{   name:"Shout about epedemic",
+				desc:"Shouting about an epedemic can be heard.\nPanic increased by 10 in all districts",
+				effects: [{
+					name:"largecity + 10 panic",
+					domain:'zone',
+					type:'event',
+					panic:(10),
+					affects:'largecity'
+				},
+				{ 
+					name:"residential + 10 panic",
+					domain:'zone',
+					type:'event',
+					panic:(10),
+					affects:'residential'
+				},
+				{
+					name:"park + 10 panic",
+					domain:'zone',
+					type:'event',
+					panic:(10),
+					affects:'park'
+				},
+				{	
+					name:"industry + 10 panic",
+					domain:'zone',
+					type:'event',
+					panic:(10),
+					affects:'industry'
+				}]
+			});
+	gco.events.push(
+			{   name:"Explosion in industry",
+				desc:"An explosion has occured!\nPanic increased by 10 in all industry districts",
+				effects: [{
+					name:"industry + 10 panic",
+					domain:'zone',
+					type:'event',
+					panic:(10),
+					affects:'industry'
+				}]
+			});
+	gco.events.push(
+			{   name:"Rabid dogs in the park",
+				desc:"Rabid dogs roam the park!\nPanic increased by 10 in all parks",
+				effects: [{
+					name:"park + 10 panic",
+					domain:'zone',
+					type:'event',
+					panic:(10),
+					affects:'park'
+				}]
+			});
+	gco.events.push(
+			{   name:"Pipe bomb in residential",
+				desc:"Viable pipe bomb has been found near a school!\nPanic increased by 10 in all residential districts",
+				effects: [{
+					name:"residential + 10 panic",
+					domain:'zone',
+					type:'event',
+					panic:(10),
+					affects:'residential'
+				}]
+			});
+	gco.events.push(
+			{   name:"Gunshots in residential",
+				desc:"Gunshots can be heard through a school cooridor!\nPanic increased by 10 in all residential districts",
+				effects: [{
+					name:"residential + 10 panic",
+					domain:'zone',
+					type:'event',
+					panic:(10),
+					affects:'residential'
+				}]
+			});
+	gco.events.push(
+			{   name:"Anthrax spread underground",
+				desc:"Anthrax has been spread on an undergroud!\nPanic increased by 10 in all financial districts",
+				effects: [{
+					name:"largecity + 10 panic",
+					domain:'zone',
+					type:'event',
+					panic:(10),
+					affects:'largecity'
+				}]
 
+			});
+	gco.events.push(
+			{   name:"Bacteria in residential",
+				desc:"Large occurenses of MRSA Staph Bacteria Infections have been reported!\nPanic increased by 10 in all residential districts",
+				effects: [{
+					name:"residential +10 panic",
+					domain:'zone',
+					type:'event',
+					panic:(10),
+					affects:'residential'
+				}]
+			});
+	gco.events.push(
+			{   name:"Gunshot in residential",
+				desc:"Gunshots can be heard through a school cooridor!\nPanic increased by 10 in all residential districts",
+				effects: [{
+					name:"residential + 10 panic",
+					domain:'zone',
+					type:'event',
+					panic:(10),
+					affects:'residential'
+				}]
+			});
+	
+	gco.info_cards.push(
+		{
+	    name:"Calm financial",
+	    desc:"Calm financial23 districts",
+	    effects: [{
+	        name:"financ calm",
+	        domain:'zone',
+	        type:'panic',
+	        panic:(-5),
+	        affects:'largecity'
+	    }]
+		});
+   gco.info_cards.push(
+		{
+        name:"Calm industry",
+        desc:"Calm industry2 districts",
+        effects: [{
+            name:"indus calm",
+            domain:'zone',
+            type:'panic',
+            panic:(-5),
+            affects:'industry'
+        }]
+        });
+    gco.info_cards.push({
+		name:"Calm residental",
+		desc:"Calm residental11 districts",
+		effects: [{
+            name:"resid calm",
+            domain:'zone',
+            type:'panic',
+            panic:(-5),
+            affects:'residential'
+        }]
+        });
+	gco.update_ddbox(document.getElementById("event_show"), gco.events, true)
+	
+	console.log(gco.events.length);
+	gco.update_ddbox(document.getElementById("card_show"), gco.info_cards, true)
+	gco.show_event();
+	gco.show_card();
+	
     gco.draw();
 }
 
@@ -1237,8 +1434,8 @@ gco.show_card = function(){ // show the info on the selected card. want to edit 
 			effects2 += "+more";
 		}
 	}
-	document.getElementById("card_name_label").innerHTML = gco.cut_to_size(card.name, 150);
-	document.getElementById("card_desc_label").innerHTML = gco.cut_to_size(card.desc, 150);
+	document.getElementById("card_name_label").innerHTML = gco.cut_to_size(card.name, 130);
+	document.getElementById("card_desc_label").innerHTML = gco.cut_to_size(card.desc, 130);
 	document.getElementById("card_effects_label").innerHTML = effects;
 	document.getElementById("card_effects_label2").innerHTML = effects2;
 	
@@ -1263,8 +1460,8 @@ gco.show_event = function(){ // show the info on the selected event. want to edi
 			effects2 += "+more";
 		}
 	}
-	document.getElementById("event_name_label").innerHTML = gco.cut_to_size(event.name, 150);
-	document.getElementById("event_desc_label").innerHTML = gco.cut_to_size(event.desc, 150);
+	document.getElementById("event_name_label").innerHTML = gco.cut_to_size(event.name, 130);
+	document.getElementById("event_desc_label").innerHTML = gco.cut_to_size(event.desc, 130);
 	document.getElementById("event_effects_label").innerHTML = effects;
 	document.getElementById("event_effects_label2").innerHTML = effects2;
 	
