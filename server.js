@@ -204,6 +204,7 @@ socket_listener.sockets.on('connection', function (client) {
         console.log("Checking for user ID... "+o.id);
         
         if(o.is_gm){
+        	client.is_gm = true;
         	client.emit("get_room_id");
         }
         

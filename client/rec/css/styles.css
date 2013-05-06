@@ -100,8 +100,15 @@ p
 #status_label
 {
 	width:40%;
-	font-size:50px;
+	font-size:30px;
 	color:white;
+	text-align:center;
+}
+#error_label
+{
+	width:40%;
+	font-size:40px;
+	color:red;
 	text-align:center;
 }
 .info-container

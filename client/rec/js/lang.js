@@ -1,7 +1,7 @@
 
 
 // The default language
-var chosen_lang = "no";
+var chosen_lang = "en";
 
 // Supported languages
 var supported_lang = ['en', 'no', 'it'];
@@ -17,6 +17,8 @@ var lang = {
 	
 	// English
 	'en': {
+	
+		'none' : ' ',
 	
 		// Button Labels
 		'end-game-label' : 'End Game',
@@ -56,7 +58,6 @@ var lang = {
 		'stat-dragging-player' : 'Dragging player ',
 		
 		
-		
 		// Index
 		'play' : 'Play',
 		'expert-interface' : 'Expert Interface',
@@ -69,6 +70,23 @@ var lang = {
 		'default-template' : 'Default template',
 		'no-active-rooms' : 'No active rooms!',
 		'no-avail-replay' : 'No available replays!',
+		
+		// Errors
+		'player-not-adj' : "Player is not adjacent to zone",
+		'not-enough-people' : "Not enough people in zone",
+		'panic-too-low' : "The panic is too low to decrease",
+		'not-adj-node' : "The node is not adjacent",
+		'need-player-node' : "Need another player on node",
+		'no-rb' : "No road block on this node",
+		'node-has-rb' : "Node already has road block",
+		'player-not-node' : "Player is not on this node",
+		'has-info' : "Node already has info center",
+		'node-not-conn' : 'Node is not connected',
+		'player-lacks-action' : "Player doesn't have enough actions",
+		'move-same' : "Cannot move to the same node"
+		
+		
+		
 	},
 	
 	

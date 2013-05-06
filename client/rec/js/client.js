@@ -29,6 +29,7 @@ socket.on('not_in_game', function(o){
 });
 
 socket.on('error', function (e) {
+	gco.update_error(speak(e));
     console.log(e);
 });
 
@@ -96,7 +97,7 @@ socket.on('change', function (data) {
     }
     if (d.lose) {
     	console.log("LOST");
-    	//window.alert("You lost the game! Replay is saved to database.");
+    	window.alert("You lost the game! Replay is saved to database.");
     	//Save to database
     }
     gco.draw();
