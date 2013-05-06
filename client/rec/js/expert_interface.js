@@ -678,7 +678,7 @@ gco.zone_draw = function(zone, ctx){ // draws a zone with the provided context
 	ctx.clip();
 	
 	
-	//draw the images
+	//draw the images for the zones
 	if (zone.type==='residential'){
 		ctx.drawImage(residential_img, minx, miny);
 	}
@@ -694,9 +694,9 @@ gco.zone_draw = function(zone, ctx){ // draws a zone with the provided context
 	}
 	
 
-	//ctx.fill();
+	
 	//Draw transparent red corresponding to panic level
-	//ctx.fillStyle = "rgba(255,0,0,"+(0.2*zone.panic_level/10)+")";
+	
 	ctx.fillStyle = "rgba(255,0,0,"+(0.2+(0.12*zone.panic_level/11))+")";
 	ctx.fill();
 	
@@ -763,28 +763,9 @@ gco.zone_draw = function(zone, ctx){ // draws a zone with the provided context
     
 }
 
-gco.selection_draw = function(ctx){
-    var nodes = gco.nodes,
-        cst = gco.cst,
-        zones = gco.zones;
-        
-    if (cst.selected_zone !== null){
-        var zone = zones[cst.selected_zone];
-        ctx.beginPath();
-        ctx.moveTo(nodes[zone.nodes[0]].x, nodes[zone.nodes[0]].y);
-        for (var j = 1; j < zone.nodes.length; j++){
-            ctx.lineTo(nodes[zone.nodes[j]].x, nodes[zone.nodes[j]].y);
-        }
-        ctx.lineTo(nodes[zone.nodes[0]].x, nodes[zone.nodes[0]].y);
-        ctx.closePath();
-        ctx.strokeStyle = "blue";
-        ctx.lineWidth = 20;
-        ctx.stroke();
 
-    }
-}
 
-gco.player_contains = function(p, mx, my) {
+gco.player_contains = function(p, mx, my) { //checks if the clicked area contains a player
     var pn = gco.nodes[p.node.id];
     return (mx<=(pn.x+player_offsetX[p.id]+player_size))&&
         (mx>=(pn.x+player_offsetX[p.id]-player_size))&&
@@ -792,7 +773,7 @@ gco.player_contains = function(p, mx, my) {
         (my>=(pn.y+player_offsetY[p.id]-player_size));
 }
 
-gco.node_contains = function(node, mx, my) {
+gco.node_contains = function(node, mx, my) { // checks if the clicked area containts a node
     return (mx<=(node.x+node_size))&&
         (mx>=(node.x-node_size))&&
         (my<=(node.y+node_size))&&
@@ -835,9 +816,11 @@ gco.draw = function(){ //Draws everything
         
     for (var i = 0; i < zones.length; i++) {
         zone = zones[i];
-        gco.zone_draw(zone,ctx);
+		if(i != gco.selected_zone){ // skips drawing the selected zone for now to prevent it from beeing drawn twice
+			gco.zone_draw(zone,ctx);
+		}
     }
-	if(gco.selected_zone > -1){
+	if(gco.selected_zone > -1){ // draws the selected zone last so the blue lines around it will show 
 		gco.zone_draw(zones[gco.selected_zone], ctx);
 	}
     
@@ -851,7 +834,6 @@ gco.draw = function(){ //Draws everything
     	}
     }
     
-    gco.selection_draw(ctx);
 
     for (var i = 0; i < nodes.length; i++) {
         node = nodes[i];
@@ -862,16 +844,10 @@ gco.draw = function(){ //Draws everything
     for (var i = 0; i < players.length; i++) {
         pl = players[i];
         gco.player_draw(pl, ctx);
-        //var id = "p"+i;
-        //document.getElementById(id).style.background = "gray";
-        //if (i === gco.active_player) document.getElementById(id).style.background = "lightgray";
+
     }
     
-    /*if(players.length > 1){
-        document.getElementById("turn-label").innerHTML = "Turn: "+(gco.turn); 
-        document.getElementById("player-turn-label").innerHTML = "Player "+(gco.active_player)+"'s turn";
-        document.getElementById("action-label").innerHTML = "Actions left: "+(players[gco.active_player].actions_left); 
-    } */
+
 	ctx.fillStyle="White";
 	ctx.font="10px verdana";
 	selected_line = "Selected: ";
@@ -943,7 +919,7 @@ gco.add_player = function(){ // creates a player and adds it to the game.
 
 }
 
-gco.change_player = function() //
+gco.change_player = function() //changes a selected player
 {
 	if(gco.selected_player == -1){
 		console.log("no player selected");
@@ -965,7 +941,7 @@ gco.change_player = function() //
 	console.log("player node: "+node);
 	
 	player.role = role;
-	player.node =  gco.nodes[node];
+	player.node = gco.nodes[node];
 	
 	gco.draw();
 	
@@ -995,12 +971,12 @@ gco.edit_zone = function(){ //edits the selected zone, might need more errorchec
 		return;
 	}
 	
-	//var zone = gco.zones[gco.selected_zone];
-	console.log("changing zone");
-	gco.zones[gco.selected_zone].type = document.getElementById("edit_zone_type").value;
-	gco.zones[gco.selected_zone].people = document.getElementById("zone_people").value;
-	gco.zones[gco.selected_zone].panic_level = document.getElementById("zone_panic").value;
-	//console.log("changing zone");
+	var zone = gco.zones[gco.selected_zone];
+	console.log("editing zone");
+	zone.type = document.getElementById("edit_zone_type").value;
+	zone.people = document.getElementById("zone_people").value;
+	zone.panic_level = document.getElementById("zone_panic").value;
+	
 	gco.draw();
 	
 	
@@ -1771,7 +1747,7 @@ gco.cut_to_size = function(string, maxwidth){ // function to cut down string to 
 	}
 	return string;
 }
-gco.toggle_hotkeys = function(){ // toggle hotkeys
+gco.toggle_hotkeys = function(){ // toggle hotkeys on or off
 	if(gco.hotkeys){
 		gco.hotkeys = false;
 		document.getElementById("delete_node_button").innerHTML="Delete node";
