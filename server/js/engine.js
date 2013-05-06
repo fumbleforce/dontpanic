@@ -1,11 +1,14 @@
-/**  Engine module
-
-    This module will be a game "Class".
-    It is an instance of a game, and handles all game related logic.
-    
-    id			Integer				Game id from the server
-    client		socket.io client	The client that created the game
-    template	Object				Contains the map, players and settings configured as a template by an expert
+/**
+* This module will be a game "Class".
+* It is an instance of a game, and handles all game related logic.
+*
+* @module Game Engine
+* @class Game Engine
+* @param {Integer} id Game id
+* @param {Object} client The socket.io client creating the game
+* @param {Object} template Template to base game on
+* @param {Integer} template_id Id of the template in DB
+* @param {Integer} id_replay Id of the replay to be made
 */
 var ge = module.exports = function (id, client, template,template_id, id_replay) {
 
@@ -61,7 +64,7 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
 
 		player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
     	
-    	//First player gets one extra
+    	//First player gets one extra card
 		if(i === 0){
 			player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
 		}
@@ -105,9 +108,13 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
 
 
 
-/*  Decode command
-
-    Executes in-game commands.
+/**
+* Handles all in game commands received
+* from the clients
+*
+* @method Command
+* @param {Object} client The socket.io client sending command
+* @param {Object} c Command object containing instructions
 */
 ge.prototype.command = function(client, c){
 	this.command_id++;
@@ -388,6 +395,7 @@ ge.prototype.command = function(client, c){
     
     //Check for lose
     changed.lose = this.check_lose();
+    
     if(changed.lose || changed.win) this.ended = true;
     
     if(changed.players || changed.nodes || changed.zones || changed.turn || changed.event || changed.win || changed.lose){
@@ -407,8 +415,13 @@ ge.prototype.command = function(client, c){
     
 }
 
-
-
+/**
+* Starts a game if not already started, and sends the
+* state to client
+*
+* @method start
+* @param {Object} client The socket.io client starting the game
+*/
 ge.prototype.start = function(client){
     var g = state(this);
     console.log("Sending start state to client "+this.clients[0].userid);
@@ -426,23 +439,25 @@ ge.prototype.start = function(client){
     }
 }
 
-
-
-
-ge.prototype.reconnect_game = function(client, c) {
-    
-}
-
-ge.prototype.save_state = function(client, c) {
-
-}
-
-ge.prototype.delete_game = function(client, c) {
+/**
+* Stops the timer and deletes the game
+*
+* @method delete_game
+* @param {Object} client The socket.io client deleting the game
+*/
+ge.prototype.delete_game = function(client) {
 	this.ended = true;
 	this.stop_timer();
 	delete this;
 }
 
+/**
+* Adds a client to the client list,
+* usually an expert.
+*
+* @method join_game
+* @param {Object} client The socket.io client joining the game
+*/
 ge.prototype.join_game = function(client) {
 	if (this.clients.indexOf(client) < 0){
 		this.clients.push(client);
@@ -453,12 +468,24 @@ ge.prototype.join_game = function(client) {
 	this.start(client);
 }
 
+/**
+* Sends data to all connected clients.
+*
+* @method emit
+* @param {String} type Type of data sent
+* @param {Object} o Data sent
+*/
 ge.prototype.emit = function(type, o){
 	for(var i = 0; i < this.clients.length; i++){
 		this.clients[i].emit(type, o);
 	}
 }
 
+/**
+* Returns the current state of the game.
+*
+* @method state
+*/
 ge.prototype.state = function(){
 	var g = this;
     return {
@@ -474,13 +501,22 @@ ge.prototype.state = function(){
     };
 }
 
-
-
+/**
+* Changes the active player to the next player in line
+*
+* @method next_player
+*/
 ge.prototype.next_player = function() {
 	this.active_player.set_actions_left(4);
 	this.active_player = this.players[(this.turn-1) % this.players-length];
 }
 
+/**
+* Checks if the game instance has given client connected to it
+*
+* @method has_client
+* @param {Integer} clientid Id of the client
+*/
 ge.prototype.has_client = function(clientid){
 	for (var i = 0; i<this.clients.length; i++){
 		if (this.clients[i].userid === clientid) return true;
@@ -488,7 +524,12 @@ ge.prototype.has_client = function(clientid){
 	return false;
 }
 
-
+/**
+* Starts the in game timer for increasing panic.
+* Uses the local timer_dur to initialize on.
+*
+* @method start_timer
+*/
 ge.prototype.start_timer = function() {	
 	var that = this;
     that.timer = that.timer_dur;
@@ -507,12 +548,21 @@ ge.prototype.start_timer = function() {
     }
 }
 
+/**
+* Stops active timer.
+*
+* @method stop_timer
+*/
 ge.prototype.stop_timer = function(){
 	clearInterval(this.inter);
 
 }
 
-
+/**
+* Checks zones for panic, won if no panic is found.
+*
+* @method check_win
+*/
 ge.prototype.check_win = function(){
 	var zones = this.map.zones;
 	for(var i = 0; i < zones.length; i++){
@@ -523,6 +573,11 @@ ge.prototype.check_win = function(){
 	return true;
 }
 
+/**
+* Checks for zones without max panic, if none found, game is lost.
+*
+* @method check_lose
+*/
 ge.prototype.check_lose = function(){
 	var zones = this.map.zones;
 	console.log("Checking lose..");
@@ -536,8 +591,13 @@ ge.prototype.check_lose = function(){
 	return true;
 }
 
-
-
+/**
+* Interprets info- and event cards, and executes their effects
+*
+* @method effects
+* @param {Object} card The card to be executed
+* @param {Object} g The current game instance
+*/
 function effect(card, g) {
     var effects = card.effects,
         e, i, z, p,
@@ -688,7 +748,16 @@ function effect(card, g) {
 //----------------------------
 
 
-//Returns a state object based on the game provided
+/**
+* @class none
+*/
+
+/**
+* Returns the state of the game instance provided
+*
+* @method state
+* @param {Object} g A game instance
+*/
 function state(g){
     return {
         type : 'state',
@@ -704,7 +773,12 @@ function state(g){
 }
 
 
-//Returns an empty state
+/**
+* An empty game State
+*
+* @method empty_state
+* @param {Object} g A game instance
+*/
 function empty_state(g){
     return {
         type : 'none',
@@ -715,7 +789,12 @@ function empty_state(g){
 }
 
 
-//Rounds panic to nearest five
+/**
+* Rounds an int to nearest 5
+*
+* @method round5
+* @param {Integer} x Integer to be rounded
+*/
 function round5(x)
 {
     return (x % 5) >= 2.5 ? parseInt(x / 5) * 5 + 5 : parseInt(x / 5) * 5;
@@ -729,10 +808,14 @@ function round5(x)
 //---------MODELS-------------
 //----------------------------
 
-/*	Player model
 
-	Contains all information and functions related to an in-game player
-	
+
+/**
+* The class containing all funcitons and variables 
+* associated with an in-game player
+*
+* @class Player
+* @constructor
 */
 ge.Player = function(id, user, node, color, role, actions_left) {
 	this.id = id;
@@ -745,7 +828,12 @@ ge.Player = function(id, user, node, color, role, actions_left) {
 	this.class = 'player';
 
 }
-
+/**
+* Updates the action points of a player
+*
+* @method update_actions
+* @param {Integer} actions Number of actions to change
+*/
 ge.Player.prototype.update_actions = function (g,actions) {
 	var able = this.can_update_actions(g,actions);
 	if (able) {
@@ -755,6 +843,12 @@ ge.Player.prototype.update_actions = function (g,actions) {
 	}
     return false;
 }
+/**
+* Checks if action points chan be changed
+*
+* @method can_update_actions
+* @param {Integer} actions Number of actions to change
+*/
 ge.Player.prototype.can_update_actions = function (g,actions) {
 
 	var result_action = this.actions_left + actions;
@@ -764,7 +858,12 @@ ge.Player.prototype.can_update_actions = function (g,actions) {
 	}
     return true;
 }
-
+/**
+* Removes info card from player
+*
+* @method remove_info_card
+* @param {Object} info_card The info card to be removed
+*/
 ge.Player.prototype.remove_info_card = function(g,info_card) {
 	for (var i = 0; i < this.info_cards.length; i++) {
 		if (this.info_cards[i] === info_card) {
@@ -772,10 +871,22 @@ ge.Player.prototype.remove_info_card = function(g,info_card) {
 		}
 	}
 }
+/**
+* Adds an info card to player
+*
+* @method add_info_card
+* @param {Object} info_card Info card to be added
+*/
 ge.Player.prototype.add_info_card = function(g,info_card) {
 	this.info_cards.push(info_card);
 }
-
+/**
+* Moves a player
+*
+* @method move_player
+* @param {Integer} node_from Node to move from
+* @param {Integer} node_to Node to move to
+*/
 ge.Player.prototype.move_player = function (g,node_from, node_to) {
 	var able = this.can_move_player(g,node_from, node_to);
 	if (able) {
@@ -785,6 +896,13 @@ ge.Player.prototype.move_player = function (g,node_from, node_to) {
 	}
 	return false;
 }
+/**
+* Checks if player can be moved
+*
+* @method can_move_player
+* @param {Integer} node_from Node to move from
+* @param {Integer} node_to Node to move to
+*/
 ge.Player.prototype.can_move_player = function (g,node_from, node_to) {
 	console.log("Can move player?");
 	if (node_from === node_to) {
@@ -807,31 +925,12 @@ ge.Player.prototype.can_move_player = function (g,node_from, node_to) {
 
 
 
-
-/* User model	[TODO Not implemented]
-
-	Contains information related to a user profile.
-	Not implemented.
-	
-*/
-ge.User = function (username, password, name, email, is_admin) {
-	this.username = username;
-	this.password = password;
-	this.name = name;
-	this.email = email;
-	this.is_admin = is_admin;
-}
-
-
-
-
-
-
-
-/* Node model
-
-	Contains information related to a node on the map.
-	Takes a node created in the expert interface as argument
+/**
+* The class containing all funcitons and variables 
+* associated with an in-game node
+*
+* @class Node
+* @constructor
 */
 ge.Node = function (n) {
 	this.id = n.id;
@@ -843,6 +942,12 @@ ge.Node = function (n) {
 	this.has_road_block = false;
 
 }
+/**
+* Adds an information center to the node
+*
+* @method add_information_center
+* @param {Player} player Player to decrease panic on
+*/
 ge.Node.prototype.add_information_center = function (g,player) {
 	var able = this.can_add_information_center(player);
 	if (able){
@@ -852,6 +957,12 @@ ge.Node.prototype.add_information_center = function (g,player) {
 	}
 	return false;
 }
+/**
+* Checks if information center can be added to node
+*
+* @method can_add_information_center
+* @param {Player} player Player to decrease panic on
+*/
 ge.Node.prototype.can_add_information_center = function (g,player) {
 	console.log("Can add info center?");
 	if (this.has_information_center) {
@@ -872,7 +983,13 @@ ge.Node.prototype.can_add_information_center = function (g,player) {
     return false;
 }
 
-
+/**
+* Adds a road block to the node
+*
+* @method add_road_block
+* @param {Player} player Player to decrease panic on
+* @param {List} players All players, to check if two are on the node
+*/
 ge.Node.prototype.add_road_block = function (g,player, players) {
 	var able = this.can_add_road_block(g,player, players);
 	if (able){
@@ -883,6 +1000,13 @@ ge.Node.prototype.add_road_block = function (g,player, players) {
 	return false;	
 
 }
+/**
+* Checks if road block can be added
+*
+* @method can_add_road_block
+* @param {Player} player Player to decrease panic on
+* @param {List} players All players, to check if two are on the node
+*/
 ge.Node.prototype.can_add_road_block = function (g,player, players) {
 	console.log("Can add road block?");
 
@@ -915,6 +1039,13 @@ ge.Node.prototype.can_add_road_block = function (g,player, players) {
 	return false;	
 
 }
+/**
+* Removes a road block to the node
+*
+* @method remove_road_block
+* @param {Player} player Player to decrease panic on
+* @param {List} players All players, to check if two are on the node
+*/
 ge.Node.prototype.remove_road_block = function (g,player, players) {
 	var able = this.can_remove_road_block(g,player, players);
 	if (able){
@@ -924,6 +1055,13 @@ ge.Node.prototype.remove_road_block = function (g,player, players) {
 	}
 	return false;
 }
+/**
+* Checks if road block can be removed
+*
+* @method can_remove_road_block
+* @param {Player} player Player to decrease panic on
+* @param {List} players All players, to check if two are on the node
+*/
 ge.Node.prototype.can_remove_road_block = function (g,player, players) {
 	console.log("Can remove road block?");
 	if (!this.has_road_block) {
@@ -950,6 +1088,12 @@ ge.Node.prototype.can_remove_road_block = function (g,player, players) {
 	}
 	return false;	
 }
+/**
+* Checks if node connects with given node
+*
+* @method connects_with
+* @param {Integer} n Node
+*/
 ge.Node.prototype.connects_with = function(n){
     return this.connects_to.indexOf(n.id) > -1;
 }
@@ -961,9 +1105,12 @@ ge.Node.prototype.connects_with = function(n){
 
 
 
-/* Role object
-
-	Contains info and effect related to a role
+/**
+* The class containing all funcitons and variables 
+* associated with an in-game role
+*
+* @class Role
+* @constructor
 */
 ge.Role = function (title, info, effect) {
 	this.title = title;
@@ -972,7 +1119,13 @@ ge.Role = function (title, info, effect) {
 }
 
 
-
+/**
+* The class containing all funcitons and variables 
+* associated with an in-game event
+*
+* @class Event
+* @constructor
+*/
 ge.Event = function (text, effect) {
 	this.text = text;
 	this.effect = effect;
@@ -987,9 +1140,12 @@ ge.Event = function (text, effect) {
 
 
 
-/*	Zone object
-
-	
+/**
+* The class containing all funcitons and variables 
+* associated with an in-game Zone
+*
+* @class Zone
+* @constructor
 */
 ge.Zone = function (z) {
 	this.id = z.id;
@@ -1002,6 +1158,12 @@ ge.Zone = function (z) {
 	this.isBlocked = false; //if all nodes of zone are blocked, then zone is blocked from spreading panic
 
 }
+/**
+* Updates panic in the zone
+*
+* @method update_panic
+* @param {Integer} panic_level Change in panic
+*/
 ge.Zone.prototype.update_panic = function (g,panic_level) {
 	this.panic_level += panic_level;		
 	if (this.panic_level >= 50) {
@@ -1011,12 +1173,29 @@ ge.Zone.prototype.update_panic = function (g,panic_level) {
 		this.panic_level = 0;
 	}
 }
+/**
+* Checks if panic is zero
+*
+* @method is_panic_zero
+*/
 ge.Zone.prototype.is_panic_zero = function () {
 	return this.panic_level === 0 ?  true : false;
 }
+/**
+* Returns the panic in the zone
+*
+* @method get_panic_level
+*/
 ge.Zone.prototype.get_panic_level = function () {
 	return this.panic_level;
 }
+/**
+* Player decreases panic
+*
+* @method dec_panic
+* @param {Player} player The player decreasing panic
+* @param {Node} node The node the player is on
+*/
 ge.Zone.prototype.dec_panic = function(g,player, node) {
 	var able = this.can_dec_panic(g,player, node);
 	if(able){
@@ -1031,6 +1210,13 @@ ge.Zone.prototype.dec_panic = function(g,player, node) {
 	}
 	return false;
 }
+/**
+* Checks if decreasing panic is possible
+*
+* @method can_dec_panic
+* @param {Player} player The player decreasing panic
+* @param {Node} node The node the player is on
+*/
 ge.Zone.prototype.can_dec_panic = function(g,player, node) {
 	console.log("Can decrease panic?");
 	if (this.nodes.indexOf(node.id) >= 0) {
@@ -1051,7 +1237,14 @@ ge.Zone.prototype.can_dec_panic = function(g,player, node) {
 	return false;
 }
 
-
+/**
+* Moves peopple from one zone to another
+*
+* @method move_people
+* @param {Player} p The player moving people
+* @param {Zone} z The Zone to move people to
+* @param {Integer} num Number of people to move
+*/
 ge.Zone.prototype.move_people = function (g, p, to_zone, num) {
 	var peopleMoved = this.can_move_people(g,p, to_zone, num);
 	if(peopleMoved==5||peopleMoved==10){
@@ -1062,6 +1255,14 @@ ge.Zone.prototype.move_people = function (g, p, to_zone, num) {
 	}
 	return false;
 }
+/**
+* Checks if moving people is possible
+*
+* @method can_move_people
+* @param {Player} p The player moving people
+* @param {Zone} z The Zone to move people to
+* @param {Integer} num Number of people to move
+*/
 ge.Zone.prototype.can_move_people = function (g, p, to_zone, num) {
 	console.log("Can move people?");
 	//if driver wants to move 5, but there is only 5, change driver's move-variable to 5
@@ -1085,6 +1286,13 @@ ge.Zone.prototype.can_move_people = function (g, p, to_zone, num) {
 	}
 	return 0;
 }
+/**
+* Checks if moving people from this zone is possible
+*
+* @method can_move_people_from
+* @param {Player} p The player moving people
+* @param {Integer} num Number of people to move
+*/
 ge.Zone.prototype.can_move_people_from = function (g, p, num){
 	if (this.people==5)
 		num=5;
@@ -1108,12 +1316,13 @@ ge.Zone.prototype.can_move_people_from = function (g, p, num){
 
 
 
-/*
-	
 
-	text 	What to be shown to the users when looking at the card
-	id 		identification to what case sentence to be called when using the card
-	value	value to be used in the effect of the card
+/**
+* The class containing all funcitons and variables 
+* associated with an in-game info card
+*
+* @class Info Card
+* @constructor
 */
 ge.Info_card = function (text, id, value) {
 	this.text = text;
@@ -1126,7 +1335,13 @@ ge.Info_card = function (text, id, value) {
 
 
 
-
+/**
+* The class containing all funcitons and variables 
+* associated with an in-game map
+*
+* @class Map
+* @constructor
+*/
 ge.Map = function (nodes, zones) {
 	this.nodes = nodes;
 	this.zones = zones;
@@ -1136,7 +1351,12 @@ ge.Map = function (nodes, zones) {
 
 
 
-
+/**
+* Contains settings for a game
+*
+* @class Settings
+* @constructor
+*/
 ge.Settings = function (timer_interval) {
 	var timer = new timer(timer_interval);
 }

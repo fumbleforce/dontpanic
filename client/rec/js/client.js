@@ -1,4 +1,11 @@
-
+/**
+* My property description.  Like other pieces of your comment blocks, 
+* this can span multiple lines.
+* 
+* @module propertyName
+* @type {Object}
+* @default "foo"
+*/
 
 var socket = io.connect(remote_ip);
 
