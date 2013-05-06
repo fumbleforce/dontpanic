@@ -145,6 +145,7 @@ ge.prototype.command = function(client, c){
   					options.push('rem_block');
   				}
   			changed.options = options;
+  			this.emit("error", "none");
   			
   			break;
   			
@@ -159,6 +160,7 @@ ge.prototype.command = function(client, c){
   				options.push('panic');
   			}
   			changed.options = options;
+  			this.emit("error", "none");
   			break;
   
   

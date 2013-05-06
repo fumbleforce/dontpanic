@@ -1,7 +1,7 @@
 
 
 // The default language
-var chosen_lang = "no";
+var chosen_lang = "en";
 
 // Supported languages
 var supported_lang = ['en', 'no', 'it'];
@@ -17,6 +17,8 @@ var lang = {
 	
 	// English
 	'en': {
+	
+		'none' : ' ',
 	
 		// Button Labels
 		'end-game-label' : 'End Game',
@@ -81,7 +83,8 @@ var lang = {
 		'has-info' : "Node already has info center",
 		'node-not-conn' : 'Node is not connected',
 		'player-lacks-action' : "Player doesn't have enough actions",
-		'move-same' : "Cannot move to the same node",
+		'move-same' : "Cannot move to the same node"
+		
 		
 		
 	},

@@ -299,6 +299,9 @@ gco.update_cards = function() {
 gco.update_status = function(status){
 	$('#status_label').html(status);
 }
+gco.update_error = function(error){
+	$('#error_label').html(error);
+}
 
 gco.info_card_click = function(p, c) {
 	console.log(p);
