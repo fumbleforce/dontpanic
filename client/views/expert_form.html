@@ -163,7 +163,7 @@
 					<div class="expert-row">
 						<button class="button" onclick="gco.add_event();">Create Event</button>
 						<button class="button" onclick="gco.edit_event();">Edit Event</button>
-						<button class="button" onclick="gco.delete_event();">Delete Event</button>
+						
 					</div>
 					
 				</div>
@@ -216,6 +216,7 @@
 								</div>
 								<div class="expert-row">
 									<button class="button" onclick="gco.event_move_to_edit();">Move To Edit</button>
+									<button class="button" onclick="gco.delete_event();">Delete Event</button>
 								</div>
 							</div>
 						</div>
@@ -296,7 +297,7 @@
 					<div class="expert-row">
 						<button class="button" onclick="gco.add_info_card();">Create ICard</button>
 						<button class="button" onclick="gco.edit_card();">Edit ICard</button>
-						<button class="button" onclick="gco.delete_card();">Delete ICard</button>
+						
 					</div>
 					
 				</div>
@@ -351,6 +352,7 @@
 								</div>
 								<div class="expert-row">
 									<button class="button" onclick="gco.card_move_to_edit();">Move To Edit</button>
+									<button class="button" onclick="gco.delete_card();">Delete ICard</button>
 								</div>
 							</div>
 						</div>
@@ -573,12 +575,13 @@
 	</div>
 	<div class="expert-row">
 		
-		<button class="button" onclick="gco.del_selected_node();">Delete node (D)</button>
-		<button class="button" onclick="gco.node_connection();">Start node connection (C)</button>
-		<button class="button" onclick="gco.add_zone_nodes();">Add zone node (A)</button>
-		<button class="button" onclick="gco.clear_zone_nodes();">Clear zone nodes</button>
-		<button class="button" onclick="gco.create_zone();">Create zone (Z)</button>
-		<button class="button" onclick="gco.del_selected_zone();">Delete zone (D)</button>
+		<button class="button" id="delete_node_button" onclick="gco.del_selected_node();">Delete node</button>
+		<button class="button" id="node_connection_button" onclick="gco.node_connection();">Start node connection</button>
+		<button class="button" id="add_zone_button" onclick="gco.add_zone_nodes();">Add zone node</button>
+		<button class="button" id="clear_zone_nodes_button" onclick="gco.clear_zone_nodes();">Clear zone nodes</button>
+		<button class="button" id="create_zone_button" onclick="gco.create_zone();">Create zone</button>
+		<button class="button" id="delete_zone_button" onclick="gco.del_selected_zone();">Delete zone</button>
+		<button class="button" id="toggle_hotkeys_button" onclick="gco.toggle_hotkeys();">Turn On hotkeys</button>
 	</div>
 	<div class="expert-row">
 		<canvas id="viewport">

@@ -126,7 +126,8 @@ var gco = {
 	info_cards : [],
 	rdy_effects :[],
 	event_effects : [],
-	events : []
+	events : [],
+	hotkeys : false
 		  
 }
 gco.ctx = gco.canvas.getContext("2d");
@@ -1600,22 +1601,26 @@ gco.set_canvas_listener = function(){
 	
 
 	window.addEventListener('keydown',function(e) { // need to edit this so it wont check when canvas is unfocused
-		console.log("key" + e.keyCode);
+		//console.log("key" + e.keyCode);
 		
-		
-		if(e.keyCode == 68 || e.keyCode == 46){
-			gco.connection = -1;
-			gco.del_selected_node();
-			gco.del_selected_zone();
-		}
-		if(e.keyCode == 67){
-			gco.node_connection();
-		}
-		if(e.keyCode == 65){
-			gco.add_zone_nodes();
-		}
-		if(e.keyCode == 90){
-			gco.create_zone();
+		if(gco.hotkeys){
+			if(e.keyCode == 68 || e.keyCode == 46){
+				gco.connection = -1;
+				gco.del_selected_node();
+				gco.del_selected_zone();
+			}
+			if(e.keyCode == 67){
+				gco.node_connection();
+			}
+			if(e.keyCode == 65){
+				gco.add_zone_nodes();
+			}
+			if(e.keyCode == 90){
+				gco.create_zone();
+			}
+			if(e.keyCode == 88){
+				gco.clear_zone_nodes();
+			}
 		}
 	
 	},true); // end key listener
@@ -1742,7 +1747,7 @@ gco.set_canvas_listener = function(){
 	
 }//end set canvas listener
 
-String.prototype.width = function() {
+String.prototype.width = function() { // function to calculate the length of a string in pixels
 	var font = '12px arial',
 			
 		o = $('<div>' + this + '</div>')
@@ -1754,7 +1759,7 @@ String.prototype.width = function() {
 
 	return w;
 }
-gco.cut_to_size = function(string, maxwidth){
+gco.cut_to_size = function(string, maxwidth){ // function to cut down string to a spesific(default 50) width of pixels
 	var highestwidth = (maxwidth > 50) ? maxwidth : 50;
 	var stringwidth = string.width();
 	
@@ -1765,4 +1770,27 @@ gco.cut_to_size = function(string, maxwidth){
 		return gco.cut_to_size(string, maxwidth);
 	}
 	return string;
+}
+gco.toggle_hotkeys = function(){ // toggle hotkeys
+	if(gco.hotkeys){
+		gco.hotkeys = false;
+		document.getElementById("delete_node_button").innerHTML="Delete node";
+		document.getElementById("node_connection_button").innerHTML="Start node connection";
+		document.getElementById("add_zone_button").innerHTML="Add zone node";
+		document.getElementById("clear_zone_nodes_button").innerHTML="Clear zone nodes";
+		document.getElementById("create_zone_button").innerHTML="Create zone";
+		document.getElementById("delete_zone_button").innerHTML="Delete zone";
+		document.getElementById("toggle_hotkeys_button").innerHTML="Turn On hotkeys";
+		return;
+
+	}
+	gco.hotkeys = true;
+	document.getElementById("delete_node_button").innerHTML="Delete node (D)";
+	document.getElementById("node_connection_button").innerHTML="Start node connection (C)";
+	document.getElementById("add_zone_button").innerHTML="Add zone node (A)";
+	document.getElementById("clear_zone_nodes_button").innerHTML="Clear zone nodes (X)";
+	document.getElementById("create_zone_button").innerHTML="Create zone (Z)";
+	document.getElementById("delete_zone_button").innerHTML="Delete zone (D)";
+	document.getElementById("toggle_hotkeys_button").innerHTML="Turn Off hotkeys";
+
 }
