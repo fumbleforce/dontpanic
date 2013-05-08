@@ -123,7 +123,12 @@ db.get_replay_id = function(next) {
 	connection.query('SELECT replay_id FROM replay ORDER BY replay_id DESC',
 	function (err, rows, fields) {
 		if (err) throw err;
-		return next(rows[0].replay_id);
+		if (rows[0] === undefined) {
+			return next(0);
+		}
+		else {
+			return next(rows[0].replay_id);
+		}
 	});
 }
 

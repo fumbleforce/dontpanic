@@ -18,9 +18,9 @@ var c_height = 1550,
     panic_info_size = 40,
     w_inc = 0;
 	player_colors = ["red","orange","yellow","chartreuse ","green","aqua","blue","purple"];
-	effect_zone_list = ["panic, event"];
+	effect_zone_list = ["panic", "event"];
 	
-	effect_people_list = ["decreasemoves1", "decreasemoves2", "decreasemoves3", "increasemoves",  "nextplayer", "stealaction", "blocknextevent"];
+	effect_people_list = ["actions", "nextplayer", "stealaction", "blocknextevent"];
 	
 	
 	max_players = 7;
@@ -132,6 +132,7 @@ gco.ctx = gco.canvas.getContext("2d");
 /**
 method that initiates the game canvas, and creates some default events and information cards
 
+@method init_game
 **/
 gco.init_game = function () {
     console.log("Expert interface initiated");
@@ -343,7 +344,11 @@ gco.init_game = function () {
 }
 
 
+/**
+Exports the info held by the gco object to the database
 
+@method export_to_database
+**/
 
 gco.export_to_database = function(){ // exports the info held by the gco to the database
 
@@ -978,6 +983,10 @@ gco.add_player = function(){ // creates a player and adds it to the game.
 	var player_node = document.getElementById("player_node").value;
 	
 	console.log("Node: " + player_node);
+	if(player_node == -1){
+		console.log("invalid node");
+		return;
+	}
 	
 	if (gco.next_player > max_players) {
 		console.log("to many players");
@@ -1360,7 +1369,17 @@ gco.event_add_effect = function(){ // adds an effect to the event, see info_card
 			return;
 		}
 	}
-	
+	else if (edomain == "player") {
+		if(etype == "actions"){
+		
+			if(isNaN(eaffects)){
+				
+				
+				console.log("affects is NaN");
+				return;
+			}
+		}
+	}
 	
 	gco.event_effects.push( newEffect = {
 		name : ename,
@@ -1474,7 +1493,15 @@ gco.card_create_add_effect = function() { // creates an effect and adds it to a 
 		}
 	}
 	else if (edomain == "player") {
+		if(etype == "actions"){
 		
+			if(isNaN(eaffects)){
+				
+				
+				console.log("affects is NaN");
+				return;
+			}
+		}
 	}
 	
 	gco.rdy_effects.push( newEffect = {
@@ -1723,7 +1750,7 @@ gco.edit_card = function(){
 	gco.show_card();
 }
 /**
-Edit event takes teh selected event and changes its values to teh values in the event create form 
+Edit event takes teh selected event and changes its values to the values in the event create form 
 @method edit_event
 **/
 gco.edit_event = function(){
@@ -1766,7 +1793,51 @@ gco.effect_domain_change = function(){ // changes the effect creation to better 
 	}
 	gco.update_ddbox(ddbox, list, true);
 	
+	gco.effect_type_change();
 	
+}
+
+/**
+Type change changes the possebilities of input depending on the type of the effect
+@method effect_type_change
+**/
+gco.effect_type_change = function(){
+	var type = document.getElementById("effect_type").value;
+	
+	var panic_container = document.getElementById("effect_panic_container");
+	var affects_container = document.getElementById("effect_affects_container");
+	
+	switch(type){
+		case 'panic':
+			panic_container.innerHTML = "<input id=\'effect_panic\' type=\'text\' style=\'width:170px;\'>";
+			affects_container.innerHTML = "<select id=\'effect_affects\' style=\'width:170px;\'><option value=\'residential\'>residential</option><option value=\'park\'>park</option><option value=\'industry\'>industry</option><option value=\'largecity\'>largecity</option></select>";
+		break;
+		
+		case 'event':
+			panic_container.innerHTML = "<input id=\'effect_panic\' type=\'text\' style=\'width:170px;\'>";
+			affects_container.innerHTML = "<select id=\'effect_affects\' style=\'width:170px;\'><option value=\'residential\'>residential</option><option value=\'park\'>park</option><option value=\'industry\'>industry</option><option value=\'largecity\'>largecity</option></select>";
+		break;
+		
+		case 'actions':
+			panic_container.innerHTML = "<div id=\'effect_panic\' type=\'info_label\' style='width:170px;'></div>";
+			affects_container.innerHTML = "<input id=\'effect_affects\' type=\'text\' style=\'width:170px;\'>";
+		break;
+		
+		case 'nextplayer':
+			panic_container.innerHTML = "<div id=\'effect_panic\' type=\'info_label\' style='width:170px;'></div>";
+			affects_container.innerHTML = "";
+		break;
+		
+		case 'stealaction':
+			panic_container.innerHTML = "<div id=\'effect_panic\' type=\'info_label\' style='width:170px;'></div>";
+			affects_container.innerHTML = "";
+		break;
+		
+		case 'blocknextevent':
+			panic_container.innerHTML = "<div id=\'effect_panic\' type=\'info_label\' style='width:170px;'></div>"
+			affects_container.innerHTML = "";
+		break;
+	}
 	
 }
 

@@ -51,7 +51,7 @@
 								Name:
 							</div>
 							<div class="expert-column">
-								<input id="effect_name" type="text" name="something">
+								<input id="effect_name" type="text" style='width:185px;'>
 							</div>
 						</div>
 						<div class="expert-row">
@@ -59,7 +59,7 @@
 								Domain:
 							</div>
 							<div class="expert-column">
-								<select id="effect_domain" onChange="gco.effect_domain_change()" style='width:180px;'>
+								<select id="effect_domain" onChange="gco.effect_domain_change()" style='width:185px;'>
 									<option value="zone">zone</option>
 									<option value="player">player</option>
 									
@@ -74,8 +74,9 @@
 								Type:
 							</div>
 							<div id="node_column" class="expert-column">
-								<select id="effect_type" style='width:180px;'>
+								<select id="effect_type" onChange="gco.effect_type_change()" style='width:185px;'>
 									<option value="panic">panic</option>
+									<option value="event">event</option>
 									
 									
 									
@@ -97,16 +98,16 @@
 							<div class="expert-column">
 								Panic:
 							</div>
-							<div class="expert-column">
-								<input id="effect_panic" type="text" name="something">
+							<div id="effect_panic_container" class="expert-column" >
+								<input id="effect_panic" type="text" style='width:170px;'  >
 							</div>
 						</div>
 						<div class="expert-row">
 							<div class="expert-column">
 								Affects:
 							</div>
-							<div class="expert-column">
-								<select id="effect_affects">
+							<div id="effect_affects_container" class="expert-column">
+								<select id="effect_affects" style='width:170px;'>
 									<option value="residential">residential</option>
 									<option value="park">park</option>
 									<option value="industry">industry</option>
