@@ -1,8 +1,13 @@
-/*  Settings variables
+/**
+* All game-related objects and functions are encapsulated 
+* in the "gco" (game client object) object, to avoid polluting
+* the global namespace. Only one instance of this object is created for each client.
+*    
+* @module Game Client
+* @class Game Client
+**/
 
-    Used for setting size of objects and 
-    positioning in drawing functions.
-*/
+//variables for setting size of objects and positioning in drawing functions.
 var c_height = 1550,
     c_width = 1500,
     node_size = 50,
@@ -23,7 +28,6 @@ var c_height = 1550,
 	var decrease_panic = new Audio("/music/decrease_panic_mixdown.mp3");
 	var moving_player = new Audio("/music/moving_player.mp3");
 	
-	
 	//set images
 	var residential_img = new Image();
 	residential_img.src = "/img/residential.jpg";
@@ -36,25 +40,18 @@ var c_height = 1550,
 	
 	var coordinator_img = new Image();
 	coordinator_img.src = "/img/coordinator.png";
-	
 	var crowd_manager_img = new Image();
 	crowd_manager_img.src = "/img/crowd_manager.png";
-	
 	var driver_img = new Image();
 	driver_img.src = "/img/driver.png";
-	
 	var operation_expert_img = new Image();
 	operation_expert_img.src = "/img/operation_expert.png";
-	
 	var volunteer_img = new Image();
 	volunteer_img.src = "/img/volunteer.png";
-	
 	var passer_by_img = new Image();
 	passer_by_img.src = "/img/passer_by.png";
 
-
-
-
+//set offsets for player, to give each player a specific position on nodes
 var player_offsetX = [0, 
                       Math.cos(315*(Math.PI/180))*offset_distance,
                       offset_distance, 
@@ -73,18 +70,6 @@ var player_offsetX = [0,
                       0,
                       Math.sin(225*(Math.PI/180))*offset_distance];
 
-
-
-
-/*  Game Client Object
-
-    All game-related objects and functions are encapsulated 
-    in the "gco" (game client object) object, to avoid polluting
-    the global namespace.
-    
-    Only one instance of this object is created for each client.
-    
-*/
 var gco = {
     players : [],
     nodes : [],
@@ -98,14 +83,13 @@ var gco = {
 gco.ctx = gco.canvas.getContext("2d");
 
 
-/*  Initialize Game
-
-    Initializes the game by populating the Game Client Object,
-    adding listeners to the objects and starting the timer.
-    
-    List ps         List of player objects
-    Object map      The map object containing list of Zones and Nodes
-*/
+/**
+* Initializes the game by populating the Game Client Object,
+* adding listeners to the objects and starting the timer.
+*
+* @method init_game
+* @param {Object} d JSON-object with starting state of game 
+**/
 gco.init_game = function (d) {
 	
     console.log("Game initiated.");
@@ -126,15 +110,12 @@ gco.init_game = function (d) {
 }
 
 
-/* Start Timer
-    
-    Controls the timer label, and emits an event to server 
-    when the duration has been reached.
-    
-    Int dur         Duration of timer.
-*/
-
-
+/** 
+* Updates the timer label, and starts an audio file if the time is below a certain value.
+* 
+* @method update_timer
+* @param {Int} update_timer Amount of time the timer is updated to
+**/
 gco.update_timer = function(time){
 	
 	
@@ -146,12 +127,11 @@ gco.update_timer = function(time){
 }
 
 
-/*  Set up Canvas
-    
-    Configures the height and width of the canvas 
-    according to the settings variables.
-
-*/
+/**
+* Configures the height and width of the canvas according to the settings variables.
+* 
+* @method setup_canvas
+**/
 gco.setup_canvas = function(){
     gco.canvas.width = c_width;
     gco.canvas.height = c_height;
@@ -159,6 +139,12 @@ gco.setup_canvas = function(){
     gco.cst.selected_node = null;
 }
 
+/**
+* Constructs the divs for the player information boxes
+* 
+* @method construct_player_divs
+* @param {List} players List of all players in the game
+**/
 gco.construct_player_divs = function(players){
 	var $l = $('#left-sidebar'),
 		$r = $('#right-sidebar'),
@@ -185,20 +171,35 @@ gco.construct_player_divs = function(players){
 	$r.html(inner);
 }
 
+/**
+* Resets the player states
+* 
+* @method reset
+**/
 gco.reset = function(){
-    /*var p = gco.players[gco.active_player];
-    p.x = gco.nodes[p.node].x;
-    p.y = gco.nodes[p.node].y;*/
     gco.update_players(gco.players);
 }
 
+/**
+* Updates whose turn it is
+* 
+* @method update_turn
+* @param {Int} turn Whose turn it is
+* @param {Int} ap Which player is the active player
+**/
 gco.update_turn = function(turn, ap){
     gco.turn = turn;
     gco.active_player = ap;
-    gco.cst.selected_zone = null
-    gco.cst.selected_node = null
+    gco.cst.selected_zone = null;
+    gco.cst.selected_node = null;
 }
 
+/**
+* Updates which command buttons are visible for the player
+* 
+* @method update_options
+* @param {List} o List of commands that should be available to the current player
+**/
 gco.update_options = function(o){
 	var $s = $('#selection'),
 		inner = '';
@@ -229,12 +230,12 @@ gco.update_options = function(o){
 }
 
 
-/*  Update Player
-    
-    Called by the server when a player has been updated with new information. 
-    Replaces the local player object with an updated object from the server.
-    
-    Object p        The updated player object.
+/**
+* Called by the server when a player has been updated with new information. 
+* Replaces the local player object with an updated object from the server.
+*     
+* @method update_player
+* @param {Object} p The updated player object.
 */
 gco.update_player = function(p){
     gco.players[p.id] = p;
@@ -242,6 +243,13 @@ gco.update_player = function(p){
     gco.players[p.id].y = gco.nodes[p.node].y;
 }
 
+/**
+* Called by the server when players have been updated with new information. 
+* Replaces the local player objects with updated objects from the server.
+*     
+* @method update_players
+* @param {List} ps List of the updated player objects.
+*/
 gco.update_players = function(ps){
 	var $con;
     for(var i = 0; i < ps.length; i++) {
@@ -250,6 +258,13 @@ gco.update_players = function(ps){
     }
 }
 
+/**
+* Called by the server when nodes have been updated with new information. 
+* Replaces the local node objects with updated objects from the server.
+*     
+* @method update_nodes
+* @param {List} ns List of the updated node objects.
+**/
 gco.update_nodes = function(ns){
     for(var i = 0; i < ns.length;i++){
         gco.nodes[ns[i].id] = ns[i];
@@ -258,12 +273,25 @@ gco.update_nodes = function(ns){
 
 }
 
+/**
+* Called by the server when zones have been updated with new information. 
+* Replaces the local zone objects with updated objects from the server.
+*     
+* @method update_zones
+* @param {List} zs List of the updated zone objects.
+**/
 gco.update_zones = function(zs){
     for(var i = 0; i < zs.length;i++){
         gco.zones[zs[i].id] = zs[i];
     }
 }
 
+/**
+* Called by the server when information cards should be updated on the screen.
+* Replaces the information cards on the screen with new cards from the players.
+*     
+* @method update_cards
+**/
 gco.update_cards = function() {
     var ps = gco.players,
         $con,
@@ -277,9 +305,6 @@ gco.update_cards = function() {
     for (i = 0; i < ps.length; i++){
         cards = ps[i].info_cards;
 		
-		
-		
-
         $con = $("#"+i+"_cards");
         $con.empty();
 			if ((cards.length)*110+75 > (parseInt($con.parent().parent().css('width')))) {
@@ -295,14 +320,36 @@ gco.update_cards = function() {
     }
 }
 
-
+/**
+* Called by the server when the status label should be updated.
+* Replaces the information in the status label with new information from the server.
+*     
+* @method update_status
+* @param {String} status The new message to be put in the status label 
+**/
 gco.update_status = function(status){
 	$('#status_label').html(status);
 }
+
+/**
+* Called by the server when the error label should be updated.
+* Replaces the information in the error label with new information from the server.
+*     
+* @method update_error
+* @param {String} error The new message to be put in the error label 
+**/
 gco.update_error = function(error){
 	$('#error_label').html(error);
 }
 
+/**
+* Called when a user clicks a information card.
+* Emits a command to the server, telling it which card was used, then plays an audio file.
+*     
+* @method info_card_click
+* @param {Object} p Which player clicked the card 
+* @param {Object} c Which information card was clicked
+**/
 gco.info_card_click = function(p, c) {
 	console.log(p);
 	console.log(c);
@@ -313,100 +360,49 @@ gco.info_card_click = function(p, c) {
 	}
 }
 
-
-gco.sounds = function(){
-/*
-var snd = new Audio("/music/painstick.wav"); // buffers automatically when created
-snd.play();
-	
-var snd = new Audio("painstick.wav"); // buffers automatically when created
-if (player.changed){
-snd.play();
-}*/
-}
-
-
-
-
+/**
+* Called when a user has moved people between two zones.
+* Sets which zones the player moved people between.
+*     
+* @method move_people
+**/
 gco.move_people = function(){
 	if(gco.cst.selected_zone !== null){
 		gco.update_status(speak('stat-move-people')+gco.cst.selected_zone+"...");
 		gco.cst.moving_people = true;
 		gco.cst.moving_from = gco.cst.selected_zone;
-		
-		
-		
 	}
-	
 }
 
-
-/* deprecated - Update whole player instead
-gco.decrease_actions = function(){
-    if (gco.players[gco.active_player].actions_left > 0) {
-        gco.players[gco.active_player].actions_left--;
-    }
-    gco.draw();
-}
-
-gco.decrease_4_actions = function(){
-    if (gco.players[gco.active_player].actions_left > 0) {
-        gco.players[gco.active_player].actions_left -= 4;
-    }
-    gco.draw();
-}
-*/
-
-/* Update whole zone instead
-//decrease panic (server knows if player has special -10 panic role, if not decrease by 5)
-gco.decrease_panic = function(zone){
-	gco.zones[zone.id].panic_level = zone.panic_level;
-	gco.draw();
-}
-*/
-
-
-
+/**
+* Draws a player on the canvas.
+* 
+* @method player_draw
+* @param {Object} player The player to be drawn on the canvas
+* @param {Object} ctx The context object that provides methods and properties for drawing on the canvas
+**/
 gco.player_draw = function(player, ctx){
 	ctx.fillStyle = "rgba(255,0,0,0)";
 	ctx.save();
 
+	//set player coordinates
 	if (!player.x) player.x = gco.nodes[player.node].x;
     if (!player.y) player.y = gco.nodes[player.node].y;
-	
-	//ctx.fillStyle = player.color;
-	
     ctx.beginPath();
     ctx.arc(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size, 0, Math.PI*7, true); 
 
-    //ctx.fill();
-    //TODO draw circle to show active player when dragging/active?
+    //draw circle to show active player when dragging/active
     if (this.active_player===player.id){
-    	
 		ctx.fill();
     	ctx.strokeStyle = 'red';
     	ctx.lineWidth = 10;
     	ctx.stroke();
 		}
-		/*var gradiant = ctx.createRadialGradient(player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size-10, player.x+player_offsetX[player.id], player.y+player_offsetY[player.id], player_size);
-    	gradiant.addColorStop(0, 'red');
-    	gradiant.addColorStop(1, 'rgba(255,0,0,0)');
-    	ctx.fillStyle=gradiant;
-    	ctx.fill();
-    }*/
-    /*else{
-    	//ctx.fill();
-    	ctx.strokeStyle = 'black';
-    	ctx.lineWidth = 2;
-    	ctx.stroke();
-    }
-*/
-	//ctx.fillStyle = "Black";
+
     ctx.font="bold 15px Arial",
     ctx.fillText(player.id, player.x+player_offsetX[player.id]-5, player.y+player_offsetY[player.id]+6);
 
-	
-			//draw the images
+	//draw the images
 	if (player.role==='coordinator'){
 		ctx.drawImage(coordinator_img, player.x + player_offsetX[player.id]-24, player.y+player_offsetY[player.id]-24);
 	}
@@ -432,75 +428,90 @@ gco.player_draw = function(player, ctx){
 	ctx.restore();
 }
 
+/**
+* Draws a node on the canvas.
+* 
+* @method node_draw
+* @param {Object} node The node to be drawn on the canvas
+* @param {Object} ctx The context object that provides methods and properties for drawing on the canvas
+**/
 gco.node_draw = function(node, ctx){
     ctx.fillStyle = 'white';
     ctx.beginPath();
+    //set coordinates for where to draw the node
     ctx.arc(node.x, node.y, node_size, 0, Math.PI*2, true); 
     ctx.closePath();
     ctx.fill();    
     
     ctx.fillStyle = "black";
     ctx.font="15px Arial";
+    
+    //set where node id should be drawn on the node, depending how large the number is
     if(node.id>9){
     	ctx.fillText(node.id, node.x-8, node.y-15);
     }
     else{
     	ctx.fillText(node.id, node.x-4, node.y-15);
     }
-    
-if (node.has_information_center){
-		
-		ctx.fillStyle = 'blue';
-		ctx.fill();
-        //ctx.fillRect(node.x-(info_center_size/2), node.y-(info_center_size/2)+6, info_center_size, info_center_size);
-        ctx.fillStyle = 'white';
-        ctx.font='50px Georgia',
-         //draw i for infocenter, or number for node?
-         //
-         ctx.fillText("i", node.x-4, node.y+18);
-     }
-    
+
+    //draw information center on node
+    if (node.has_information_center){
+    	ctx.fillStyle = 'blue';
+    	ctx.fill();
+    	ctx.fillStyle = 'white';
+    	ctx.font='50px Georgia',
+    	ctx.fillText("i", node.x-4, node.y+18);
+    }
+
 }
 
-
+/**
+* Draws a roadblock on the canvas.
+* 
+* @method roadblock_draw
+* @param {Object} node The node to draw the roadblock on
+* @param {Object} ctx The context object that provides methods and properties for drawing on the canvas
+**/
 gco.roadblock_draw = function(node, ctx){
 	ctx.strokeStyle = '#202020';
 	ctx.lineWidth = 34;
 	var nodes = gco.nodes;
 	
+	//draws the roadblock to all connecting nodes
 	for (var i = 0; i < node.connects_to.length; i++){
 		ctx.beginPath();
 	    ctx.moveTo(node.x, node.y);
-	    //TODO maybe: 50% road block to another node with road block (50+50=100), 
-	    // but only 10% when neighbor does not have r b (looks better...?)
-	    // for now: just draw 50% block
-	    //if (nodes[node.connects_to[i]].has_road_block){
-	    	ctx.lineTo(((nodes[node.connects_to[i]].x)+node.x)/2, ((nodes[node.connects_to[i]].y)+node.y)/2);
-	    //}
-	    //else{
-	    //	ctx.lineTo(((nodes[node.connects_to[i]].x)+node.x)/10, ((nodes[node.connects_to[i]].y)+node.y)/10);
-	    //}
-	    
+	    ctx.lineTo(((nodes[node.connects_to[i]].x)+node.x)/2, ((nodes[node.connects_to[i]].y)+node.y)/2);
 	    ctx.closePath();
 	    ctx.stroke();
     }
 	
 }
 
+/**
+* Resets the canvas, making it visible.
+* 
+* @method background_draw
+* @param {Object} ctx The context object that provides methods and properties for drawing on the canvas
+**/
 gco.background_draw = function(ctx){
 	gco.canvas.width = gco.canvas.width;
-	/*
-    ctx.fillStyle="rgba(0, 0, 0, 0.0)";
-    ctx.fillRect(0,0, c_width, c_height);
-    */
 }
 
+/**
+* Draws a zone on the canvas.
+* 
+* @method zone_draw
+* @param {Object} zone The zone to be drawn on the canvas
+* @param {Object} ctx The context object that provides methods and properties for drawing on the canvas
+**/
 gco.zone_draw = function(zone, ctx){
 
 	ctx.save();
 	var minx = 2000;
 	var miny = 2000;
 	
+	//calculate which node of the zone is the top-left node, to use when drawing the image
     for (var j = 0; j < zone.nodes.length; j++){
        	if (gco.nodes[zone.nodes[j]].x < minx){
 		minx = gco.nodes[zone.nodes[j]].x;
@@ -511,29 +522,23 @@ gco.zone_draw = function(zone, ctx){
     }
 	    ctx.beginPath();
 
-	//var node = gco.nodes;
-	//var zones = 
+	//draw lines for the zone
     ctx.moveTo(gco.nodes[zone.nodes[0]].x, gco.nodes[zone.nodes[0]].y);
     for (var j = 0; j < zone.nodes.length; j++){
         ctx.lineTo(gco.nodes[zone.nodes[j]].x, gco.nodes[zone.nodes[j]].y);
     }
     ctx.lineTo(gco.nodes[zone.nodes[0]].x, gco.nodes[zone.nodes[0]].y);
     
-	
-	
 	ctx.closePath();
 	ctx.save();
 	ctx.clip();
-	
-	
-	
-	//draw the images
+
+	//draw an image on the zone
 	if (zone.type==='residential'){
 		ctx.drawImage(residential_img, minx, miny);
 	}
 	else if (zone.type==='industry'){
 		ctx.drawImage(industry_img, minx, miny);
-	
 	}
 	else if (zone.type==='park'){
 		ctx.drawImage(park_img, minx, miny);
@@ -542,14 +547,8 @@ gco.zone_draw = function(zone, ctx){
 		ctx.drawImage(largecity_img, minx, miny);	
 	}
 	
-	
-	//ctx.fill();
-	//Draw transparent red corresponding to panic level
-	//ctx.fillStyle = "rgba(255,0,0,"+(0.2*zone.panic_level/10)+")";
 	ctx.fillStyle = "rgba(255,0,0,"+(0.2+(0.12*zone.panic_level/11))+")";
 	ctx.fill();
-	
-	
 
 	ctx.restore();
 	//Draw outline of zones
@@ -559,23 +558,22 @@ gco.zone_draw = function(zone, ctx){
 	ctx.restore(); // Put the canvas back how it was before we started
 	
    
-    //TODO TEMPORARY show simple panic info
+    //draw panic info on the zone
     ctx.fillStyle = 'black';
-
 	ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]-22,25,30); 
 	if (zone.panic_level >= 10){
 		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]-22,40,30); 
 	}
 	else{
-		//console.log("was here");
 		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]-22,25,30); 
 	}
+	
 	ctx.save();
 	ctx.fillStyle = 'white';
 	ctx.font='27px Arial'
 	ctx.fillText(zone.panic_level, zone.centroid[0]-20, zone.centroid[1]+3);
 	
-	//TODO simple people info
+	//draw people info on the zone
 	ctx.fillStyle = 'black';
 	if (zone.people > 9 && zone.people < 100){
 	
@@ -587,20 +585,25 @@ gco.zone_draw = function(zone, ctx){
 	else{
 		ctx.fillRect(zone.centroid[0]-24,zone.centroid[1]+28,25,30); 
 	}
+	
 	ctx.save();
 	ctx.fillStyle = 'white';
 	ctx.font='27px Arial'
 	ctx.fillText(zone.people, zone.centroid[0]-20, zone.centroid[1]+54);
-	
-
-    
 }
 
+/**
+* Draws an outline to show which zone or node is selected
+* 
+* @method selection_draw
+* @param {Object} ctx The context object that provides methods and properties for drawing on the canvas
+**/
 gco.selection_draw = function(ctx){
     var nodes = gco.nodes,
         cst = gco.cst,
         zones = gco.zones;
         
+    //draw lines to outline the selected zone
     if (cst.selected_zone !== null){
         var zone = zones[cst.selected_zone];
         ctx.beginPath();
@@ -614,6 +617,7 @@ gco.selection_draw = function(ctx){
         ctx.lineWidth = 20;
         ctx.stroke();
     }
+    //draw lines to outline the selected node
     if (cst.selected_node !== null){
         var node = nodes[cst.selected_node];
         ctx.beginPath();
@@ -626,6 +630,14 @@ gco.selection_draw = function(ctx){
     }
 }
 
+/**
+* Checks if mouse click coordinates are within a player's area on the canvas
+* 
+* @method player_contains
+* @param {Object} p The player used when checking if mouse coordinates are within its area
+* @param {Int} mx The x-coordinates for a mouse click
+* @param {Int} my The y-coordinates for a mouse click
+**/
 gco.player_contains = function(p, mx, my) {
     var pn = gco.nodes[p.node];
     return (mx<=(pn.x+player_offsetX[p.id]+player_size))&&
@@ -634,6 +646,14 @@ gco.player_contains = function(p, mx, my) {
         (my>=(pn.y+player_offsetY[p.id]-player_size));
 }
 
+/**
+* Checks if mouse click coordinates are within a node's area on the canvas
+* 
+* @method node_contains
+* @param {Object} node The node used when checking if mouse coordinates are within its area
+* @param {Int} mx The x-coordinates for a mouse click
+* @param {Int} my The y-coordinates for a mouse click
+**/
 gco.node_contains = function(node, mx, my) {
     return (mx<=(node.x+node_size))&&
         (mx>=(node.x-node_size))&&
@@ -641,6 +661,14 @@ gco.node_contains = function(node, mx, my) {
         (my>=(node.y-node_size));
 }
 
+/**
+* Checks if mouse click coordinates are within a zone's area on the canvas
+* 
+* @method zone_contains
+* @param {Object} z The zone used when checking if mouse coordinates are within its area
+* @param {Int} mx The x-coordinates for a mouse click
+* @param {Int} my The y-coordinates for a mouse click
+**/
 gco.zone_contains = function(z, mx, my){
     var n = z.nodes,
         nodes = gco.nodes;
@@ -659,6 +687,11 @@ gco.zone_contains = function(z, mx, my){
     return r;
 }
 
+/**
+* The main draw function for drawing the objects on the canvas
+* 
+* @method draw
+**/
 gco.draw = function(){
     var to_node = {},
         node = {},
@@ -670,15 +703,14 @@ gco.draw = function(){
         players = gco.players;
         
     gco.background_draw(ctx);    
-        
+
+    //call draw method for zone objects
     for (var i = 0; i < zones.length; i++) {
-        zone = zones[i];
-        gco.zone_draw(zone,ctx);
+    	zone = zones[i];
+    	gco.zone_draw(zone,ctx);
     }
-    
-    
-    
-    
+
+    //call draw method for node objects
     for (var i = 0; i < nodes.length; i++) {
     	if (nodes[i].has_road_block){
     		node = nodes[i]
@@ -686,14 +718,16 @@ gco.draw = function(){
     	}
     }
     
+    //call draw method for a selection
     gco.selection_draw(ctx);
 
+    //call draw method for nodes
     for (var i = 0; i < nodes.length; i++) {
         node = nodes[i];
         gco.node_draw(node, ctx);
     }
     
-    
+    //call draw method for player objects
     for (var i = 0; i < players.length; i++) {
         pl = players[i];
         gco.player_draw(pl, ctx);
@@ -705,6 +739,7 @@ gco.draw = function(){
         }
     }
     
+    //update labels
     if(players.length > 1){
         $("#turn-label").html(speak("turn-label")+(gco.turn)); 
         $("#player-turn-label").html(speak("player-turn-label")[0]+(gco.active_player)+"'"+speak("player-turn-label")[1]);
@@ -713,7 +748,11 @@ gco.draw = function(){
     
 }// end draw
 
-
+/**
+* Adds event listeners to the canvas
+* 
+* @method set_canvas_listener
+**/
 gco.set_canvas_listener = function(){
     var canvas = gco.canvas,
         cst = gco.cst,
@@ -855,8 +894,11 @@ gco.set_canvas_listener = function(){
     
 }//end set canvas listener
 
-
-
+/**
+* Translates labels
+* 
+* @method translate_page
+**/
 var translate_page = function(){
 	$("#end-game-label").html(speak("end-game-label"));
 	$("footer").html(speak("footer"));

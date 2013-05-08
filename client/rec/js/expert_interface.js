@@ -1,3 +1,9 @@
+/**
+*    
+* @module Expert Interface
+* @class Expert Interface
+**/
+
 /**  Settings variables
 
     Used for setting size of objects and 
@@ -85,19 +91,6 @@ var player_offsetX = [0,
                       Math.sin(225*(Math.PI/180))*offset_distance];
 
 
-
-
-
-/**
-Game Client Object
-All game-related objects and functions are encapsulated 
-in the "gco" (game client object) object, to avoid polluting
-the global namespace.
-
-@class gco
-
-
-**/
 var gco = {
     players : [],
     nodes : [],

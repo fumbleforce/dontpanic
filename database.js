@@ -76,7 +76,8 @@ handleDisconnect(connection);
 
 /**
 	Checking if the tables for the database exists, if they dont, they will be made and a 
-	a default gametemplate will be put in the database
+	a default gametemplate will be put in the database. This method is never called in the 
+	code, has to be called to set up the database tables.
 
 	@method set_up_database
 **/
@@ -123,7 +124,12 @@ db.get_replay_id = function(next) {
 	connection.query('SELECT replay_id FROM replay ORDER BY replay_id DESC',
 	function (err, rows, fields) {
 		if (err) throw err;
-		return next(rows[0].replay_id);
+		if (rows[0] === undefined) {
+			return next(0);
+		}
+		else {
+			return next(rows[0].replay_id);
+		}
 	});
 }
 

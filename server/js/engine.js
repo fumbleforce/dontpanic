@@ -37,7 +37,7 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
 	this.template_id = template_id || 0;
 
     //Replay
-    this.state_id = 0;
+    this.state_id = -1;
 	this.replay_id = id_replay;
 
 	//Map
@@ -747,7 +747,7 @@ function effect(card, g) {
 
 
 /**
-* @class none
+* @class Utility
 */
 
 /**
