@@ -76,7 +76,8 @@ handleDisconnect(connection);
 
 /**
 	Checking if the tables for the database exists, if they dont, they will be made and a 
-	a default gametemplate will be put in the database
+	a default gametemplate will be put in the database. This method is never called in the 
+	code, has to be called to set up the database tables.
 
 	@method set_up_database
 **/
