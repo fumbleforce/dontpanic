@@ -76,7 +76,7 @@
 							<div id="node_column" class="expert-column">
 								<select id="effect_type" onChange="gco.effect_type_change()" style='width:185px;'>
 									<option value="panic">panic</option>
-									<option value="event">event</option>
+									
 									
 									
 									
@@ -413,7 +413,7 @@
 								Role:
 							</div>
 							<div id="player_role_column" class="expert-column">
-								<select id="player_role">
+								<select id="player_role" style='width:180px;'>
 									
 									<option value="crowd manager">crowd manager</option>
 									<option value="driver">driver</option>
@@ -430,7 +430,7 @@
 								Startnode:
 							</div>
 							<div id="node_column" class="expert-column">
-								<select id="player_node">
+								<select id="player_node" style='width:180px;'>
 									<option value="-1">none added</option>
 									
 								</select>
@@ -456,6 +456,9 @@
 							<br>
 							Edit the info of the zone
 						</div>
+						<div class="expert-row">
+							<button class="button" onclick="gco.edit_zone();">Change</button>
+						</div>
 						
 					</div>
 				</div>
@@ -468,7 +471,7 @@
 								Name:
 							</div>
 							<div class="expert-column">
-								<div id="zone_id" type="info_label">no zone selected</div>
+								<div id="zone_id" type="info_label" style='width:180px;'>no zone selected</div>
 							</div>
 						</div>
 							
@@ -478,7 +481,7 @@
 								Type:
 							</div>
 							<div id="content_column" class="expert-column">
-								<select id="edit_zone_type">
+								<select id="edit_zone_type" style='width:180px;'>
 									<option value="residential">residential</option>
 									<option value="industry">industry</option>
 									<option value="park">park</option>
@@ -492,22 +495,20 @@
 							<div class="expert-column">
 								People:
 							</div>
-							<div id="content_column" class="expert-column">
-								<input type="text" id="zone_people" value="0">
+							<div class="expert-column">
+								<input type="text" id="zone_people" value="0" style='width:180px;'>
 							</div>
 						</div>
 						<div class="expert-row">
 							<div class="expert-column">
 								Panic:
 							</div>
-							<div id="content_column" class="expert-column">
-								<input type="text" id="zone_panic" value="0">
+							<div class="expert-column">
+								<input type="text" id="zone_panic" value="0" style='width:180px;'>
 							</div>
 						</div>
 					</div>
-					<div class="expert-row">
-						<button class="button" onclick="gco.edit_zone();">Change</button>
-					</div>
+					
 					
 				</div>
 			</div>
@@ -526,12 +527,12 @@
 				<div class="expert-column">
 					<div class="expert-row">
 						
-						Author:
-						<input id="template_author" type="text">
+						Author:<br>
+						<input id="template_author" type="text" style='width:180px;'>
 					</div>
 					<div class="expert-row">
-						Map Description: 
-						<input id="template_desc" type="text">
+						Map Description: <br>
+						<input id="template_desc" type="text" style='width:180px;'>
 						
 					</div>
 	
@@ -541,24 +542,18 @@
 					
 					<div class="expert-row">
 						
-						Turns before events:
-						<input id="template_event_step" type="text">
+						Turns before events:<br>
+						<input id="template_event_step" type="text" style='width:180px;'>
 					</div>
 					<div class="expert-row">
-						Time before panic inc: 
-						<input id="template_timestep" type="text">
+						Time before panic inc:<br>
+						<input id="template_timestep" type="text" style='width:180px;'>
 						
 					</div>
 					
 	
 				</div>
-				<div class="expert-column">
-					
-					
-					<div id="event_effects_label2" type="info_label"></div>
-
-					
-				</div>
+				
 			</div>
 			
 		

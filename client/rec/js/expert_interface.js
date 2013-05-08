@@ -12,7 +12,7 @@ var c_height = 1550,
     panic_info_size = 40,
     w_inc = 0;
 	player_colors = ["red","orange","yellow","chartreuse ","green","aqua","blue","purple"];
-	effect_zone_list = ["panic", "event"];
+	effect_zone_list = ["panic"];
 	
 	effect_people_list = ["actions", "nextplayer", "stealaction", "blocknextevent"];
 	
@@ -156,7 +156,7 @@ gco.init_game = function () {
 				effects: [{
 					name:"industry + 20 panic",
 					domain:'zone',
-					type:'event',
+					type:'panic',
 					panic:(20),
 					affects:'industry'
 			   }]
@@ -167,7 +167,7 @@ gco.init_game = function () {
 				effects: [{
 					name:"residential +5 panic",
 					domain:'zone',
-					type:'event',
+					type:'panic',
 					panic:(5),
 					affects:'residential'
 				}]
@@ -178,7 +178,7 @@ gco.init_game = function () {
 				effects: [{
 					name:"largecity + 10 panic",
 					domain:'zone',
-					type:'event',
+					type:'panic',
 					panic:(10),
 					affects:'largecity'
 				 }]
@@ -189,7 +189,7 @@ gco.init_game = function () {
 				effects: [{
 					name:"residential +10 panic",
 					domain:'zone',
-					type:'event',
+					type:'panic',
 					panic:(10),
 					affects:'residential'
 				}]
@@ -200,28 +200,28 @@ gco.init_game = function () {
 				effects: [{
 					name:"largecity + 10 panic",
 					domain:'zone',
-					type:'event',
+					type:'panic',
 					panic:(10),
 					affects:'largecity'
 				},
 				{ 
 					name:"residential + 10 panic",
 					domain:'zone',
-					type:'event',
+					type:'panic',
 					panic:(10),
 					affects:'residential'
 				},
 				{
 					name:"park + 10 panic",
 					domain:'zone',
-					type:'event',
+					type:'panic',
 					panic:(10),
 					affects:'park'
 				},
 				{	
 					name:"industry + 10 panic",
 					domain:'zone',
-					type:'event',
+					type:'panic',
 					panic:(10),
 					affects:'industry'
 				}]
@@ -232,7 +232,7 @@ gco.init_game = function () {
 				effects: [{
 					name:"industry + 10 panic",
 					domain:'zone',
-					type:'event',
+					type:'panic',
 					panic:(10),
 					affects:'industry'
 				}]
@@ -243,7 +243,7 @@ gco.init_game = function () {
 				effects: [{
 					name:"park + 10 panic",
 					domain:'zone',
-					type:'event',
+					type:'panic',
 					panic:(10),
 					affects:'park'
 				}]
@@ -254,7 +254,7 @@ gco.init_game = function () {
 				effects: [{
 					name:"residential + 10 panic",
 					domain:'zone',
-					type:'event',
+					type:'panic',
 					panic:(10),
 					affects:'residential'
 				}]
@@ -265,7 +265,7 @@ gco.init_game = function () {
 				effects: [{
 					name:"residential + 10 panic",
 					domain:'zone',
-					type:'event',
+					type:'panic',
 					panic:(10),
 					affects:'residential'
 				}]
@@ -276,7 +276,7 @@ gco.init_game = function () {
 				effects: [{
 					name:"largecity + 10 panic",
 					domain:'zone',
-					type:'event',
+					type:'panic',
 					panic:(10),
 					affects:'largecity'
 				}]
@@ -288,7 +288,7 @@ gco.init_game = function () {
 				effects: [{
 					name:"residential +10 panic",
 					domain:'zone',
-					type:'event',
+					type:'panic',
 					panic:(10),
 					affects:'residential'
 				}]
@@ -299,7 +299,7 @@ gco.init_game = function () {
 				effects: [{
 					name:"residential + 10 panic",
 					domain:'zone',
-					type:'event',
+					type:'panic',
 					panic:(10),
 					affects:'residential'
 				}]
@@ -342,7 +342,7 @@ gco.init_game = function () {
         });
 	gco.update_ddbox(document.getElementById("event_show"), gco.events, true)
 	
-	console.log(gco.events.length);
+	
 	gco.update_ddbox(document.getElementById("card_show"), gco.info_cards, true)
 	gco.show_event();
 	gco.show_card();
@@ -359,6 +359,7 @@ Exports the info held by the gco object to the database
 
 gco.export_to_database = function(){ // exports the info held by the gco to the database
 
+	gco.clear_adjacent_zones();
 	gco.update_adjacent_zones();
 	
 
@@ -378,6 +379,26 @@ gco.export_to_database = function(){ // exports the info held by the gco to the 
 		
 		
 	};
+	
+	
+	gco.remove_unused_nodes();
+	
+	for(var i = 0; i < gco.nodes.length; i++){
+		
+		var nodetest = false;
+		for (var z = 0; z < gco.zones.length ; z++){
+		
+			if(gco.zones[z].nodes.indexOf(gco.nodes[i]) > -1 ){
+				
+				nodetest = true;
+			}
+		}
+		if(!nodetest){
+			console.log("a node is not part of a zone. node: " + i);
+			window.alert("There is a node that is not part of a zone, please fix that before trying to export to database.");
+			return;
+		}
+	}
 	for(var i = 0; i < gco.nodes.length ; i++){
 		snode = gco.nodes[i];
 		sconnects_to = [];
@@ -397,7 +418,9 @@ gco.export_to_database = function(){ // exports the info held by the gco to the 
 	}
 
 	
-	
+	if(!gco.zone_connection_check()){
+		return;
+	}
 	for (var i = 0; i < gco.zones.length; i++){
 		szone = gco.zones[i];
 		
@@ -445,7 +468,7 @@ gco.export_to_database = function(){ // exports the info held by the gco to the 
 		window.alert("There are no nodes added to the template, finish the map before trying to export to database");
 		return;
 	}
-	if(gco.zones.length){
+	if(gco.zones.length == 0){
 		console.log("no zones added");
 		window.alert("There are no zones added to the template, finish the map before trying to export to database");
 		return;
@@ -1148,6 +1171,7 @@ gco.del_selected_zone = function(){ // delete the selected zone, if none is sele
 		
 		
 		gco.zones.splice(index, 1);
+	
 		
 		gco.selected_zone = -1;
 		gco.re_id();
@@ -1174,10 +1198,15 @@ gco.del_selected_player = function(){ // deletes the selected player
 		gco.re_id();
 		gco.draw();
 	}
+	else {
+		console.log("no player selected");
+	}
 }
 /**
-Deletes the selected node, if no node is selected none will be removed
+Deletes the selected node, if no node is selected none will be removed 
 @method del_selected_node
+@return Boolean deleted
+	False if node was not deleted, true if it was
 **/
 gco.del_selected_node = function(){ // deletes the selected node, if none is selected nothing will be removed
 			
@@ -1192,12 +1221,12 @@ gco.del_selected_node = function(){ // deletes the selected node, if none is sel
 		node = gco.nodes[index];
 		
 		
-		
+		// check if node is part of a zone
 		for (var z = 0; z < gco.zones.length ; z++){
 			if(gco.zones[z].nodes.indexOf(gco.nodes[gco.selected_node]) > -1 ){
 				console.log("failed delete test");
 				gco.selected_node = -1;
-				return;
+				return false;
 			}
 		}
 		// check if node has a player
@@ -1206,7 +1235,7 @@ gco.del_selected_node = function(){ // deletes the selected node, if none is sel
 			if(gco.players[i].node == node){
 				console.log("failed delete test");
 				gco.selected_node = -1;
-				return;
+				return false;
 			}
 		}
 		console.log("passed delete test");
@@ -1225,6 +1254,7 @@ gco.del_selected_node = function(){ // deletes the selected node, if none is sel
 		gco.selected_node = -1;
 		gco.update_ddbox(document.getElementById("player_node"), gco.nodes, false);
 		gco.draw();
+		return true;
 	}
 }
 /**
@@ -1244,8 +1274,73 @@ gco.re_id = function(){ // redo all id's of the nodes, to make it look better
 	}
 }
 /**
+This will try to delete all nodes on the map, but its only possible to delete nodes that are not used by a player or a zone
+@method remove_unused_nodes
+**/
+gco.remove_unused_nodes = function(){ // remove all unused nodes
+	
+	for(var i = gco.nodes.length -1; i>= 0;i--){
+		
+		gco.selected_node = i;
+		//console.log("trying to delete node " + i + " result: " + gco.del_selected_node());
+		gco.del_selected_node();
+	}
+
+	return;
+}
+/**
+Connection check tryes to check if it possible to walk through all the zones
+@method zone_connection_check
+@return Boolean
+	True if all zones are connected, false otherwise
+**/
+gco.zone_connection_check = function(){
+	var returnvalue = false;
+	var connected_zones = [];
+	var connected_zones2 = [];
+	for(var i = 0; i < gco.zones.length; i++){
+		connected_zones.push(false);
+	}
+	//connected_zones[0] = true;
+	connected_zones2.push(gco.zones[0]);
+	
+	for(var i = 0; i< connected_zones2.length;i++){
+		var zone = connected_zones2[i];
+		console.log(connected_zones2.length + " length");
+		connected_zones[zone.id] = true;
+		console.log("zone: " + zone.id );
+		
+		for(var o = 0; o < zone.zones.length;o++){
+			if(!connected_zones[zone.zones[o]]){
+				connected_zones2.push(gco.zones[zone.zones[o]]);
+			}
+		}
+	}
+	for(var i = 0; i < connected_zones.length; i++){
+		if(!connected_zones[i]){
+			console.log("zone " + i + " failed connection test");
+			window.alert("A zone or more is not connected to the rest, fix it before trying to export to database");
+			return false;
+		}
+	}
+	
+	
+	
+	return true;
+}
+/**
+Clears the adjacent zones in case some zones where deleted since last time 
+@method clear_adjacent_zones
+**/
+gco.clear_adjacent_zones = function(){
+	for(var i = 0 ;i < gco.zones.length; i++){
+		gco.zones[i].zones = [];
+	}
+}
+/**
 Iterates over all the zones to figure out which ones are adjacent
 @method update_adjacent_zones
+
 **/
 gco.update_adjacent_zones = function () { //iterates over all the zones to figure out which ones are adjacent
 
@@ -1262,10 +1357,12 @@ Calculates the adjacent zones of a provided zone
 @method calculate_adjacent_zones
 @param Zone zone
 	The zone that will be checked for adjacent zones
+
 **/
 gco.calculate_adjacent_zones = function (zone){ //calculates the adjecent zones
 
 	//console.log("trying to calculate adjacent zones");
+	
 	
 	for(var i = 0; i <  zone.nodes.length; i++){
 	
@@ -1285,6 +1382,7 @@ gco.calculate_adjacent_zones = function (zone){ //calculates the adjecent zones
 						
 						zone.zones.push(gco.zones[z].id);
 						console.log("created a zone connection between zone " + zone.id + " and zone " + gco.zones[z].id);
+						
 						
 					}
 				}
@@ -1958,7 +2056,7 @@ gco.set_canvas_listener = function(){
 			}	
 		}
 		
-		gco.nodes.push(newNode = {
+		gco.nodes.push({
 				id:gco.next_node,
 				x:mx,
 				y:my,
