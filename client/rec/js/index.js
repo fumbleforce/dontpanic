@@ -1,3 +1,9 @@
+/**
+* Called by the "play" button on the index page.
+* Sends an ajax request to the server to retrieve a list of templates.
+*
+* @method play
+*/
 function play(){
 
 	create_cookie("is_gm", false, 1);
@@ -17,7 +23,14 @@ function play(){
     });
 
 }
-
+/**
+* Callback from the "play" function.
+* Interprets the templates loaded from 
+* database and creates a list on the index page.
+*
+* @method templates
+* @param {List} d List of templates
+*/
 function templates(d){
 	var cont = "",
 		t;
@@ -56,12 +69,24 @@ function templates(d){
 	}
 }
 
+/**
+* Creates a cookie for selected template, when a template is selected.
+*
+* @method selected_template
+* @param {Integer} id Template id
+*/
 function selected_template(id){
 	console.log("Creating cookie for chosen template: "+id);
 	create_cookie("is_gm", false, 1);
 	create_cookie("template_id", id, 1);
 }
 
+/**
+* Called by the "replay" button on the index page.
+* Sends an ajax request to the server to retrieve a list of replays.
+*
+* @method replay
+*/
 function replay(){
 	create_cookie("is_gm", false, 1);
 
@@ -80,7 +105,7 @@ function replay(){
         }
     });
 }
-
+v
 function replays(d){
 	var cont = "",
 		t;
@@ -115,12 +140,25 @@ function replays(d){
 	}
 }
 
+/**
+* Creates a cookie for selected replay, when a replay is selected.
+*
+* @method selected_replay
+* @param {Integer} replay_id Replay id
+*/
 function selected_replay (replay_id) {
 	console.log("creating cookie for chosen replay: "+replay_id);
 	create_cookie("is_gm", false, 1);
 	create_cookie("replay_id", replay_id, 1);
 }	
 
+
+/**
+* Called by the "Game Manager" button on the index page.
+* Sends an ajax request to the server to retrieve a list of active rooms.
+*
+* @method game_manager
+*/
 function game_manager(){
 	console.log("Creating cookie for GM: ");
 	create_cookie("is_gm", true, 1);
@@ -142,6 +180,14 @@ function game_manager(){
 
 }
 
+/**
+* Callback from the "game_manager" function.
+* Interprets the rooms loaded from 
+* database and creates a list on the index page.
+*
+* @method game_master
+* @param {List} d List of rooms
+*/
 function game_master(d){
 	var cont = "",
 		t;
@@ -183,13 +229,24 @@ function game_master(d){
 
 
 }
+
+/**
+* Creates a cookie for selected room, when a room is selected.
+*
+* @method selected_game
+* @param {Integer} id Room id
+*/
 function selected_game(id){
 	console.log("Creating cookie for chosen game: "+id);
 	create_cookie("game_id", id, 1);
 }
 
 
-
+/**
+* Translates the page to the selected language.
+*
+* @method translate_page
+*/
 function translate_page(){
 	$("#play-btn").html(speak("play"));
 	$("#expert-btn").html(speak("expert-interface"));

@@ -1,3 +1,12 @@
+
+/**
+* Creates a cookie, which can be retrieved with the read_cookie function.
+*
+* @method create_cookie
+* @param {String} name Cookie name/key
+* @param {Object} value The value to be stored
+* @param {Integer} days Number of days to store cookie
+*/
 function create_cookie(name,value,days) {
 	if (days) {
 		var date = new Date();
@@ -8,6 +17,12 @@ function create_cookie(name,value,days) {
 	document.cookie = name+"="+value+expires+"; path=/";
 }
 
+/**
+* Reads an existing cookie. Returns null if no cookie is found.
+*
+* @method read_cookie
+* @param {String} name Cookie name/key
+*/
 function read_cookie(name) {
 	var nameEQ = name + "=";
 	var ca = document.cookie.split(';');
@@ -19,6 +34,12 @@ function read_cookie(name) {
 	return null;
 }
 
+/**
+* Destroys a cookie.
+*
+* @method erase_cookie
+* @param {String} name Cookie name/key
+*/
 function erase_cookie(name) {
 	createCookie(name,"",-1);
 }
