@@ -747,7 +747,7 @@ function effect(card, g) {
 
 
 /**
-* @class none
+* @class Utility
 */
 
 /**
