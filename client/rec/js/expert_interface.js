@@ -373,7 +373,21 @@ gco.export_to_database = function(){ // exports the info held by the gco to the 
 		
 	};
 	
-	
+	if(gco.nodes.length == 0){
+		console.log("no nodes added");
+		window.alert("There are no nodes added to the template, finish the map before trying to export to database");
+		return;
+	}
+	if(gco.zones.length == 0){
+		console.log("no zones added");
+		window.alert("There are no zones added to the template, finish the map before trying to export to database");
+		return;
+	}
+	if(gco.players.length == 0){
+		console.log("no players added");
+		window.alert("There are no players added to the template, add some players before trying to export to database");
+		return;
+	}
 	gco.remove_unused_nodes();
 	
 	for(var i = 0; i < gco.nodes.length; i++){
@@ -456,21 +470,8 @@ gco.export_to_database = function(){ // exports the info held by the gco to the 
 	game_template.info_cards = gco.info_cards.slice(0);
 	game_template.events = gco.events.slice(0);
 	
-	if(gco.nodes.length == 0){
-		console.log("no nodes added");
-		window.alert("There are no nodes added to the template, finish the map before trying to export to database");
-		return;
-	}
-	if(gco.zones.length == 0){
-		console.log("no zones added");
-		window.alert("There are no zones added to the template, finish the map before trying to export to database");
-		return;
-	}
-	if(gco.players.length == 0){
-		console.log("no players added");
-		window.alert("There are no players added to the template, add some players before trying to export to database");
-		return;
-	}
+
+
 	if(gco.info_cards.length == 0){
 		console.log("no info cards added");
 		window.alert("There are no info cards added, add some info cards before trying to export to database");
@@ -673,7 +674,7 @@ Draws a line between connected nodes to prove that there is a connection between
 **/
 gco.draw_connections = function(ctx){ // draw the connections between the nodes
 	var nodes = gco.nodes;
-	ctx.strokeStyle = '#202020';
+	ctx.strokeStyle = '#000000';
 	ctx.lineWidth = 5;
 	
 	for(var i = 0; i < nodes.length; i++){
@@ -699,7 +700,7 @@ Draws the background of the canvas
 	The canvas context
 **/
 gco.background_draw = function(ctx){ // draws the background
-    ctx.fillStyle="grey";
+    ctx.fillStyle="rgb(12,26,45)";
     ctx.fillRect(0,0, c_width, c_height);
 }
 /**
@@ -1001,7 +1002,7 @@ gco.add_player = function(){ // creates a player and adds it to the game.
 	var player_role = document.getElementById("player_role").value;
 	
 	
-	console.log("role" + player_role);
+	console.log("role " + player_role);
 	
 	var player_node = document.getElementById("player_node").value;
 	
@@ -1114,9 +1115,11 @@ Saves the selected node to use in the create_connection function
 @method node_connection
 **/
 gco.node_connection = function(){ // saves the selected node fot connection purposes
-
-	gco.connection = gco.selected_node; 
-	gco.draw();
+	
+	if(gco.selected_node != -1){
+		gco.connection = gco.selected_node; 
+		gco.draw();
+	}
 	
 }
 
@@ -1288,6 +1291,7 @@ Connection check tryes to check if it possible to walk through all the zones
 	True if all zones are connected, false otherwise
 **/
 gco.zone_connection_check = function(){
+
 	var returnvalue = false;
 	var connected_zones = [];
 	var connected_zones2 = [];
@@ -1454,11 +1458,12 @@ gco.event_add_effect = function(){ // adds an effect to the event, see info_card
 	if(edomain == "zone") {
 		if(etype == "panic"){
 		
-			if(isNaN(epanic)){
+			if(isNaN(epanic) || (epanic == "")){
 				
 				console.log("panic is NaN");
 				return;
 			}
+			
 			
 		
 		}
@@ -1470,7 +1475,7 @@ gco.event_add_effect = function(){ // adds an effect to the event, see info_card
 	else if (edomain == "player") {
 		if(etype == "actions"){
 		
-			if(isNaN(eaffects)){
+			if(isNaN(eaffects) || eaffects == ""){
 				
 				
 				console.log("affects is NaN");
@@ -1578,7 +1583,7 @@ gco.card_create_add_effect = function() { // creates an effect and adds it to a 
 	if(edomain == "zone") {
 		if(etype == "panic"){
 		
-			if(isNaN(epanic)){
+			if(isNaN(epanic) || epanic == ""){
 				
 				console.log("panic is NaN");
 				return;
@@ -1593,7 +1598,7 @@ gco.card_create_add_effect = function() { // creates an effect and adds it to a 
 	else if (edomain == "player") {
 		if(etype == "actions"){
 		
-			if(isNaN(eaffects)){
+			if(isNaN(eaffects) || eaffects == ""){
 				
 				
 				console.log("affects is NaN");
