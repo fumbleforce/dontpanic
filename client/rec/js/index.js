@@ -105,7 +105,7 @@ function replay(){
         }
     });
 }
-v
+
 function replays(d){
 	var cont = "",
 		t;
