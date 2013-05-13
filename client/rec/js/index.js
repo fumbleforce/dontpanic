@@ -18,7 +18,7 @@ function play(){
             console.log(data);
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            alert('error ' + textStatus + " " + errorThrown);
+            alert('(If you are outside the NTNU network, the database connection is stopped by the IDI firewall. By using VPN to access the NTNU network this will be fixed) error ' + textStatus + " " + errorThrown);
         }
     });
 
@@ -101,7 +101,7 @@ function replay(){
             console.log(data);
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            alert('error ' + textStatus + " " + errorThrown);
+            alert('(If you are outside the NTNU network, the database connection is stopped by the IDI firewall. By using VPN to access the NTNU network this will be fixed) error ' + textStatus + " " + errorThrown);
         }
     });
 }
