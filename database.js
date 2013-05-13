@@ -43,7 +43,7 @@ var connection = mysql.createConnection({
 
 connection.connect(function(err) { 
 	if (err) {
-		console.log('ERROR: ' + err);
+		console.log('(If you are outside the NTNU network, the database connection is stopped by the IDI firewall. By using VPN to access the NTNU network this will be fixed) ERROR: ' + err);
 	}
 });
 
