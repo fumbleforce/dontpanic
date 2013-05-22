@@ -62,11 +62,11 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
 		var tplayer = template.players[i]
 		player = new ge.Player(tplayer.id, tplayer.user, tplayer.node , tplayer.color, tplayer.role, tplayer.actions_left);
 
-		player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
+		player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length)))]);
     	
     	//First player gets one extra card
 		if(i === 0){
-			player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
+			player.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length)))]);
 		}
     	this.players.push(player);
     }
@@ -364,7 +364,7 @@ ge.prototype.command = function(client, c){
             //TODO Add random info cards
 			this.emit('msg', "Cards left: "+this.cards_left);
 			if(this.cards_left > 0){
-				ap.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length-1)))]);
+				ap.info_cards.push(this.info_cards[Math.floor((Math.random()*(this.info_cards.length)))]);
 				this.cards_left -= 1;
 			}
 
