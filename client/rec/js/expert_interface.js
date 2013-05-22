@@ -2146,7 +2146,7 @@ gco.cut_to_size = function(string, maxwidth){ // function to cut down string to 
 /**
 Toggle hotkeys sets the boolean gco.hotkeys to either true or false depending on its previous value and then changes the text on 
 the buttons so it either hides the hotkeybuttons or no.
-@mehtod toggle_hotkeys
+@method toggle_hotkeys
 **/
 gco.toggle_hotkeys = function(){ // toggle hotkeys on or off
 	if(gco.hotkeys){
