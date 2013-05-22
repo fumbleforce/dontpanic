@@ -121,14 +121,6 @@ var gco = {
 gco.ctx = gco.canvas.getContext("2d");
 
 
-/*  Initialize Game
-
-    Initializes the game by populating the Game Client Object,
-    adding listeners to the objects and starting the timer.
-    
-
-*/
-
 /**
 method that initiates the game canvas, and creates some default events and information cards
 
