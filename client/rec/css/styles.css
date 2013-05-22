@@ -89,9 +89,21 @@ p
     width:730px;
     height: 100px;
     right:0px;
-    margin-bottom:30px;
+
     padding:10px;
-    border-radius:30px;
+	margin:20px;
+}
+.expert-color-text
+{
+	color:white;
+}
+.expert-top-text
+{
+	float:left;
+    color:white;
+    font-size:35px;
+    margin:15px;
+
 }
 #selection
 {
@@ -175,7 +187,7 @@ background-image: -webkit-gradient(
 }
 .info-label-form
 {
-	color:black;
+	color:white;
 	font-size:15px;
 }
 #turn-label

@@ -79,19 +79,21 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
 	this.active_player = 0;
 	this.turn = 0;
 	this.time_step = 20;
-	this.timer_dur = 20;
+	//this.timer_dur = 20;
     this.information_centers = 0;
     this.road_blocks = 0;
     this.max_information_centers = 5;
     this.max_road_blocks = 10;
 	this.cards_left = 10;
-	this.eventTurns = 3;
+	//this.eventTurns = 3;
 	this.turnsSinceEvent = 0;
 	this.eventblocked = false;
 	this.started=false;
 	this.ended=false;
 	this.used_info_card = false;
-
+	
+	this.timer_dur = template.timestep || 20;
+	this.eventTurns = template.eventstep || 3;
 	//Local
 	var SCALE= 90;
 	var PADD = 50;

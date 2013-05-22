@@ -18,18 +18,6 @@ var c_height = 1550,
     offset_distance = node_size*1,
     panic_info_size = 40,
     w_inc = 0,
-	    
-    //replay holder
-    game_states = [],
-    //actions counter
-    actions = 0;var c_height = 1550,
-    c_width = 1500,
-    node_size = 50,
-    player_size = 20,
-    info_center_size = 35,
-    offset_distance = node_size*1,
-    panic_info_size = 40,
-    w_inc = 0,
     
     //replay holder
     game_states = [],
@@ -64,14 +52,14 @@ var c_height = 1550,
 	var passer_by_img = new Image();
 	passer_by_img.src = "/img/passer_by.png";
 	
-	var role_desc = {
+	/*var role_desc = {
 	    'coordinator':'info',
 	    'passer by':'info',
 	    'crowd manager':'info',
 	    'operation expert':'info',
 	    'driver':'info',
 
-	}
+	}*/
 //set offsets for player, to give each player a specific position on nodes	
 var player_offsetX = [0, 
                       Math.cos(315*(Math.PI/180))*offset_distance,
@@ -162,12 +150,12 @@ gco.construct_player_divs = function(players){
 		lim2 = 0;
 	}
 	for(i = 0; i<lim1; i++){
-		inner += "<div id='p"+i+"' class='sidebar-player'><h2>Player "+i+"</h2><br><div class='player-info'><p>"+ players[i].role +"</p><div id='"+i+"_text' class='role-info-label'>"+ role_desc[players[i].role] +"</div></div><div id='"+i+"_cards' class='card-container'></div></div>";
+		inner += "<div id='p"+i+"' class='sidebar-player'><h2>"+speak("player")+i+"</h2><br><div class='player-info'><p>"+ speak("role_name")[players[i].role] +"</p><div id='"+i+"_text' class='role-info-label'>"+ speak("role_desc")[players[i].role] +"</div></div><div id='"+i+"_cards' class='card-container'></div></div>";
 	}
 	$l.html(inner);
 	inner = '';
 	for(i=lim1; i<lim2; i++){
-		inner += "<div id='p"+i+"' class='sidebar-player'><h2>Player "+i+"</h2><br><div class='player-info'><p>"+ players[i].role +"</p><div id='"+i+"_text' class='role-info-label'>"+ role_desc[players[i].role] +"</div></div><div id='"+i+"_cards' class='card-container'></div></div>";
+		inner += "<div id='p"+i+"' class='sidebar-player'><h2>"+speak("player")+i+"</h2><br><div class='player-info'><p>"+ speak("role_name")[players[i].role] +"</p><div id='"+i+"_text' class='role-info-label'>"+ speak("role_desc")[players[i].role] +"</div></div><div id='"+i+"_cards' class='card-container'></div></div>";
 	}
 	$r.html(inner);
 }
@@ -828,4 +816,14 @@ function previous_action () {
 	else {
 		alert("No previous actions are available");
 	}
+}
+
+/**
+* Translates labels
+* 
+* @method translate_page
+**/
+var translate_page = function(){
+	$("#end-game-label").html(speak("end-game-label"));
+	$("footer").html(speak("footer"));
 }

@@ -43,7 +43,7 @@ var connection = mysql.createConnection({
 
 connection.connect(function(err) { 
 	if (err) {
-		console.log('ERROR: ' + err);
+		console.log('Database error: ' + err);
 	}
 });
 
