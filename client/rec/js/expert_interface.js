@@ -367,8 +367,8 @@ gco.export_to_database = function(){ // exports the info held by the gco to the 
 		events : [],
 		author : document.getElementById("template_author").value,
 		desc : document.getElementById("template_desc").value,
-		timestep : document.getElementById("template_timestep").value,
-		eventstep : document.getElementById("template_event_step").value
+		timestep : parseInt(document.getElementById("template_timestep").value),
+		eventstep : parseInt(document.getElementById("template_event_step").value)
 		
 		
 	};
@@ -1097,8 +1097,8 @@ gco.edit_zone = function(){ //edits the selected zone, might need more errorchec
 	var zone = gco.zones[gco.selected_zone];
 	console.log("editing zone");
 	zone.type = document.getElementById("edit_zone_type").value;
-	newpeople = document.getElementById("zone_people").value;
-	newpanic_level = document.getElementById("zone_panic").value;
+	newpeople = parseInt(document.getElementById("zone_people").value);
+	newpanic_level = parseInt(document.getElementById("zone_panic").value);
 	if(isNaN(newpeople) || isNaN(newpanic_level)){
 		console.log("either people or panic level was NaN");
 		return;
@@ -1457,6 +1457,7 @@ gco.event_add_effect = function(){ // adds an effect to the event, see info_card
 	
 	if(edomain == "zone") {
 		if(etype == "panic"){
+			epanic = parseInt(epanic);
 		
 			if(isNaN(epanic) || (epanic == "")){
 				
@@ -1474,6 +1475,8 @@ gco.event_add_effect = function(){ // adds an effect to the event, see info_card
 	}
 	else if (edomain == "player") {
 		if(etype == "actions"){
+		
+			eaffects = parseInt(eaffects);
 		
 			if(isNaN(eaffects) || eaffects == ""){
 				
@@ -1582,6 +1585,7 @@ gco.card_create_add_effect = function() { // creates an effect and adds it to a 
 	}
 	if(edomain == "zone") {
 		if(etype == "panic"){
+			epanic = parseInt(epanic);
 		
 			if(isNaN(epanic) || epanic == ""){
 				
@@ -1597,6 +1601,7 @@ gco.card_create_add_effect = function() { // creates an effect and adds it to a 
 	}
 	else if (edomain == "player") {
 		if(etype == "actions"){
+			eaffects = parseInt(eaffects);
 		
 			if(isNaN(eaffects) || eaffects == ""){
 				
