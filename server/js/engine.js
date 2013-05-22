@@ -80,6 +80,7 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
 	this.turn = 0;
 	this.time_step = 20;
 	//this.timer_dur = 20;
+	this.timer_active=false;
     this.information_centers = 0;
     this.road_blocks = 0;
     this.max_information_centers = 5;
@@ -92,8 +93,8 @@ var ge = module.exports = function (id, client, template,template_id, id_replay)
 	this.ended=false;
 	this.used_info_card = false;
 	
-	this.timer_dur = template.timestep || 20;
-	this.eventTurns = template.eventstep || 3;
+	this.timer_dur = parseInt(template.timestep) || 20;
+	this.eventTurns = parseInt(template.eventstep) || 3;
 	//Local
 	var SCALE= 90;
 	var PADD = 50;
@@ -131,6 +132,11 @@ ge.prototype.command = function(client, c){
     
 
     switch (c.type) {
+    
+        case 'new_timer':
+            this.stop_timer();
+            this.start_timer();
+            
         case 'move_player':
             if (c.player_id === this.active_player) {
                 var p = players[c.player_id];
@@ -305,8 +311,6 @@ ge.prototype.command = function(client, c){
 	        	if (!zones[i].is_panic_zero()){
 
 	        		if (zones[i].people<=10){
-
-					
 						
 	        			zones[i].update_panic(this,10);
 					}
@@ -324,8 +328,8 @@ ge.prototype.command = function(client, c){
 	        }
 
 
-	        this.timer_dur += this.time_step;
-	        this.start_timer();
+	        
+	        
 
 	        for (var i = 0; i < zones.length;i++) {
 	        	//if zones has 50 panic, spread to adjacent zones
@@ -396,7 +400,10 @@ ge.prototype.command = function(client, c){
     //Check for lose
     changed.lose = this.check_lose();
     
-    if(changed.lose || changed.win) this.ended = true;
+    if(changed.lose || changed.win){
+        this.ended = true;
+        this.stop_timer;
+    } 
     
     if(changed.players || changed.nodes || changed.zones || changed.turn || changed.event || changed.win || changed.lose){
         changed.none = false;
@@ -530,22 +537,34 @@ ge.prototype.has_client = function(clientid){
 *
 * @method start_timer
 */
-ge.prototype.start_timer = function() {	
-	var that = this;
-    that.timer = that.timer_dur;
-    
+ge.prototype.start_timer = function() {
+
+    this.timer_active = true;
+    var that = this;
+    that.timer = parseInt(that.timer_dur);
+    console.log("Starting timer");
+    console.log("Duration: "+that.timer_dur);
+    console.log("Timestep: "+that.time_step);
     if(!this.ended){
-    var inter = setInterval(function(){
-        
-        that.timer--;
-        if (that.timer === -1) {
-            that.command("", {type:'inc_panic'});
-            clearInterval(inter);
-        }
-        
-        that.emit('change', JSON.stringify({timer:that.timer}));
-    }, 1000);
+        that.inter = setInterval(function(){
+            
+            that.timer--;
+            if (that.timer < 0) {
+                console.log("Timer reached 0");
+                that.command("", {type:'inc_panic'});
+                console.log("Dur before: "+that.timer_dur);
+                console.log("timestep:"+that.time_step);
+                that.timer_dur += parseInt(that.time_step);
+                console.log("Dur after: "+that.timer_dur);
+                that.command("", {type:"new_timer"});
+                clearInterval(this);
+            }
+            
+            that.emit('change', JSON.stringify({timer:that.timer}));
+        }, 1000);
     }
+    
+    
 }
 
 /**
@@ -554,7 +573,15 @@ ge.prototype.start_timer = function() {
 * @method stop_timer
 */
 ge.prototype.stop_timer = function(){
-	clearInterval(this.inter);
+	if(this.timer_active){
+	    console.log("Stopping active timer");
+	    clearInterval(this.inter);
+	    this.timer_active=false;
+	    
+	}
+	else{
+	    console.log("Cannot stop timer when timer is already stopped!");
+	}
 
 }
 
