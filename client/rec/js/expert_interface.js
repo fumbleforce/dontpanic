@@ -293,7 +293,7 @@ gco.init_game = function () {
 	gco.info_cards.push(
 		{
 	    name:"Calm financial",
-	    desc:"Calm financial23 districts",
+	    desc:"Calm financial districts by 5",
 	    effects: [{
 	        name:"financ calm",
 	        domain:'zone',
@@ -305,7 +305,7 @@ gco.init_game = function () {
    gco.info_cards.push(
 		{
         name:"Calm industry",
-        desc:"Calm industry2 districts",
+        desc:"Calm industry districts by 5",
         effects: [{
             name:"indus calm",
             domain:'zone',
@@ -316,7 +316,7 @@ gco.init_game = function () {
         });
     gco.info_cards.push({
 		name:"Calm residental",
-		desc:"Calm residental11 districts",
+		desc:"Calm residental districts by 5",
 		effects: [{
             name:"resid calm",
             domain:'zone',
